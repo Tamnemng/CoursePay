@@ -1,38 +1,50 @@
-.App {
+.Web {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.Web-header {
+  background-image: url('C:\Users\nguyn\Downloads\website\sptphcm1-16901105564401079438420.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.Logging {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  backdrop-filter: blur(20px);
+  border: 2px solid #ffffff;
+  border-radius: 10px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.input-field {
+  margin-bottom: 10px;
+  width: 300px;
+}
+
+.Logging-radio {
+  margin-top: 20px;
+}
+
+.radio_style {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.radio-button {
+  color: white;
+}
+
+.Web-link {
+  color: #61dafb;
+  
 }
