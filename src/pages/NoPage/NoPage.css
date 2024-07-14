@@ -1,0 +1,26 @@
+.no-page-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+}
+
+.no-page {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: red;
+    color: white;
+    text-align: center;
+}
+
+.no-title {
+    font-size: 2em;
+    margin-bottom: 1em;
+}
+
+.no-message {
+    font-size: 1.2em;
+}
+
