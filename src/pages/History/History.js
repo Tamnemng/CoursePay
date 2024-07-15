@@ -4,6 +4,9 @@ import { Table, DatePicker } from 'antd';
 import moment from 'moment';
 import './History.css';
 
+//thông tin sinh viên trước mắt sẽ bao gồm các ý dưới
+// tên, mssv, các khoản phí[khoảng phí, mã hóa đơn,....], chuyên ngành,...
+//thêm api gọi thông tin sinh viên
 const studentInfo = {
     id: "48.01.104.128",
     name: "Nguyễn Phúc Thịnh",

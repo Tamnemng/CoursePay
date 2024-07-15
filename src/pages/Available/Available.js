@@ -6,6 +6,7 @@ import './Available.css';
 
 const { TabPane } = Tabs;
 
+//THịnh thêm api gọi các tên môn học vô đây
 const availableCoursesInfo = {
     general: [
         { id: 1, name: "General Course 1", courseCredits: 2, timeStart: '2024-08-10', timeEnd: '2024-11-10', maxStudents: 50, currentStudents: 30 },
