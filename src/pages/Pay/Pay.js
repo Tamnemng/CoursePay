@@ -13,14 +13,16 @@ export default function Pay() {
     const [selectedFees, setSelectedFees] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
 
+    //Call API o day de lay thong tin cua sinh vien
     const studentInfo = {
-        id: "SV001",
-        name: "Nguyễn Văn A",
+        id: "48.01.104.128",
+        name: "Nguyễn Phúc Thịnh",
         major: "Công nghệ thông tin",
         fees: [
             { id: 1, name: "Học phí học kỳ", amount: 10000000, paid: false, paymentDate: null },
             { id: 2, name: "Bảo hiểm y tế", amount: 500000, paid: true, paymentDate: "2024-07-15" },
             { id: 3, name: "Phí ký túc xá", amount: 2000000, paid: false, paymentDate: null },
+            { id: 4, name: "Phí ăn uống", amount: 300000, paid: true, paymentDate: '2024-07-16' },
         ],
     };
 
@@ -38,7 +40,7 @@ export default function Pay() {
     const onFinish = (values) => {
         setLoading(true);
         console.log('Payment submitted:', { ...values, selectedFees });
-
+        //xuat api o day de tra ve cac khoang phi da tra   
         setTimeout(() => {
             setLoading(false);
             message.success('Thanh toán học phí thành công!');
