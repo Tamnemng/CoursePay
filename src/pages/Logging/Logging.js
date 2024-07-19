@@ -37,7 +37,7 @@ export default function Logging() {
                 <div className='Logging'>
                     <Input placeholder='input username' className='input-field' required value={username} onChange={(e) => setUsername(e.target.value)} />
                     <Input.Password placeholder="input password" className='input-field' required value={password} onChange={(e) => setPassword(e.target.value)} />
-                    <Button type="primary" onClick={checking} className='input-field'>
+                    <Button type="primary" onClick={checking} className='input-button'>
                         Logging
                     </Button>
                     <Radio.Group onChange={onChange} value={value}>

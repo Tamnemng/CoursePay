@@ -125,7 +125,7 @@ export default function Header() {
         navigate('/courses/register/general');
         break;
       case 'specialized-courses':
-        navigate('/courses/register/major');
+        navigate('/courses/register/specialized');
         break;
       case 'improve-courses':
         navigate('/courses/register/improve');
