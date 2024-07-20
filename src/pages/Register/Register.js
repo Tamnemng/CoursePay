@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import './Register.css';
-import { FloatButton, Table } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Table } from 'antd';
 
 const columns = [
     {
@@ -29,6 +28,10 @@ const columns = [
     {
         title: 'Ngày Kết Thúc',
         dataIndex: 'ended_day',
+    },
+    {
+        title: 'Action',
+        render: () => <a>Đăng Ký Lớp Học</a>,
     },
 ];
 const data = [
@@ -70,16 +73,6 @@ const data = [
     }
 ];
 
-const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    },
-    //if class size is equal to 50 the class will be disabled for register
-    getCheckboxProps: (record) => ({
-        disabled: record.class_size === 50,
-        name: record.name,
-    }),
-};
 
 export default function Register() {
     const [selectionType, setSelectionType] = useState('checkbox');
@@ -98,10 +91,6 @@ export default function Register() {
                 </h1>
                 <div className='table-container'>
                     <Table className='displayer'
-                        rowSelection={{
-                            type: selectionType,
-                            ...rowSelection,
-                        }}
                         columns={columns}
                         dataSource={data}
                     />
