@@ -1,16 +1,68 @@
-.improve-container {
+.register-container {
     display: flex;
     flex-direction: row;
     height: 100vh;
 }
 
-.improve {
+.register {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     background-color: rgb(255, 255, 255);
     color: rgb(0, 0, 0);
     text-align: center;
+    width: 100%;
+    padding: 20px;
+}
+
+.register-title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.table-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.course-table, .class-table {
+    width: 100%;
+}
+
+.class-list-modal {
+    top: 20px;
+}
+
+.class-list-modal .ant-modal-content {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.class-list-modal .ant-modal-body {
+    padding: 24px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.class-table {
+    width: 100%;
+}
+
+.modal-title {
+    text-align: center;
+}
+
+.modal-cancel-btn, .modal-confirm-btn {
+    min-width: 80px;
+}
+
+.register-link, .register-class-link {
+    color: #1890ff;
+    cursor: pointer;
+}
+
+.register-link:hover, .register-class-link:hover {
+    text-decoration: underline;
 }

@@ -3,45 +3,51 @@ import Header from '../../components/Header';
 import './Pay.css';
 import { Form, Input, InputNumber, Button, Select, message, Typography, Checkbox, Space, Tag } from 'antd';
 import { CreditCardOutlined } from '@ant-design/icons';
-
+import { studentInfo } from '../../data/studentData';
 const { Option } = Select;
 const { Text, Title } = Typography;
+
+
+
 
 export default function Pay() {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [selectedFees, setSelectedFees] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
+    const [studentData, setStudentData] = useState(studentInfo);
 
-    //Call API o day de lay thong tin cua sinh vien
-    const studentInfo = {
-        id: "48.01.104.128",
-        name: "Nguyễn Phúc Thịnh",
-        major: "Công nghệ thông tin",
-        fees: [
-            { id: 1, name: "Học phí học kỳ", amount: 10000000, paid: false, paymentDate: null },
-            { id: 2, name: "Bảo hiểm y tế", amount: 500000, paid: true, paymentDate: "2024-07-15" },
-            { id: 3, name: "Phí ký túc xá", amount: 2000000, paid: false, paymentDate: null },
-            { id: 4, name: "Phí ăn uống", amount: 300000, paid: true, paymentDate: '2024-07-16' },
-        ],
-    };
-
-    const unpaidFees = studentInfo.fees.filter(fee => !fee.paid);
+    const unpaidFees = studentData.fees.filter(fee => !fee.paid);
 
     useEffect(() => {
         const newTotal = selectedFees.reduce((sum, feeId) => {
-            const fee = studentInfo.fees.find(f => f.id === feeId);
+            const fee = studentData.fees.find(f => f.id === feeId);
             return sum + (fee && !fee.paid ? fee.amount : 0);
         }, 0);
         setTotalAmount(newTotal);
         form.setFieldsValue({ amount: newTotal });
-    }, [selectedFees, form]);
+    }, [selectedFees, form, studentData.fees]);
 
     const onFinish = (values) => {
         setLoading(true);
         console.log('Payment submitted:', { ...values, selectedFees });
-        //xuat api o day de tra ve cac khoang phi da tra   
+        
+        // Goi Api ra o day de chinh sua thong tin hoc phi sinh vien
         setTimeout(() => {
+            // Update payment cho sinh vien
+            const updatedFees = studentData.fees.map(fee => {
+                if (selectedFees.includes(fee.id)) {
+                    return { ...fee, paid: true, paymentDate: new Date().toISOString().split('T')[0] };
+                }
+                return fee;
+            });
+
+            // Update
+            setStudentData(prevData => ({
+                ...prevData,
+                fees: updatedFees
+            }));
+
             setLoading(false);
             message.success('Thanh toán học phí thành công!');
             form.resetFields();
@@ -61,9 +67,9 @@ export default function Pay() {
                     <div className='student-informations'>
                         <Title level={2}>Thông Tin Sinh Viên</Title>
                         <Text>
-                            <pre>ID: {studentInfo.id}</pre>
-                            <pre>Họ và tên: {studentInfo.name}</pre>
-                            <pre>Ngành học: {studentInfo.major}</pre>
+                            <pre>ID: {studentData.id}</pre>
+                            <pre>Họ và tên: {studentData.name}</pre>
+                            <pre>Ngành học: {studentData.major}</pre>
                         </Text>
                         <div className='warning'>
                             Yêu cầu sinh viên kiểm tra thông tin thật kỹ trước khi đóng tiền học.
@@ -77,39 +83,6 @@ export default function Pay() {
                             onFinish={onFinish}
                             layout="vertical"
                         >
-                            <Form.Item
-                                name="amount"
-                                label="Tổng số tiền thanh toán"
-                            >
-                                <InputNumber
-                                    style={{ width: '100%' }}
-                                    formatter={value => `₫ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                    parser={value => value.replace(/₫\s?|(,*)/g, '')}
-                                    value={totalAmount}
-                                    disabled
-                                />
-                            </Form.Item>
-
-                            <Form.Item
-                                name="paymentMethod"
-                                label="Phương thức thanh toán"
-                                rules={[{ required: true, message: 'Vui lòng chọn phương thức thanh toán!' }]}
-                            >
-                                <Select placeholder="Chọn phương thức thanh toán">
-                                    <Option value="credit_card">Thẻ tín dụng</Option>
-                                    <Option value="bank_transfer">Chuyển khoản ngân hàng</Option>
-                                    <Option value="momo">MoMo</Option>
-                                </Select>
-                            </Form.Item>
-
-                            <Form.Item
-                                name="cardNumber"
-                                label="Số thẻ"
-                                rules={[{ required: true, message: 'Vui lòng nhập số thẻ!' }]}
-                            >
-                                <Input prefix={<CreditCardOutlined />} placeholder="Nhập số thẻ" />
-                            </Form.Item>
-
                             <Form.Item>
                                 <Button type="primary" htmlType="submit" loading={loading} block disabled={selectedFees.length === 0}>
                                     Xác nhận thanh toán
@@ -139,5 +112,5 @@ export default function Pay() {
                 </div>
             </div>
         </div>
-    )
-};
+    );
+}

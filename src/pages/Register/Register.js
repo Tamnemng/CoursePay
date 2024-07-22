@@ -1,101 +1,123 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Table, Modal, Button, message } from 'antd';
 import Header from '../../components/Header';
+import { coursesData } from '../../data/coursesData';
 import './Register.css';
-import { Table } from 'antd';
 
-const columns = [
+const columns = (handleRegisterClick) => [
     {
         title: 'Tên Học Phần',
         dataIndex: 'name',
+        className: 'course-name-column',
     },
     {
         title: 'Mã Học Phần',
         dataIndex: 'id',
-    },
-    {
-        title: 'Sỉ Số',
-        dataIndex: 'class_size',
-    },
-    {
-        title: 'Tên Giáo Viên',
-        dataIndex: 'lecturers',
-    },
-    {
-        title: 'Ngày Bắt Đầu',
-        dataIndex: 'started_day',
-    },
-    {
-        title: 'Ngày Kết Thúc',
-        dataIndex: 'ended_day',
+        className: 'course-id-column',
     },
     {
         title: 'Action',
-        render: () => <a>Đăng Ký Lớp Học</a>,
+        render: (text, record) => (
+            <a onClick={() => handleRegisterClick(record)} className="register-link">Đăng Ký Lớp Học</a>
+        ),
+        className: 'action-column',
     },
 ];
-const data = [
-    {
-        key: '2',
-        name: 'Môn 2',
-        id: 'mon2',
-        class_size: 35,
-        lecturers: 'tran thi B',
-        started_day: '02/01/2024',
-        ended_day: '02/06/2024',
-    },
-    {
-        key: '3',
-        name: 'Môn 3',
-        id: 'mon3',
-        class_size: 30,
-        lecturers: 'le van C',
-        started_day: '03/01/2024',
-        ended_day: '03/06/2024',
-    },
-    {
-        key: '4',
-        name: 'Môn 4',
-        id: 'mon4',
-        class_size: 25,
-        lecturers: 'pham thi D',
-        started_day: '04/01/2024',
-        ended_day: '04/06/2024',
-    },
-    {
-        key: '5',
-        name: 'Môn 5',
-        id: 'mon5',
-        class_size: 40,
-        lecturers: 'nguyen van E',
-        started_day: '05/01/2024',
-        ended_day: '05/06/2024',
-    }
-];
-
 
 export default function Register() {
-    const [selectionType, setSelectionType] = useState('checkbox');
+    const [selectedCourse, setSelectedCourse] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
+    const [selectedClass, setSelectedClass] = useState(null);
     const navigate = useNavigate();
 
-    const handleButtonClick = () => {
-        navigate('/new-page'); // Replace with your desired route
+    const handleRegisterClick = (course) => {
+        setSelectedCourse(course);
+        setIsModalVisible(true);
     };
+
+    const handleOk = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleClassRegister = (classInfo) => {
+        setSelectedClass(classInfo);
+        setIsConfirmModalVisible(true);
+    };
+
+    const handleConfirmRegister = () => {
+        message.success('Đăng ký thành công!');
+        setIsConfirmModalVisible(false);
+        setIsModalVisible(false);
+    };
+
+    const handleCancelRegister = () => {
+        setIsConfirmModalVisible(false);
+    };
+
+    const classColumns = [
+        { title: 'Tên Lớp', dataIndex: 'name', className: 'class-name-column' },
+        { title: 'Sĩ Số', dataIndex: 'class_size', className: 'class-size-column' },
+        { title: 'Giảng Viên', dataIndex: 'lecturers', className: 'lecturer-column' },
+        { title: 'Ngày Bắt Đầu', dataIndex: 'started_day', className: 'start-date-column' },
+        { title: 'Ngày Kết Thúc', dataIndex: 'ended_day', className: 'end-date-column' },
+        { 
+            title: 'Action', 
+            render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
+            className: 'action-column'
+        },
+    ];
 
     return (
         <div className='register-container'>
             <Header />
             <div className='register'>
-                <h1>
-                    Đăng ký môn chung
-                </h1>
+                <h1 className='register-title'>Đăng ký môn chung</h1>
                 <div className='table-container'>
-                    <Table className='displayer'
-                        columns={columns}
-                        dataSource={data}
+                    <Table
+                        className='course-table'
+                        columns={columns(handleRegisterClick)}
+                        dataSource={coursesData}
                     />
                 </div>
+                <Modal
+                    title={<h2 className="modal-title">Danh sách lớp học - {selectedCourse?.name}</h2>}
+                    visible={isModalVisible}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    className="class-list-modal"
+                    width="80%"
+                    footer={[
+                        <Button key="back" onClick={handleCancel} className="modal-cancel-btn">
+                            Đóng
+                        </Button>
+                    ]}
+                >
+                    {selectedCourse && (
+                        <Table
+                            className='class-table'
+                            columns={classColumns}
+                            dataSource={selectedCourse.classes}
+                            scroll={{ y: 400 }}
+                            rowClassName={(record) => record.class_size >= 50 ? 'full-class-row' : ''}
+                        />
+                    )}
+                </Modal>
+                <Modal
+                    title="Xác nhận đăng ký"
+                    visible={isConfirmModalVisible}
+                    onOk={handleConfirmRegister}
+                    onCancel={handleCancelRegister}
+                    className="confirm-modal"
+                >
+                    <p>Bạn có chắc chắn muốn đăng ký lớp {selectedClass?.name} của môn {selectedCourse?.name}?</p>
+                </Modal>
             </div>
         </div>
-    )
+    );
 }
