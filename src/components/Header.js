@@ -67,6 +67,10 @@ const items = [
     label: 'Thông Tin Liên lạc',
     icon: <ApartmentOutlined />,
   },
+  {
+    key: 'logout',
+    label: "Đăng Xuất",
+  }
 ];
 
 const getLevelKeys = (items1) => {
@@ -135,6 +139,10 @@ export default function Header() {
         break;
       case 'contact':
         navigate('/contact');
+        break;
+      case 'logout':
+        localStorage.setItem('isAuthenticated', 'false');
+        navigate('');
         break;
       default:
         if (!items.find(item => item.key === key)?.children) {

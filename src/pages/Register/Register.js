@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Modal, Button, message } from 'antd';
 import Header from '../../components/Header';
@@ -30,7 +30,12 @@ export default function Register() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
+    const [data, setData] = useState([]);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        setData(coursesData);
+    }, []);
 
     const handleRegisterClick = (course) => {
         setSelectedCourse(course);
@@ -66,8 +71,8 @@ export default function Register() {
         { title: 'Giảng Viên', dataIndex: 'lecturers', className: 'lecturer-column' },
         { title: 'Ngày Bắt Đầu', dataIndex: 'started_day', className: 'start-date-column' },
         { title: 'Ngày Kết Thúc', dataIndex: 'ended_day', className: 'end-date-column' },
-        { 
-            title: 'Action', 
+        {
+            title: 'Action',
             render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
             className: 'action-column'
         },
@@ -78,11 +83,19 @@ export default function Register() {
             <Header />
             <div className='register'>
                 <h1 className='register-title'>Đăng ký môn chung</h1>
+                <Button onClick={() => {
+                    setData([...data, {
+                        ...data.at(-1),
+                        key: data.length + 1
+                    }]);
+                }}>
+                    {data.map((v) => v.key).join(" ")}
+                </Button>
                 <div className='table-container'>
                     <Table
                         className='course-table'
                         columns={columns(handleRegisterClick)}
-                        dataSource={coursesData}
+                        dataSource={data}
                     />
                 </div>
                 <Modal
