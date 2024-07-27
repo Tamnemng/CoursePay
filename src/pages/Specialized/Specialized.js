@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button, message } from 'antd';
 import Header from '../../components/Header';
 import { coursesData } from '../../data/coursesData';
+import { studentInfo } from '../../data/studentData';
 import './Specialized.css';
 
 const columns = (handleRegisterClick) => [
@@ -30,7 +30,20 @@ export default function Specialized() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
-    const navigate = useNavigate();
+    const [courses, setCourses] = useState([]);
+
+    useEffect(() => {
+        const allCourses = coursesData
+            .filter(semesterData => semesterData.semester === studentInfo.semester && semesterData.major == studentInfo.major)
+            .flatMap(semesterData =>
+                semesterData.courses.map(course => ({
+                    ...course,
+                    semester: semesterData.semester,
+                    major: semesterData.major
+                }))
+            );
+        setCourses(allCourses);
+    }, []);
 
     const handleRegisterClick = (course) => {
         setSelectedCourse(course);
@@ -66,8 +79,8 @@ export default function Specialized() {
         { title: 'Giảng Viên', dataIndex: 'lecturers', className: 'lecturer-column' },
         { title: 'Ngày Bắt Đầu', dataIndex: 'started_day', className: 'start-date-column' },
         { title: 'Ngày Kết Thúc', dataIndex: 'ended_day', className: 'end-date-column' },
-        { 
-            title: 'Action', 
+        {
+            title: 'Action',
             render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
             className: 'action-column'
         },
@@ -78,33 +91,28 @@ export default function Specialized() {
             <Header />
             <div className='register'>
                 <h1 className='register-title'>Đăng ký môn chuyên ngành</h1>
-                <div className='table-container'>
-                    <Table
-                        className='course-table'
-                        columns={columns(handleRegisterClick)}
-                        dataSource={coursesData}
-                    />
-                </div>
+                <Table
+                    columns={columns(handleRegisterClick)}
+                    dataSource={courses}
+                    rowKey="id"
+                />
                 <Modal
                     title={<h2 className="modal-title">Danh sách lớp học - {selectedCourse?.name}</h2>}
                     visible={isModalVisible}
                     onOk={handleOk}
                     onCancel={handleCancel}
-                    className="class-list-modal"
                     width="80%"
                     footer={[
-                        <Button key="back" onClick={handleCancel} className="modal-cancel-btn">
+                        <Button key="back" onClick={handleCancel}>
                             Đóng
                         </Button>
                     ]}
                 >
                     {selectedCourse && (
                         <Table
-                            className='class-table'
                             columns={classColumns}
                             dataSource={selectedCourse.classes}
-                            scroll={{ y: 400 }}
-                            rowClassName={(record) => record.class_size >= 50 ? 'full-class-row' : ''}
+                            rowKey="id"
                         />
                     )}
                 </Modal>
@@ -113,11 +121,10 @@ export default function Specialized() {
                     visible={isConfirmModalVisible}
                     onOk={handleConfirmRegister}
                     onCancel={handleCancelRegister}
-                    className="confirm-modal"
                 >
                     <p>Bạn có chắc chắn muốn đăng ký lớp {selectedClass?.name} của môn {selectedCourse?.name}?</p>
                 </Modal>
             </div>
         </div>
     );
-}
+};

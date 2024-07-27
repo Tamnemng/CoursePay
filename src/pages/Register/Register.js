@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button, message } from 'antd';
 import Header from '../../components/Header';
-import { coursesData } from '../../data/coursesData';
+import { generalCourses } from '../../data/coursesData';
 import { studentInfo } from '../../data/studentData';
 import './Register.css';
 
@@ -33,8 +33,8 @@ export default function Register() {
     const [courses, setCourses] = useState([]);
 
     useEffect(() => {
-        const allCourses = coursesData
-            .filter(semesterData => semesterData.semester === studentInfo.semester && semesterData.major == studentInfo.major)
+        const allCourses = generalCourses
+            .filter(semesterData => semesterData.semester === studentInfo.semester )
             .flatMap(semesterData =>
                 semesterData.courses.map(course => ({
                     ...course,
@@ -90,7 +90,7 @@ export default function Register() {
         <div className='register-container'>
             <Header />
             <div className='register'>
-                <h1 className='register-title'>Đăng ký môn học</h1>
+                <h1 className='register-title'>Đăng ký môn chung</h1>
                 <Table
                     columns={columns(handleRegisterClick)}
                     dataSource={courses}

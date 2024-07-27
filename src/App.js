@@ -8,7 +8,6 @@ import Register from './pages/Register/Register';
 import Specialized from './pages/Specialized/Specialized';
 import Improve from './pages/Improve/Improve';
 import Registered from './pages/Registered/Registered';
-import Available from './pages/Available/Available';
 import Contact from './pages/Contact/Contact';
 import ProtectedRoute from './components/ProtectedRoute';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -101,14 +100,6 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Registered />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/courses/available"
-            element={
-              <ProtectedRoute>
-                <Available />
               </ProtectedRoute>
             }
           />

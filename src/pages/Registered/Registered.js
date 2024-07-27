@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header';
-import { Table, DatePicker } from 'antd';
+import { Table } from 'antd';
 import moment from 'moment';
 import './Registered.css';
 import { studentInfo } from '../../data/studentData';
@@ -31,7 +31,10 @@ const columns = [
 ];
 
 export default function Registered() {
-    const [courses] = useState(studentInfo.registeredCourses);
+    const [courses, setCourses] = useState([]);
+    useEffect (() => {
+        setCourses(studentInfo.registeredCourses);
+    },[]);
 
     return (
         <div className='registered-container'>

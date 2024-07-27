@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Table, Modal, Button, message } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Table, Modal, Button, message, Tabs } from 'antd';
 import Header from '../../components/Header';
-import { coursesData } from '../../data/coursesData';
+import { coursesData, generalCourses } from '../../data/coursesData';
+import { studentInfo } from '../../data/studentData';
 import './Improve.css';
+
+const { TabPane } = Tabs;
 
 const columns = (handleRegisterClick) => [
     {
@@ -30,7 +32,31 @@ export default function Improve() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
-    const navigate = useNavigate();
+    const [specializedCourses, setSpecializedCourses] = useState([]);
+    const [generalCoursesData, setGeneralCoursesData] = useState([]);
+    const [activeTab, setActiveTab] = useState('general');
+    useEffect(() => {
+        const allSpecializedCourses = coursesData
+            .filter(semesterData => semesterData.major === studentInfo.major)
+            .flatMap(semesterData =>
+                semesterData.courses.map(course => ({
+                    ...course,
+                    semester: semesterData.semester,
+                    major: semesterData.major
+                }))
+            );
+        setSpecializedCourses(allSpecializedCourses);
+
+        const allGeneralCourses = generalCourses
+            .flatMap(semesterData =>
+                semesterData.courses.map(course => ({
+                    ...course,
+                    semester: semesterData.semester,
+                    major: semesterData.major
+                }))
+            );
+        setGeneralCoursesData(allGeneralCourses);
+    }, []);
 
     const handleRegisterClick = (course) => {
         setSelectedCourse(course);
@@ -60,14 +86,18 @@ export default function Improve() {
         setIsConfirmModalVisible(false);
     };
 
+    const handleTabChange = (key) => {
+        setActiveTab(key);
+    };
+
     const classColumns = [
         { title: 'Tên Lớp', dataIndex: 'name', className: 'class-name-column' },
         { title: 'Sĩ Số', dataIndex: 'class_size', className: 'class-size-column' },
         { title: 'Giảng Viên', dataIndex: 'lecturers', className: 'lecturer-column' },
         { title: 'Ngày Bắt Đầu', dataIndex: 'started_day', className: 'start-date-column' },
         { title: 'Ngày Kết Thúc', dataIndex: 'ended_day', className: 'end-date-column' },
-        { 
-            title: 'Action', 
+        {
+            title: 'Action',
             render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
             className: 'action-column'
         },
@@ -77,47 +107,80 @@ export default function Improve() {
         <div className='register-container'>
             <Header />
             <div className='register'>
-                <h1 className='register-title'>Đăng ký môn ngoài kế hoạch</h1>
-                <div className='table-container'>
-                    <Table
-                        className='course-table'
-                        columns={columns(handleRegisterClick)}
-                        dataSource={coursesData}
-                    />
-                </div>
-                <Modal
-                    title={<h2 className="modal-title">Danh sách lớp học - {selectedCourse?.name}</h2>}
-                    visible={isModalVisible}
-                    onOk={handleOk}
-                    onCancel={handleCancel}
-                    className="class-list-modal"
-                    width="80%"
-                    footer={[
-                        <Button key="back" onClick={handleCancel} className="modal-cancel-btn">
-                            Đóng
-                        </Button>
-                    ]}
-                >
-                    {selectedCourse && (
+                <h1 className='register-title'>Đăng ký môn học</h1>
+                <Tabs activeKey={activeTab} onChange={handleTabChange}>
+                    <TabPane tab="Môn Học Chung" key="general">
                         <Table
-                            className='class-table'
-                            columns={classColumns}
-                            dataSource={selectedCourse.classes}
-                            scroll={{ y: 400 }}
-                            rowClassName={(record) => record.class_size >= 50 ? 'full-class-row' : ''}
+                            columns={columns(handleRegisterClick)}
+                            dataSource={generalCoursesData}
+                            rowKey="id"
                         />
-                    )}
-                </Modal>
-                <Modal
-                    title="Xác nhận đăng ký"
-                    visible={isConfirmModalVisible}
-                    onOk={handleConfirmRegister}
-                    onCancel={handleCancelRegister}
-                    className="confirm-modal"
-                >
-                    <p>Bạn có chắc chắn muốn đăng ký lớp {selectedClass?.name} của môn {selectedCourse?.name}?</p>
-                </Modal>
+                        <Modal
+                            title={<h2 className="modal-title">Danh sách lớp học - {selectedCourse?.name}</h2>}
+                            visible={isModalVisible}
+                            onOk={handleOk}
+                            onCancel={handleCancel}
+                            width="80%"
+                            footer={[
+                                <Button key="back" onClick={handleCancel}>
+                                    Đóng
+                                </Button>
+                            ]}
+                        >
+                            {selectedCourse && (
+                                <Table
+                                    columns={classColumns}
+                                    dataSource={selectedCourse.classes}
+                                    rowKey="id"
+                                />
+                            )}
+                        </Modal>
+                        <Modal
+                            title="Xác nhận đăng ký"
+                            visible={isConfirmModalVisible}
+                            onOk={handleConfirmRegister}
+                            onCancel={handleCancelRegister}
+                        >
+                            <p>Bạn có chắc chắn muốn đăng ký lớp {selectedClass?.name} của môn {selectedCourse?.name}?</p>
+                        </Modal>
+                    </TabPane>
+                    <TabPane tab="Môn Học Chuyên Ngành" key="specialized">
+                        <Table
+                            columns={columns(handleRegisterClick)}
+                            dataSource={specializedCourses}
+                            rowKey="id"
+                        />
+                        <Modal
+                            title={<h2 className="modal-title">Danh sách lớp học - {selectedCourse?.name}</h2>}
+                            visible={isModalVisible}
+                            onOk={handleOk}
+                            onCancel={handleCancel}
+                            width="80%"
+                            footer={[
+                                <Button key="back" onClick={handleCancel}>
+                                    Đóng
+                                </Button>
+                            ]}
+                        >
+                            {selectedCourse && (
+                                <Table
+                                    columns={classColumns}
+                                    dataSource={selectedCourse.classes}
+                                    rowKey="id"
+                                />
+                            )}
+                        </Modal>
+                        <Modal
+                            title="Xác nhận đăng ký"
+                            visible={isConfirmModalVisible}
+                            onOk={handleConfirmRegister}
+                            onCancel={handleCancelRegister}
+                        >
+                            <p>Bạn có chắc chắn muốn đăng ký lớp {selectedClass?.name} của môn {selectedCourse?.name}?</p>
+                        </Modal>
+                    </TabPane>
+                </Tabs>
             </div>
         </div>
     );
-}
+};

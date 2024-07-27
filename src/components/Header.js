@@ -56,10 +56,6 @@ const items = [
         key: 'registered-courses',
         label: 'Học Phần Đã Đăng Ký',
       },
-      {
-        key: 'available-courses',
-        label: 'Học Phần Sẽ Được Mở',
-      },
     ],
   },
   {
@@ -133,9 +129,6 @@ export default function Header() {
         break;
       case 'improve-courses':
         navigate('/courses/register/improve');
-        break;
-      case 'available-courses':
-        navigate('/courses/available');
         break;
       case 'contact':
         navigate('/contact');

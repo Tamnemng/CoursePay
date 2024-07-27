@@ -264,6 +264,14 @@ export const coursesData = [
                         ended_day: '06/06/2024'
                     }
                 ]
+            },
+            {
+                key: '1',
+                name: 'Môn 1',
+                id: 'mon1-s1n1',
+                classes: [
+
+                ]
             }
         ]
     },
@@ -271,6 +279,71 @@ export const coursesData = [
         key: '1',
         major: 'spa',
         semester: 's1n2',
+        courses: [
+            // ... (courses for s1n2)
+        ]
+    },
+    {
+        key: '3',
+        major: 'spa',
+        semester: 's2n2',
+        courses: [
+            // ... (courses for s2n2)
+        ]
+    },
+    {
+        key: '4',
+        major: 'spa',
+        semester: 's1n3',
+        courses: [
+            // ... (courses for s1n3)
+        ]
+    },
+    {
+        key: '5',
+        major: 'spa',
+        semester: 's2n3',
+        courses: [
+            // ... (courses for s2n3)
+        ]
+    },
+    {
+        key: '6',
+        major: 'spa',
+        semester: 's1n4',
+        courses: [
+            // ... (courses for s1n4)
+        ]
+    },
+    {
+        key: '7',
+        major: 'spa',
+        semester: 's2n4',
+        courses: [
+            {
+                key: '1',
+                name: 'Môn 1',
+                id: 'mon1-s2n4',
+                classes: [
+                    {
+                        key: '1-1',
+                        name: 'Lớp 1',
+                        id: 'class1-1-s2n4',
+                        class_size: 30,
+                        lecturers: 'Lê Thị CC',
+                        started_day: '01/07/2027',
+                        ended_day: '01/12/2027'
+                    },
+                    // ... (more classes)
+                ]
+            },
+            // ... (more courses)
+        ]
+    },
+    {
+        key: '8',
+        major: 'cntt',
+        semester: 's1n1',
         courses: [
             {
                 key: '1',
@@ -535,478 +608,92 @@ export const coursesData = [
         ]
     },
     {
-        key: '3',
-        major: 'spa',
+        key: '9',
+        major: 'cntt',
+        semester: 's1n2',
+        courses: [
+
+        ]
+    },
+    {
+        key: '10',
+        major: 'cntt',
         semester: 's2n2',
         courses: [
-            // ... (courses for s2n2)
+
         ]
     },
     {
-        key: '4',
-        major: 'spa',
+        key: '11',
+        major: 'cntt',
         semester: 's1n3',
         courses: [
-            // ... (courses for s1n3)
+
         ]
     },
     {
-        key: '5',
-        major: 'spa',
-        semester: 's2n3',
-        courses: [
-            // ... (courses for s2n3)
-        ]
-    },
-    {
-        key: '6',
-        major: 'spa',
-        semester: 's1n4',
-        courses: [
-            // ... (courses for s1n4)
-        ]
-    },
-    {
-        key: '7',
-        major: 'spa',
+        key: '12',
+        major: 'cntt',
         semester: 's2n4',
         courses: [
-            {
-                key: '1',
-                name: 'Môn 1',
-                id: 'mon1-s2n4',
-                classes: [
-                    {
-                        key: '1-1',
-                        name: 'Lớp 1',
-                        id: 'class1-1-s2n4',
-                        class_size: 30,
-                        lecturers: 'Lê Thị CC',
-                        started_day: '01/07/2027',
-                        ended_day: '01/12/2027'
-                    },
-                    // ... (more classes)
-                ]
-            },
-            // ... (more courses)
+
+        ]
+    },
+    {
+        key: '13',
+        major: 'spt',
+        semester: 's1n2',
+        courses: [
+
+        ]
+    },
+    {
+        key: '14',
+        major: 'spt',
+        semester: 's2n2',
+        courses: [
+
         ]
     }
 ];
 
-export const availableCourses = [
+export const generalCourses = [
     {
         key: '0',
-        major: 'spt',
         semester: 's1n1',
-        classes: [
+        courses: [
             {
-                key: '1-1',
-                name: 'Lớp 1',
-                id: 'class1-1',
-                class_size: 35,
-                lecturers: 'Trần Thị B',
-                started_day: '02/01/2024',
-                ended_day: '02/06/2024'
+                key: '1',
+                name: 'Môn 5',
+                id: 'mon5',
+                classes: [
+                    {
+                        key: '1-1',
+                        name: 'Lớp 1',
+                        id: 'class1-1',
+                        class_size: 35,
+                        lecturers: 'Trần Thị U',
+                        started_day: '02/01/2024',
+                        ended_day: '02/06/2024'
+                    },
+                    {
+                        key: '1-2',
+                        name: 'Lớp 1',
+                        id: 'class1-1',
+                        class_size: 35,
+                        lecturers: 'Trần Thị U',
+                        started_day: '02/01/2024',
+                        ended_day: '02/06/2024'
+                    },
+                ]
             },
             {
-                key: '1-2',
-                name: 'Lớp 2',
-                id: 'class1-2',
-                class_size: 30,
-                lecturers: 'Nguyễn Văn A',
-                started_day: '03/01/2024',
-                ended_day: '03/06/2024'
-            },
-            {
-                key: '1-3',
-                name: 'Lớp 3',
-                id: 'class1-3',
-                class_size: 32,
-                lecturers: 'Lê Thị C',
-                started_day: '04/01/2024',
-                ended_day: '04/06/2024'
-            },
-            {
-                key: '1-4',
-                name: 'Lớp 4',
-                id: 'class1-4',
-                class_size: 28,
-                lecturers: 'Phạm Văn D',
-                started_day: '05/01/2024',
-                ended_day: '05/06/2024'
-            },
-            {
-                key: '1-5',
-                name: 'Lớp 5',
-                id: 'class1-5',
-                class_size: 34,
-                lecturers: 'Ngô Thị E',
-                started_day: '06/01/2024',
-                ended_day: '06/06/2024'
-            }
-        ]
-    },
-    {
-        key: '1',
-        major: 'spt',
-        semester: 's2n1',
-        classes: [
-            {
-                key: '1-1',
-                name: 'Lớp 1',
-                id: 'class1-1',
-                class_size: 35,
-                lecturers: 'Trần Thị B',
-                started_day: '02/01/2024',
-                ended_day: '02/06/2024'
-            },
-            {
-                key: '1-2',
-                name: 'Lớp 2',
-                id: 'class1-2',
-                class_size: 30,
-                lecturers: 'Nguyễn Văn A',
-                started_day: '03/01/2024',
-                ended_day: '03/06/2024'
-            },
-            {
-                key: '1-3',
-                name: 'Lớp 3',
-                id: 'class1-3',
-                class_size: 32,
-                lecturers: 'Lê Thị C',
-                started_day: '04/01/2024',
-                ended_day: '04/06/2024'
-            },
-            {
-                key: '1-4',
-                name: 'Lớp 4',
-                id: 'class1-4',
-                class_size: 28,
-                lecturers: 'Phạm Văn D',
-                started_day: '05/01/2024',
-                ended_day: '05/06/2024'
-            },
-            {
-                key: '1-5',
-                name: 'Lớp 5',
-                id: 'class1-5',
-                class_size: 34,
-                lecturers: 'Ngô Thị E',
-                started_day: '06/01/2024',
-                ended_day: '06/06/2024'
-            }
-        ]
-    },
-    {
-        key: '2',
-        major: 'spt',
-        semester: 's1n2',
-        classes: [
-            {
-                key: '1-1',
-                name: 'Lớp 1',
-                id: 'class1-1',
-                class_size: 35,
-                lecturers: 'Trần Thị B',
-                started_day: '02/01/2024',
-                ended_day: '02/06/2024'
-            },
-            {
-                key: '1-2',
-                name: 'Lớp 2',
-                id: 'class1-2',
-                class_size: 30,
-                lecturers: 'Nguyễn Văn A',
-                started_day: '03/01/2024',
-                ended_day: '03/06/2024'
-            },
-            {
-                key: '1-3',
-                name: 'Lớp 3',
-                id: 'class1-3',
-                class_size: 32,
-                lecturers: 'Lê Thị C',
-                started_day: '04/01/2024',
-                ended_day: '04/06/2024'
-            },
-            {
-                key: '1-4',
-                name: 'Lớp 4',
-                id: 'class1-4',
-                class_size: 28,
-                lecturers: 'Phạm Văn D',
-                started_day: '05/01/2024',
-                ended_day: '05/06/2024'
-            },
-            {
-                key: '1-5',
-                name: 'Lớp 5',
-                id: 'class1-5',
-                class_size: 34,
-                lecturers: 'Ngô Thị E',
-                started_day: '06/01/2024',
-                ended_day: '06/06/2024'
-            }
-        ]
-    },
-    {
-        key: '3',
-        major: 'spt',
-        semester: 's2n2',
-        classes: [
-            {
-                key: '1-1',
-                name: 'Lớp 1',
-                id: 'class1-1',
-                class_size: 35,
-                lecturers: 'Trần Thị B',
-                started_day: '02/01/2024',
-                ended_day: '02/06/2024'
-            },
-            {
-                key: '1-2',
-                name: 'Lớp 2',
-                id: 'class1-2',
-                class_size: 30,
-                lecturers: 'Nguyễn Văn A',
-                started_day: '03/01/2024',
-                ended_day: '03/06/2024'
-            },
-            {
-                key: '1-3',
-                name: 'Lớp 3',
-                id: 'class1-3',
-                class_size: 32,
-                lecturers: 'Lê Thị C',
-                started_day: '04/01/2024',
-                ended_day: '04/06/2024'
-            },
-            {
-                key: '1-4',
-                name: 'Lớp 4',
-                id: 'class1-4',
-                class_size: 28,
-                lecturers: 'Phạm Văn D',
-                started_day: '05/01/2024',
-                ended_day: '05/06/2024'
-            },
-            {
-                key: '1-5',
-                name: 'Lớp 5',
-                id: 'class1-5',
-                class_size: 34,
-                lecturers: 'Ngô Thị E',
-                started_day: '06/01/2024',
-                ended_day: '06/06/2024'
-            }
-        ]
-    },
-    {
-        key: '4',
-        major: 'spt',
-        semester: 's1n3',
-        classes: [
-            {
-                key: '1-1',
-                name: 'Lớp 1',
-                id: 'class1-1',
-                class_size: 35,
-                lecturers: 'Trần Thị B',
-                started_day: '02/01/2024',
-                ended_day: '02/06/2024'
-            },
-            {
-                key: '1-2',
-                name: 'Lớp 2',
-                id: 'class1-2',
-                class_size: 30,
-                lecturers: 'Nguyễn Văn A',
-                started_day: '03/01/2024',
-                ended_day: '03/06/2024'
-            },
-            {
-                key: '1-3',
-                name: 'Lớp 3',
-                id: 'class1-3',
-                class_size: 32,
-                lecturers: 'Lê Thị C',
-                started_day: '04/01/2024',
-                ended_day: '04/06/2024'
-            },
-            {
-                key: '1-4',
-                name: 'Lớp 4',
-                id: 'class1-4',
-                class_size: 28,
-                lecturers: 'Phạm Văn D',
-                started_day: '05/01/2024',
-                ended_day: '05/06/2024'
-            },
-            {
-                key: '1-5',
-                name: 'Lớp 5',
-                id: 'class1-5',
-                class_size: 34,
-                lecturers: 'Ngô Thị E',
-                started_day: '06/01/2024',
-                ended_day: '06/06/2024'
-            }
-        ]
-    },
-    {
-        key: '5',
-        major: 'spt',
-        semester: 's2n3',
-        classes: [
-            {
-                key: '1-1',
-                name: 'Lớp 1',
-                id: 'class1-1',
-                class_size: 35,
-                lecturers: 'Trần Thị B',
-                started_day: '02/01/2024',
-                ended_day: '02/06/2024'
-            },
-            {
-                key: '1-2',
-                name: 'Lớp 2',
-                id: 'class1-2',
-                class_size: 30,
-                lecturers: 'Nguyễn Văn A',
-                started_day: '03/01/2024',
-                ended_day: '03/06/2024'
-            },
-            {
-                key: '1-3',
-                name: 'Lớp 3',
-                id: 'class1-3',
-                class_size: 32,
-                lecturers: 'Lê Thị C',
-                started_day: '04/01/2024',
-                ended_day: '04/06/2024'
-            },
-            {
-                key: '1-4',
-                name: 'Lớp 4',
-                id: 'class1-4',
-                class_size: 28,
-                lecturers: 'Phạm Văn D',
-                started_day: '05/01/2024',
-                ended_day: '05/06/2024'
-            },
-            {
-                key: '1-5',
-                name: 'Lớp 5',
-                id: 'class1-5',
-                class_size: 34,
-                lecturers: 'Ngô Thị E',
-                started_day: '06/01/2024',
-                ended_day: '06/06/2024'
-            }
-        ]
-    },
-    {
-        key: '6',
-        major: 'spt',
-        semester: 's1n4',
-        classes: [
-            {
-                key: '1-1',
-                name: 'Lớp 1',
-                id: 'class1-1',
-                class_size: 35,
-                lecturers: 'Trần Thị B',
-                started_day: '02/01/2024',
-                ended_day: '02/06/2024'
-            },
-            {
-                key: '1-2',
-                name: 'Lớp 2',
-                id: 'class1-2',
-                class_size: 30,
-                lecturers: 'Nguyễn Văn A',
-                started_day: '03/01/2024',
-                ended_day: '03/06/2024'
-            },
-            {
-                key: '1-3',
-                name: 'Lớp 3',
-                id: 'class1-3',
-                class_size: 32,
-                lecturers: 'Lê Thị C',
-                started_day: '04/01/2024',
-                ended_day: '04/06/2024'
-            },
-            {
-                key: '1-4',
-                name: 'Lớp 4',
-                id: 'class1-4',
-                class_size: 28,
-                lecturers: 'Phạm Văn D',
-                started_day: '05/01/2024',
-                ended_day: '05/06/2024'
-            },
-            {
-                key: '1-5',
-                name: 'Lớp 5',
-                id: 'class1-5',
-                class_size: 34,
-                lecturers: 'Ngô Thị E',
-                started_day: '06/01/2024',
-                ended_day: '06/06/2024'
-            }
-        ]
-    },
-    {
-        key: '7',
-        major: 'spt',
-        semester: 's2n4',
-        classes: [
-            {
-                key: '1-1',
-                name: 'Lớp 1',
-                id: 'class1-1',
-                class_size: 35,
-                lecturers: 'Trần Thị B',
-                started_day: '02/01/2024',
-                ended_day: '02/06/2024'
-            },
-            {
-                key: '1-2',
-                name: 'Lớp 2',
-                id: 'class1-2',
-                class_size: 30,
-                lecturers: 'Nguyễn Văn A',
-                started_day: '03/01/2024',
-                ended_day: '03/06/2024'
-            },
-            {
-                key: '1-3',
-                name: 'Lớp 3',
-                id: 'class1-3',
-                class_size: 32,
-                lecturers: 'Lê Thị C',
-                started_day: '04/01/2024',
-                ended_day: '04/06/2024'
-            },
-            {
-                key: '1-4',
-                name: 'Lớp 4',
-                id: 'class1-4',
-                class_size: 28,
-                lecturers: 'Phạm Văn D',
-                started_day: '05/01/2024',
-                ended_day: '05/06/2024'
-            },
-            {
-                key: '1-5',
-                name: 'Lớp 5',
-                id: 'class1-5',
-                class_size: 34,
-                lecturers: 'Ngô Thị E',
-                started_day: '06/01/2024',
-                ended_day: '06/06/2024'
+                key: '1',
+                name: 'Môn 5',
+                id: 'mon5',
+                classes: [
+                    
+                ]
             }
         ]
     },
