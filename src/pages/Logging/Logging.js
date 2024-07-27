@@ -27,6 +27,7 @@ export default function Logging() {
             if (username === '123' && password === '123') {
                 message.success('Đăng nhập thành công!');
                 localStorage.setItem('isAuthenticated', 'true');
+                localStorage.setItem('lastActivityTime', new Date().getTime().toString());
                 console.log('Login successful, isAuthenticated:', localStorage.getItem('isAuthenticated'));
                 navigate('/home');
             } else {
