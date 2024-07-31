@@ -8,10 +8,10 @@ export default function Logging() {
     const [value, setValue] = useState(1);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [loggingState, setLoggingState] = useState(false);
 
     useEffect(() => {
         localStorage.setItem('isAuthenticated', 'false');
+        localStorage.removeItem('role');
         console.log('Initial isAuthenticated:', localStorage.getItem('isAuthenticated'));
     }, []);
 
@@ -20,23 +20,28 @@ export default function Logging() {
             message.error('Vui lòng điền tên đăng nhập và mật khẩu!');
             return;
         }
-        setLoggingState(true);
         try {
             await new Promise(resolve => setTimeout(resolve, 1000));
-
             if (username === '123' && password === '123') {
                 message.success('Đăng nhập thành công!');
                 localStorage.setItem('isAuthenticated', 'true');
                 localStorage.setItem('lastActivityTime', new Date().getTime().toString());
+                localStorage.setItem('role', value.toString());
                 console.log('Login successful, isAuthenticated:', localStorage.getItem('isAuthenticated'));
-                navigate('/home');
+                console.log('Role set to:', value);
+                
+                window.dispatchEvent(new CustomEvent('roleChanged', { detail: value }));
+                
+                if (value === 1) {
+                    navigate('/home');
+                } else if (value === 2) {
+                    navigate('/courseChange');
+                }
             } else {
                 message.error('Tên đăng nhập hoặc mật khẩu không đúng!');
             }
         } catch (error) {
             message.error('Đã xảy ra lỗi khi đăng nhập');
-        } finally {
-            setLoggingState(false);
         }
     };
 
@@ -74,14 +79,14 @@ export default function Logging() {
                         type="primary"
                         onClick={checking}
                         className='input-button'
-                        loading={loggingState}
                     >
                         Logging
                     </Button>
                     <Radio.Group onChange={onChange} value={value}>
                         <Space direction="vertical">
                             <Radio value={1} className='radio-button'>Sinh Viên</Radio>
-                            <Radio value={2} className='radio-button'>Cán Bộ</Radio>
+                            <Radio value={2} className='radio-button'>Phòng tài vụ</Radio>
+                            <Radio value={3} className='radio-button'>Phòng giáo vụ</Radio>
                         </Space>
                     </Radio.Group>
                 </div>

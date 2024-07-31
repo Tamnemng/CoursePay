@@ -9,7 +9,7 @@ export const coursesData = [
                 key: '1',
                 name: 'Môn 1',
                 id: 'mon1',
-                classes: [
+                classes: [  
                     {
                         key: '1-1',
                         name: 'Lớp 1',
