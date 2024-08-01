@@ -10,34 +10,19 @@ import { useNavigate } from 'react-router-dom';
 
 const items = [
     {
-        key: 'subject',
+        key: 'tuition',
         icon: <BankOutlined />,
-        label: 'Môn Học',
+        label: 'Học Phí',
         children: [
             {
-                key: 'add-delete-subject',
-                label: 'Thêm và xóa Môn Học',
+                key: 'add-delete-tuition',
+                label: 'Thêm và xóa Học Phí',
             },
             {
-                key: 'edit-subject',
-                label: 'Chỉnh sửa Môn Học',
+                key: 'edit-tuition',
+                label: 'Chỉnh sửa Học Phí',
             },
         ]
-    },
-    {
-        key: 'class',
-        label: 'Lớp Học',
-        icon: <BookOutlined />,
-        children: [
-            {
-                key: 'add-delete-class',
-                label: 'Thêm và xóa Lớp Học',
-            },
-            {
-                key: 'edit-class',
-                label: 'Chỉnh sửa Lớp Học',
-            },
-        ],
     },
     {
         key: 'logout',
@@ -85,17 +70,11 @@ export default function Header() {
     const onClick = (e) => {
         const { key } = e;
         switch (key) {
-            case 'add-delete-subject':
-                navigate('/courseChange');
+            case 'add-delete-tuition':
+                navigate('/tuitionChange');
                 break;
-            case 'edit-subject':
-                navigate('/courseEdit');
-                break;
-            case 'add-delete-class':
-                navigate('/classChange');
-                break;
-            case 'edit-class':
-                navigate('/classEdit');
+            case 'edit-tuition':
+                navigate('/tuitionEdit');
                 break;
             case 'logout':
                 localStorage.setItem('isAuthenticated', 'false');

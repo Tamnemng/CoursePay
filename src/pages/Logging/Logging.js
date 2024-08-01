@@ -36,6 +36,8 @@ export default function Logging() {
                     navigate('/home');
                 } else if (value === 2) {
                     navigate('/courseChange');
+                } else if (value === 3) {
+                    navigate('/tuitionChange');
                 }
             } else {
                 message.error('Tên đăng nhập hoặc mật khẩu không đúng!');
