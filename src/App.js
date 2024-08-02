@@ -9,7 +9,6 @@ import Specialized from './pages/Specialized/Specialized';
 import Improve from './pages/Improve/Improve';
 import Registered from './pages/Registered/Registered';
 import Contact from './pages/Contact/Contact';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CoursesManagement from './pages/Course Management/page';
 import ProtectedRoute from './components/ProtectedRoute';
 import CourseChange from './pages/CourseChange/CourseChange';
