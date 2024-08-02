@@ -2,7 +2,7 @@ import React from 'react';
 import './NoPage.css';
 import Header from '../../components/Header';
 import CourseHeader from '../../components/courseHeader';
-
+import TuitionHeader from '../../components/tuitionHeader';
 const NoPage = ({ role }) => {
     let HeaderComponent;
 
@@ -14,6 +14,7 @@ const NoPage = ({ role }) => {
             HeaderComponent = CourseHeader;
             break;
         case '3':
+            HeaderComponent = TuitionHeader;
             break;
         default:
             HeaderComponent = Header;
