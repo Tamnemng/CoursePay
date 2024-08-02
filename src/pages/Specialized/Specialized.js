@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button, message } from 'antd';
 import Header from '../../components/Header';
-import { generalCourses } from '../../data/coursesData';
+import { coursesData } from '../../data/coursesData';
 import { studentInfo } from '../../data/studentData';
-import './Register.css';
+import './Specialized.css';
 
 const columns = (handleRegisterClick) => [
     {
@@ -25,7 +25,7 @@ const columns = (handleRegisterClick) => [
     },
 ];
 
-export default function Register() {
+export default function Specialized() {
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
@@ -33,8 +33,8 @@ export default function Register() {
     const [courses, setCourses] = useState([]);
 
     useEffect(() => {
-        const allCourses = generalCourses
-            .filter(semesterData => semesterData.semester === studentInfo.semester )
+        const allCourses = coursesData
+            .filter(semesterData => semesterData.semester === studentInfo.semester && semesterData.major == studentInfo.major)
             .flatMap(semesterData =>
                 semesterData.courses.map(course => ({
                     ...course,
@@ -90,7 +90,7 @@ export default function Register() {
         <div className='register-container'>
             <Header />
             <div className='register'>
-                <h1 className='register-title'>Đăng ký môn chung</h1>
+                <h1 className='register-title'>Đăng ký môn chuyên ngành</h1>
                 <Table
                     columns={columns(handleRegisterClick)}
                     dataSource={courses}

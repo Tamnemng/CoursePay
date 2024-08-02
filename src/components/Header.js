@@ -56,10 +56,6 @@ const items = [
         key: 'registered-courses',
         label: 'Học Phần Đã Đăng Ký',
       },
-      {
-        key: 'available-courses',
-        label: 'Học Phần Sẽ Được Mở',
-      },
     ],
   },
   {
@@ -67,6 +63,10 @@ const items = [
     label: 'Thông Tin Liên lạc',
     icon: <ApartmentOutlined />,
   },
+  {
+    key: 'logout',
+    label: "Đăng Xuất",
+  }
 ];
 
 const getLevelKeys = (items1) => {
@@ -125,16 +125,17 @@ export default function Header() {
         navigate('/courses/register/general');
         break;
       case 'specialized-courses':
-        navigate('/courses/register/major');
+        navigate('/courses/register/specialized');
         break;
       case 'improve-courses':
         navigate('/courses/register/improve');
         break;
-      case 'available-courses':
-        navigate('/courses/available');
-        break;
       case 'contact':
         navigate('/contact');
+        break;
+      case 'logout':
+        localStorage.setItem('isAuthenticated', 'false');
+        navigate('');
         break;
       default:
         if (!items.find(item => item.key === key)?.children) {
