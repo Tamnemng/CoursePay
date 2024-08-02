@@ -87,8 +87,8 @@ export default function Logging() {
                     <Radio.Group onChange={onChange} value={value}>
                         <Space direction="vertical">
                             <Radio value={1} className='radio-button'>Sinh Viên</Radio>
-                            <Radio value={2} className='radio-button'>Phòng tài vụ</Radio>
-                            <Radio value={3} className='radio-button'>Phòng giáo vụ</Radio>
+                            <Radio value={2} className='radio-button'>Phòng giáo vụ</Radio>
+                            <Radio value={3} className='radio-button'>Phòng tài vụ</Radio>
                         </Space>
                     </Radio.Group>
                 </div>
