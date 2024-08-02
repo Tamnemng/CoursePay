@@ -9,6 +9,7 @@ import Registered from './pages/Registered/Registered';
 import Available from './pages/Available/Available';
 import Contact from './pages/Contact/Contact';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import CoursesManagement from './pages/Course Management/page';
 export default function App() {
   return (
     <div>
@@ -22,6 +23,7 @@ export default function App() {
           <Route path='/courses/registered' element={<Registered />} />
           <Route path='/courses/available' element={<Available />} />
           <Route path='/contact' element={<Contact />} />
+          <Route path='/coursesManagement' element={<CoursesManagement />} />
           <Route path="*" element={<NoPage />} />
         </Routes>
       </BrowserRouter>
