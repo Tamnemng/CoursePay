@@ -15,6 +15,10 @@ const items = [
         label: 'Học Phí',
         children: [
             {
+                key: 'main-tuition',
+                label: 'Tổng quan',
+            },
+            {
                 key: 'add-delete-tuition',
                 label: 'Thêm và xóa Học Phí',
             },
@@ -70,6 +74,9 @@ export default function Header() {
     const onClick = (e) => {
         const { key } = e;
         switch (key) {
+            case 'main-tuition':
+                navigate('/tuitionMain');
+                break;
             case 'add-delete-tuition':
                 navigate('/tuitionChange');
                 break;

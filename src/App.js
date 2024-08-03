@@ -18,6 +18,7 @@ import ClassEdit from './pages/ClassEdit/ClassEdit';
 import TuitionChange from './pages/TuitionChange/TuitionChange';
 import TuitionEdit from './pages/TuitionEdit/TuitionEdit';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import TuitionMain from './pages/tuitionMain/TuitionMain';
 
 const useRoleListener = () => {
   const [role, setRole] = useState(() => localStorage.getItem('role') || '');
@@ -95,6 +96,7 @@ export default function App() {
           <Route path="/classEdit" element={<ProtectedRoute><RoleBasedRoute element={ClassEdit} allowedRoles={['2']} /></ProtectedRoute>} />
 
           {/* Routes for Employee (Role 3) */}
+          <Route path="/tuitionMain" element={<ProtectedRoute><RoleBasedRoute element={TuitionMain} allowedRoles={['3']}/></ProtectedRoute>}/>
           <Route path="/tuitionChange" element={<ProtectedRoute><RoleBasedRoute element={TuitionChange} allowedRoles={['3']} /></ProtectedRoute>} />
           <Route path="/tuitionEdit" element={<ProtectedRoute><RoleBasedRoute element={TuitionEdit} allowedRoles={['3']} /></ProtectedRoute>} />
           <Route path='/coursesManagement' element={<CoursesManagement />} />
