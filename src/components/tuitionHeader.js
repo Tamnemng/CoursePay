@@ -1,30 +1,29 @@
 import React, { useState } from 'react';
 import {
-    BankOutlined,
-    ApartmentOutlined,
-    BookOutlined,
-    HomeOutlined,
+    BankTwoTone,
+    MoneyCollectTwoTone
 } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const items = [
     {
+        key: 'main-tuition',
+        icon: <BankTwoTone />,
+        label: 'Trang chủ',
+    },
+    {
         key: 'tuition',
-        icon: <BankOutlined />,
+        icon: <MoneyCollectTwoTone />,
         label: 'Học Phí',
         children: [
             {
-                key: 'main-tuition',
-                label: 'Tổng quan',
-            },
-            {
                 key: 'add-delete-tuition',
-                label: 'Thêm và xóa Học Phí',
+                label: 'Học phí theo chuyên ngành',
             },
             {
                 key: 'edit-tuition',
-                label: 'Chỉnh sửa Học Phí',
+                label: 'Học phí khác',
             },
         ]
     },
