@@ -10,11 +10,6 @@ import { useNavigate } from 'react-router-dom';
 
 const items = [
   {
-    key: 'home',
-    icon: <HomeOutlined />,
-    label: 'Trang Chủ',
-  },
-  {
     key: 'tuition',
     icon: <BankOutlined />,
     label: 'Học Phí',
@@ -109,9 +104,6 @@ export default function Header() {
   const onClick = (e) => {
     const { key } = e;
     switch (key) {
-      case 'home':
-        navigate('/home');
-        break;
       case 'pay-tuition':
         navigate('/tuition/pay');
         break;

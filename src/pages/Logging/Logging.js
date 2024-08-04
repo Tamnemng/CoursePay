@@ -42,11 +42,11 @@ export default function Logging() {
         window.dispatchEvent(new CustomEvent("roleChanged", { detail: value }));
 
         if (value === 1) {
-          navigate("/home");
+          navigate("/tuition/pay");
         } else if (value === 2) {
           navigate("/courseChange");
         } else if (value === 3) {
-          navigate("/tuitionChange");
+          navigate("/tuitionMain");
         }
       } else {
         message.error("Tên đăng nhập hoặc mật khẩu không đúng!");

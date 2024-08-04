@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import Logging from './pages/Logging/Logging';
-import Home from './pages/Home/Home';
 import NoPage from './pages/NoPage/NoPage';
 import Pay from './pages/Pay/Pay';
 import History from './pages/History/History';
@@ -79,7 +78,6 @@ export default function App() {
           <Route index element={<Logging />} />
 
           {/* Routes for Students (Role 1) */}
-          <Route path="/home" element={<ProtectedRoute><RoleBasedRoute element={Home} allowedRoles={['1']} /></ProtectedRoute>} />
           <Route path="/tuition/pay" element={<ProtectedRoute><RoleBasedRoute element={Pay} allowedRoles={['1']} /></ProtectedRoute>} />
           <Route path="/tuition/history" element={<ProtectedRoute><RoleBasedRoute element={History} allowedRoles={['1']} /></ProtectedRoute>} />
           <Route path="/courses/register/general" element={<ProtectedRoute><RoleBasedRoute element={Register} allowedRoles={['1']} /></ProtectedRoute>} />
