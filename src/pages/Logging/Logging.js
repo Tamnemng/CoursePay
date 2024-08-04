@@ -93,18 +93,24 @@ export default function Logging() {
               onKeyPress={handleKeyPress}
             />
           </div>
-          <Button type="primary" onClick={checking} className="input-button">
-            Đăng nhập
-          </Button>
+          <div className="">
+            <Button
+              type="primary"
+              onClick={checking}
+              className="input-button"
+            >
+              Đăng nhập
+            </Button>
+          </div>
           <Radio.Group onChange={onChange} value={value}>
-            <Space className="!flex !flex-col gap-8 p-4 mb-4">
-              <Radio value={1} className="absolute left-36 radio-button">
+            <Space className="flex justify-center items-center p-4">
+              <Radio value={1} className="radio-button">
                 Sinh Viên
               </Radio>
-              <Radio value={2} className="absolute left-36 radio-button">
+              <Radio value={2} className="radio-button">
                 Phòng giáo vụ
               </Radio>
-              <Radio value={3} className="absolute left-36 radio-button">
+              <Radio value={3} className="radio-button">
                 Phòng tài vụ
               </Radio>
             </Space>
