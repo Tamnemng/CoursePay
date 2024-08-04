@@ -4,6 +4,7 @@ import Header from "../../components/tuitionHeader";
 import Typography from "antd/es/typography/Typography";
 import { Select, Input } from "antd";
 import StudentTable from "./StudentTable";
+import PaymentTable from "./PaymentTable";
 
 const {Title, Text} = Typography;
 
@@ -101,6 +102,7 @@ export default function TuitionMain() {
                 readOnly
               />
             </div>
+            <PaymentTable/>
           </div>
         </div>
       </div>

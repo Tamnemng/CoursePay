@@ -26,7 +26,7 @@ const data = [
   },
 ];
 
-export default function StudentTable(){
+export default function PaymentTable() {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
@@ -138,24 +138,22 @@ export default function StudentTable(){
 
   const columns = [
     {
-      title: 'Mã sinh viên',
-      dataIndex: 'stuID',
-      key: 'stuID',
-      ...getColumnSearchProps('stuID'),
-      width: 120,
+      title: 'Mã hóa đơn',
+      dataIndex: 'paymID',
+      key: 'paymID',
+      ...getColumnSearchProps('paymID'),
     },
     {
-      title: 'Họ tên',
-      dataIndex: 'stuName',
-      key: 'stuName',
-      ...getColumnSearchProps('stuName'),
+      title: 'Tên hóa đơn',
+      dataIndex: 'paymName',
+      key: 'paymName',
+      ...getColumnSearchProps('paymName'),
     },
     {
-      title: 'Giảm phí',
-      dataIndex: 'spe',
-      key: 'spe',
-      ...getColumnSearchProps('spe'),
-      width: 70,
+        title: 'Ngày thanh toán',
+        dataIndex: 'date',
+        key: 'date',
+        ...getColumnSearchProps('date'),
     },
   ];
 
@@ -168,7 +166,7 @@ export default function StudentTable(){
       scroll={{
         y: 240,
       }}
-      dataSource={data}
+      //dataSource={data}
     />
   );
 }
