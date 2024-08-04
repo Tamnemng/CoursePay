@@ -29,21 +29,26 @@ const items2 = [UserOutlined, LaptopOutlined, NotificationOutlined].map(
 const CoursesManagement = () => {
   return (
     <Layout className="flex flex-row h-screen w-ful">
-      <div className="flex flex-col mt-5">
-        <UserOutlined />
-        <Sider width={200}>
-          <Menu
-            mode="inline"
-            defaultSelectedKeys={["1"]}
-            defaultOpenKeys={["sub1"]}
-            style={{
-              height: "100%",
-            }}
-            items={items2}
-          />
-        </Sider>
+      <div className="flex flex-col mt-5  justify-between">
+        <div>
+          <div className="flex gap-4 ml-4 h-10 items-center">
+            <UserOutlined className="flex justify-center items-center" />
+            <div>Quan tri vien</div>
+          </div>
+          <Sider width={200}>
+            <Menu
+              mode="inline"
+              defaultSelectedKeys={["1"]}
+              defaultOpenKeys={["sub1"]}
+              style={{
+                height: "100%",
+              }}
+              items={items2}
+            />
+          </Sider>
+        </div>
         <Button
-          className="w-full"
+          className="w-full rounded-none"
           type="primary"
           icon={<PoweroffOutlined />}
           //   loading={loadings[2]}
