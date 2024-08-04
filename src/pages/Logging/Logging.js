@@ -75,7 +75,7 @@ export default function Logging() {
           <div className="">
             <div className="flex left-0 text-lg">Tên đăng nhập</div>
             <Input
-            //   placeholder="input username"
+              //   placeholder="input username"
               className="input-field"
               required
               value={username}
@@ -85,7 +85,7 @@ export default function Logging() {
           <div>
             <div className="flex left-0 text-lg">Mật khẩu</div>
             <Input.Password
-            //   placeholder="input password"
+              //   placeholder="input password"
               className="input-field"
               required
               value={password}

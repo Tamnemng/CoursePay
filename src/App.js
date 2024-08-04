@@ -9,7 +9,6 @@ import Specialized from './pages/Specialized/Specialized';
 import Improve from './pages/Improve/Improve';
 import Registered from './pages/Registered/Registered';
 import Contact from './pages/Contact/Contact';
-import CoursesManagement from './pages/Course Management/page';
 import ProtectedRoute from './components/ProtectedRoute';
 import CourseChange from './pages/CourseChange/CourseChange';
 import CourseEdit from './pages/CourseEdit/CourseEdit';
@@ -90,7 +89,6 @@ export default function App() {
           <Route path="/contact" element={<ProtectedRoute><RoleBasedRoute element={Contact} allowedRoles={['1']} /></ProtectedRoute>} />
 
           {/* Routes for Employee (Role 2) */}
-          <Route path='/coursesManagement' element={<CoursesManagement />} />
           <Route path="/courseChange" element={<ProtectedRoute><RoleBasedRoute element={CourseChange} allowedRoles={['2']} /></ProtectedRoute>} />
           <Route path="/courseEdit" element={<ProtectedRoute><RoleBasedRoute element={CourseEdit} allowedRoles={['2']} /></ProtectedRoute>} />
           <Route path="/classChange" element={<ProtectedRoute><RoleBasedRoute element={ClassChange} allowedRoles={['2']} /></ProtectedRoute>} />
