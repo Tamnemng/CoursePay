@@ -89,6 +89,7 @@ export default function App() {
           <Route path="/contact" element={<ProtectedRoute><RoleBasedRoute element={Contact} allowedRoles={['1']} /></ProtectedRoute>} />
 
           {/* Routes for Employee (Role 2) */}
+          <Route path='/coursesManagement' element={<CoursesManagement />} />
           <Route path="/courseChange" element={<ProtectedRoute><RoleBasedRoute element={CourseChange} allowedRoles={['2']} /></ProtectedRoute>} />
           <Route path="/courseEdit" element={<ProtectedRoute><RoleBasedRoute element={CourseEdit} allowedRoles={['2']} /></ProtectedRoute>} />
           <Route path="/classChange" element={<ProtectedRoute><RoleBasedRoute element={ClassChange} allowedRoles={['2']} /></ProtectedRoute>} />
@@ -97,7 +98,7 @@ export default function App() {
           {/* Routes for Employee (Role 3) */}
           <Route path="/tuitionChange" element={<ProtectedRoute><RoleBasedRoute element={TuitionChange} allowedRoles={['3']} /></ProtectedRoute>} />
           <Route path="/tuitionEdit" element={<ProtectedRoute><RoleBasedRoute element={TuitionEdit} allowedRoles={['3']} /></ProtectedRoute>} />
-          <Route path='/coursesManagement' element={<CoursesManagement />} />
+          
           <Route path="*" element={<ProtectedRoute><NoPage role={role} /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
