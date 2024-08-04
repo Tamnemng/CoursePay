@@ -1,30 +1,40 @@
 import React, { useRef, useState } from "react";
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from "react-highlight-words";
-import { Button, Table, Space, Input } from "antd";
+import { Button, Table, Space, Input} from "antd";
 
 const data = [
   {
+    key: '1',
     stuID: '48.01.104.000',
     stuName: 'John Brown',
     spe: 'true',
   },
   {
+    key: '2',
     stuID: '48.01.104.080',
     stuName: 'John Wick',
     spe: 'false',
   },
   {
+    key: '3',
     stuID: '48.01.104.020',
     stuName: 'Doe',
     spe: 'true',
   },
   {
+    key: '4',
     stuID: '48.01.104.013',
     stuName: 'Hunt',
     spe: 'true',
   },
 ];
+
+const rowSelection = {
+  onChange: (selectedRowKeys, selectedRows) => {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+  },
+};
 
 export default function StudentTable(){
   const [searchText, setSearchText] = useState('');
@@ -163,12 +173,16 @@ export default function StudentTable(){
     <Table 
       columns={columns}
       pagination={{
-        pageSize: 50,
+        pageSize: 10,
       }}
       scroll={{
         y: 240,
       }}
       dataSource={data}
+      rowSelection={{
+        type: 'radio',
+        ...rowSelection,
+      }}
     />
   );
 }

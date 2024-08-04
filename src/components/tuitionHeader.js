@@ -19,7 +19,7 @@ const items = [
         children: [
             {
                 key: 'add-delete-tuition',
-                label: 'Học phí theo chuyên ngành',
+                label: 'Học phí học kỳ',
             },
             {
                 key: 'edit-tuition',

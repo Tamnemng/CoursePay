@@ -5,6 +5,7 @@ import Typography from "antd/es/typography/Typography";
 import { Select, Input } from "antd";
 import StudentTable from "./StudentTable";
 import PaymentTable from "./PaymentTable";
+import RadioPaid from "./RadioPaid";
 
 const {Title, Text} = Typography;
 
@@ -102,9 +103,11 @@ export default function TuitionMain() {
                 readOnly
               />
             </div>
+            <RadioPaid/>
             <PaymentTable/>
           </div>
         </div>
+        
       </div>
     </div>
   );

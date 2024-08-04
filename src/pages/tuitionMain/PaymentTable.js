@@ -1,28 +1,23 @@
 import React, { useRef, useState } from "react";
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from "react-highlight-words";
-import { Button, Table, Space, Input } from "antd";
+import { Button, Table, Space, Input, Modal } from "antd";
 
 const data = [
   {
-    stuID: '48.01.104.000',
-    stuName: 'John Brown',
-    spe: 'true',
+    paymID: '001',
+    paymName: 'Học phí học kỳ',
+    
   },
   {
-    stuID: '48.01.104.080',
-    stuName: 'John Wick',
-    spe: 'false',
+    paymID: '002',
+    paymName: 'BHYT',
+    
   },
   {
-    stuID: '48.01.104.020',
-    stuName: 'Doe',
-    spe: 'true',
-  },
-  {
-    stuID: '48.01.104.013',
-    stuName: 'Hunt',
-    spe: 'true',
+    paymID: '003',
+    paymName: 'Trung tâm Tin học',
+    
   },
 ];
 
@@ -136,6 +131,20 @@ export default function PaymentTable() {
       ),
   });
 
+  const [visible, setVisible] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  // Hàm xử lý khi click vào hàng
+  const handleRowClick = (record) => {
+    setSelectedRow(record);
+    setVisible(true);
+  };
+
+  // Hàm xử lý đóng popup
+  const handleCancel = () => {
+    setVisible(false);
+  };
+
   const columns = [
     {
       title: 'Mã hóa đơn',
@@ -149,24 +158,45 @@ export default function PaymentTable() {
       key: 'paymName',
       ...getColumnSearchProps('paymName'),
     },
-    {
-        title: 'Ngày thanh toán',
-        dataIndex: 'date',
-        key: 'date',
-        ...getColumnSearchProps('date'),
-    },
   ];
 
   return(
-    <Table 
-      columns={columns}
-      pagination={{
-        pageSize: 50,
-      }}
-      scroll={{
-        y: 240,
-      }}
-      //dataSource={data}
-    />
+    <div>
+      <Table 
+        columns={columns}
+        pagination={{
+          pageSize: 50,
+        }}
+        scroll={{
+          y: 240,
+        }}
+        dataSource={data}
+        onRow={(record) => ({
+          onClick: () => handleRowClick(record),
+        })}
+      />
+      <Modal
+        title="Chi tiết hóa đơn"
+        visible={visible}
+        onCancel={handleCancel}
+        footer={[
+          <Button type="primary" key="back" onClick={handleCancel}>
+            Save
+          </Button>,
+          <Button type="dashed" danger>
+            Delete
+          </Button>,
+        ]}
+      >
+        {selectedRow ? (
+          <div>
+            <p><strong>Mã hóa đơn:</strong> {selectedRow.paymID}</p>
+            <p><strong>Tên hóa đơn:</strong> {selectedRow.paymName}</p>
+          </div>
+        ) : (
+          <p>No data available</p>
+        )}
+      </Modal>
+    </div>
   );
 }
