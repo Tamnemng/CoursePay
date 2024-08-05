@@ -11,7 +11,7 @@ import {
   Modal,
   DatePicker,
 } from "antd";
-import { majorSubject } from "../index";
+import { majorSubject } from "../../../data/coursesData";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 
