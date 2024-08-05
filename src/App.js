@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
+import ClassEdit from './pages/ClassEdit/ClassEdit';
+import Contact from './pages/Contact/Contact';
+import CourseEdit from './pages/CourseEdit/CourseEdit';
+import GeneralSubjectChange from './pages/GenaralSubjectChange/ClassChange';
+import History from './pages/History/History';
+import Improve from './pages/Improve/Improve';
 import Logging from './pages/Logging/Logging';
+import MajorSubjectChangeDetail from './pages/MajorSubjectChange/detail/courseChangeDetail';
+import MajorSubjectChange from './pages/MajorSubjectChange/majorSubjectChange';
 import NoPage from './pages/NoPage/NoPage';
 import Pay from './pages/Pay/Pay';
-import History from './pages/History/History';
 import Register from './pages/Register/Register';
-import Specialized from './pages/Specialized/Specialized';
-import Improve from './pages/Improve/Improve';
 import Registered from './pages/Registered/Registered';
-import Contact from './pages/Contact/Contact';
-import ProtectedRoute from './components/ProtectedRoute';
-import CourseChange from './pages/CourseChange/CourseChange';
-import CourseEdit from './pages/CourseEdit/CourseEdit';
-import ClassChange from './pages/ClassChange/ClassChange';
-import ClassEdit from './pages/ClassEdit/ClassEdit';
+import Specialized from './pages/Specialized/Specialized';
 import TuitionChange from './pages/TuitionChange/TuitionChange';
 import TuitionEdit from './pages/TuitionEdit/TuitionEdit';
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import TuitionMain from './pages/tuitionMain/TuitionMain';
 
 const useRoleListener = () => {
@@ -87,9 +88,10 @@ export default function App() {
           <Route path="/contact" element={<ProtectedRoute><RoleBasedRoute element={Contact} allowedRoles={['1']} /></ProtectedRoute>} />
 
           {/* Routes for Employee (Role 2) */}
-          <Route path="/courseChange" element={<ProtectedRoute><RoleBasedRoute element={CourseChange} allowedRoles={['2']} /></ProtectedRoute>} />
+          <Route path="/majorSubjectChange" element={<ProtectedRoute><RoleBasedRoute element={MajorSubjectChange} allowedRoles={['2']} /></ProtectedRoute>} />
+          <Route path="/majorSubjectChange/:id" element={<ProtectedRoute><RoleBasedRoute element={MajorSubjectChangeDetail} allowedRoles={['2']} /></ProtectedRoute>} />
           <Route path="/courseEdit" element={<ProtectedRoute><RoleBasedRoute element={CourseEdit} allowedRoles={['2']} /></ProtectedRoute>} />
-          <Route path="/classChange" element={<ProtectedRoute><RoleBasedRoute element={ClassChange} allowedRoles={['2']} /></ProtectedRoute>} />
+          <Route path="/generalSubjectChange" element={<ProtectedRoute><RoleBasedRoute element={GeneralSubjectChange} allowedRoles={['2']} /></ProtectedRoute>} />
           <Route path="/classEdit" element={<ProtectedRoute><RoleBasedRoute element={ClassEdit} allowedRoles={['2']} /></ProtectedRoute>} />
 
           {/* Routes for Employee (Role 3) */}

@@ -44,7 +44,7 @@ export default function Logging() {
         if (value === 1) {
           navigate("/tuition/pay");
         } else if (value === 2) {
-          navigate("/courseChange");
+          navigate("/generalSubjectChange");
         } else if (value === 3) {
           navigate("/tuitionMain");
         }

@@ -12,14 +12,14 @@ import { icons } from "lucide-react";
 
 const items = [
   {
-    key: "courseChange",
-    icon: <BankOutlined />,
-    label: "Môn Học",
+    key: "generalSubjectChange",
+    label: "Môn chung",
+    icon: <BookOutlined />,
   },
   {
-    key: "classChange",
-    label: "Lớp Học",
-    icon: <BookOutlined />,
+    key: "majorSubjectChange",
+    icon: <BankOutlined />,
+    label: "Môn chuyên ngành",
   },
   {
     key: "logout",
@@ -71,13 +71,13 @@ export default function Header() {
     const { key } = e;
     switch (key) {
       case "add-delete-subject":
-        navigate("/courseChange");
+        navigate("/majorSubjectChange");
         break;
         // case 'edit-subject':
         // navigate("/courseEdit");
         // break;
       case "add-delete-class":
-        navigate("/classChange");
+        navigate("/generalSubjectChange");
         break;
       // case 'edit-class':
       //     navigate('/classEdit');
@@ -101,7 +101,7 @@ export default function Header() {
       onOpenChange={onOpenChange}
       onClick={onClick}
       style={{
-        width: 256,
+        width: 200,
       }}
       items={items}
     />

@@ -3,7 +3,7 @@ import './ClassChange.css';
 import Header from "../../components/courseHeader";
 
 
-export default function ClassChange() {
+export default function GeneralSubjectChange() {
   return (
     <div className="classChange-container">
       <Header />
