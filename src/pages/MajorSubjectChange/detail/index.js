@@ -1,14 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import ContentLayout from "../../../components/ContentLayout";
 import Header from "../../../components/courseHeader";
-import { Form, Button, Input, Select, InputNumber, Table } from "antd";
+import {
+  Form,
+  Button,
+  Input,
+  Select,
+  InputNumber,
+  Table,
+  Modal,
+  DatePicker,
+} from "antd";
 import { majorSubject } from "../index";
 import { useNavigate, useParams } from "react-router-dom";
+import moment from "moment";
 
 export default function MajorSubjectChangeDetail() {
   const { id } = useParams();
+  const { RangePicker } = DatePicker;
   const navigate = useNavigate();
   const subject = majorSubject.find((subject) => subject.id === id);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentClassSection, setCurrentClassSection] = useState(null); // Thêm trạng thái này
+
+  const showModal = (classSection) => {
+    setCurrentClassSection(classSection); // Cập nhật trạng thái với thông tin lớp học phần được chọn
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   if (!subject) {
     return (
@@ -53,14 +80,8 @@ export default function MajorSubjectChangeDetail() {
       title: "Thao tác",
       dataIndex: "id",
       key: "id",
-      render: (text) => (
-        <Button
-          // onClick={() => {
-          //   navigate(`/majorSubjectChange/${text}`);
-          // }}
-        >
-          Chi tiết
-        </Button>
+      render: (text, record) => (
+        <Button onClick={() => showModal(record)}>Chi tiết</Button> // Truyền record vào showModal
       ),
     },
   ];
@@ -115,21 +136,62 @@ export default function MajorSubjectChangeDetail() {
             </Form>
           </div>
           <div className="flex justify-end mr-10 mb-20 gap-4">
-            {/* <Button type="primary">xem danh sách lớp học phần</Button> */}
             <Button type="primary">Lưu thay đổi</Button>
             <Button type="primary" danger>
               Xóa học phần
             </Button>
           </div>
           <div>
-            <span className="text-2xl m-12">Danh sách các lớp học phần</span>
+            <div className="flex flex-row justify-between items-center mx-10">
+              <span className="text-2xl m-12">Danh sách các lớp học phần</span>
+              <Button type="primary">Thêm lớp học phần</Button>
+            </div>
             <div className="m-10">
               <Table
                 columns={columns}
                 dataSource={subject.classSections}
                 tableLayout="auto"
+                rowKey="id"
               />
             </div>
+            {currentClassSection && (
+              <Modal
+                title="Thông tin lớp học phần"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                footer={[
+                  <Button type="primary" onClick={handleOk}>
+                    Lưu thay đổi
+                  </Button>,
+                  <Button type="primary" danger onClick={handleOk}>
+                    Xóa lớp học phần
+                  </Button>,
+                ]}
+              >
+                <div>
+                  <Form>
+                    <Form.Item name="id" label="Mã lớp học phần">
+                      <Input defaultValue={currentClassSection.id} />
+                    </Form.Item>
+                    <Form.Item name="teacher" label="Giảng viên">
+                      <Input defaultValue={currentClassSection.teacher} />
+                    </Form.Item>
+                    <Form.Item name="dateRange" label="Thời gian">
+                      <RangePicker
+                        defaultValue={[
+                          moment(currentClassSection.startDate),
+                          moment(currentClassSection.endDate),
+                        ]}
+                      />
+                    </Form.Item>
+                    <Form.Item name="enrolled" label="Số lượng đăng ký">
+                      <InputNumber defaultValue={currentClassSection.enrolled} />
+                    </Form.Item>
+                  </Form>
+                </div>
+              </Modal>
+            )}
           </div>
         </div>
       </div>
