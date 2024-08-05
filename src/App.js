@@ -12,22 +12,15 @@ import NoPage from './pages/NoPage/NoPage';
 import Pay from './pages/Pay/Pay';
 import Register from './pages/Register/Register';
 import Registered from './pages/Registered/Registered';
-<<<<<<< HEAD
-import Contact from './pages/Contact/Contact';
-import ProtectedRoute from './components/ProtectedRoute';
-import CourseChange from './pages/CourseChange/CourseChange';
-import CourseEdit from './pages/CourseEdit/CourseEdit';
-import ClassChange from './pages/ClassChange/ClassChange';
-import ClassEdit from './pages/ClassEdit/ClassEdit';
 import TuitionMajor from './pages/TuitionMajor/TuitionMajor';
-=======
+
 import Specialized from './pages/Specialized/Specialized';
-import TuitionChange from './pages/TuitionChange/TuitionChange';
->>>>>>> 4fad32890fa6659d0a4fbd1a980b06635c6c3cef
+
+
 import TuitionEdit from './pages/TuitionEdit/TuitionEdit';
 import TuitionMain from './pages/tuitionMain/TuitionMain';
-import MajorSubjectChange from '../src/pages/MajorSubjectChange/MajorSubjectChange'
-import MajorSubjectChangeDetail from '../src/pages/MajorSubjectChange/detail/MajorSubjectChangeDetail'
+import MajorSubjectChange from './pages/MajorSubjectChange/MajorSubjectChange';
+import MajorSubjectChangeDetail from '../src/pages/MajorSubjectChange/detail/MajorSubjectChangeDetail';
 
 
 const useRoleListener = () => {
