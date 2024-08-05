@@ -21,7 +21,7 @@ const data = [
   },
 ];
 
-export default function PaymentList() {
+export default function FeesList() {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
@@ -134,17 +134,38 @@ export default function PaymentList() {
 
   const columns = [
     {
-      title: 'Mã hóa đơn',
-      dataIndex: 'paymID',
-      key: 'paymID',
-      ...getColumnSearchProps('paymID'),
+      title: 'Mã phí',
+      dataIndex: 'fID',
+      key: 'fID',
+      ...getColumnSearchProps('fID'),
+
     },
     {
-      title: 'Tên hóa đơn',
-      dataIndex: 'paymName',
-      key: 'paymName',
-      ...getColumnSearchProps('paymName'),
+      title: 'Năm học',
+      dataIndex: 'year',
+      key: 'year',
+      ...getColumnSearchProps('year'),
     },
+    {
+      title: 'Học kỳ',
+      dataIndex: 'semester',
+      key: 'semester',
+      ...getColumnSearchProps('semester'),
+    },
+    {
+      title: 'Thành tiền',
+      dataIndex: 'amount',
+      key: 'amount',
+      ...getColumnSearchProps('amount'),
+      sorter: (a, b) => a.amount - b.amount
+    },
+    {
+      title: 'Ngày hết hạn',
+      dataIndex: 'date',
+      key: 'date',
+      ...getColumnSearchProps('date'),
+    },
+   
   ];
 
   return(
@@ -152,15 +173,12 @@ export default function PaymentList() {
       <Table 
         columns={columns}
         pagination={{
-          pageSize: 50,
+          pageSize: 10,
         }}
         scroll={{
           y: 240,
         }}
-        dataSource={data}
-        onRow={(record) => ({
-          onClick: () => handleRowClick(record),
-        })}
+        //dataSource={data}
       />
     </div>
   );
