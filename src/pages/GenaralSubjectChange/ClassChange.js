@@ -4,7 +4,7 @@ import { Table, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import ContentLayout from "../../components/ContentLayout";
 import { render } from "@testing-library/react";
-import { majorSubject } from "../../data/coursesData";
+import { generallSubject } from "../../data/coursesData";
 
 export default function MajorSubjectChange() {
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ export default function MajorSubjectChange() {
             onCreate={() => navigate("/generalSubjectChange/create")}
           >
             <Table
-              dataSource={majorSubject}
+              dataSource={generallSubject}
               columns={columns}
               tableLayout="auto"
             />
