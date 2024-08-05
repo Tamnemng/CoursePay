@@ -16,8 +16,8 @@ import Specialized from './pages/Specialized/Specialized';
 import TuitionChange from './pages/TuitionChange/TuitionChange';
 import TuitionEdit from './pages/TuitionEdit/TuitionEdit';
 import TuitionMain from './pages/tuitionMain/TuitionMain';
-import MajorSubjectChange from '../src/pages/MajorSubjectChange/MajorSubjectChange'
-import MajorSubjectChangeDetail from '../src/pages/MajorSubjectChange/detail/MajorSubjectChangeDetail'
+import MajorSubjectChange from './pages/MajorSubjectChange';
+import MajorSubjectChangeDetail from './pages/MajorSubjectChange/detail';
 
 
 const useRoleListener = () => {

@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import ContentLayout from "../../components/ContentLayout";
 import { render } from "@testing-library/react";
 
-const majorSubject = [
+export const majorSubject = [
   {
     id: "a001",
     name: "JavaScript Basics",
@@ -293,20 +293,6 @@ export default function MajorSubjectChange() {
       dataIndex: "type",
       key: "type",
     },
-    // {
-    //   title: "Danh sách lớp học phần",
-    //   dataIndex: "classSections",
-    //   key: "classSections",
-    //   render: (classSections) => (
-    //     <ul>
-    //       {classSections.map((section) => (
-    //         <li key={section.id}>
-    //           {section.teacher} - {section.enrolled} đăng ký
-    //         </li>
-    //       ))}
-    //     </ul>
-    //   ),
-    // },
     {
       title: "Thao tác",
       dataIndex: "id",
@@ -331,7 +317,9 @@ export default function MajorSubjectChange() {
           Quản lý học vụ
         </h1>
         <div>
-          <ContentLayout onCreate={() => navigate("/majorSubjectChange/create")}>
+          <ContentLayout
+            onCreate={() => navigate("/majorSubjectChange/create")}
+          >
             <Table
               dataSource={majorSubject}
               columns={columns}
