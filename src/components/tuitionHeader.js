@@ -18,7 +18,7 @@ const items = [
         label: 'Học Phí',
         children: [
             {
-                key: 'add-delete-tuition',
+                key: 'major-tuition',
                 label: 'Học phí học kỳ',
             },
             {
@@ -76,8 +76,8 @@ export default function Header() {
             case 'main-tuition':
                 navigate('/tuitionMain');
                 break;
-            case 'add-delete-tuition':
-                navigate('/tuitionChange');
+            case 'major-tuition':
+                navigate('/tuitionMajor');
                 break;
             case 'edit-tuition':
                 navigate('/tuitionEdit');

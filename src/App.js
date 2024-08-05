@@ -13,7 +13,7 @@ import CourseChange from './pages/CourseChange/CourseChange';
 import CourseEdit from './pages/CourseEdit/CourseEdit';
 import ClassChange from './pages/ClassChange/ClassChange';
 import ClassEdit from './pages/ClassEdit/ClassEdit';
-import TuitionChange from './pages/TuitionChange/TuitionChange';
+import TuitionMajor from './pages/TuitionMajor/TuitionMajor';
 import TuitionEdit from './pages/TuitionEdit/TuitionEdit';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import TuitionMain from './pages/tuitionMain/TuitionMain';
@@ -94,7 +94,7 @@ export default function App() {
 
           {/* Routes for Employee (Role 3) */}
           <Route path="/tuitionMain" element={<ProtectedRoute><RoleBasedRoute element={TuitionMain} allowedRoles={['3']}/></ProtectedRoute>}/>
-          <Route path="/tuitionChange" element={<ProtectedRoute><RoleBasedRoute element={TuitionChange} allowedRoles={['3']} /></ProtectedRoute>} />
+          <Route path="/tuitionMajor" element={<ProtectedRoute><RoleBasedRoute element={TuitionMajor} allowedRoles={['3']} /></ProtectedRoute>} />
           <Route path="/tuitionEdit" element={<ProtectedRoute><RoleBasedRoute element={TuitionEdit} allowedRoles={['3']} /></ProtectedRoute>} />
           
           <Route path="*" element={<ProtectedRoute><NoPage role={role} /></ProtectedRoute>} />
