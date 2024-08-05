@@ -8,8 +8,6 @@ import GeneralSubjectChange from './pages/GenaralSubjectChange/ClassChange';
 import History from './pages/History/History';
 import Improve from './pages/Improve/Improve';
 import Logging from './pages/Logging/Logging';
-import MajorSubjectChangeDetail from './pages/MajorSubjectChange/detail/courseChangeDetail';
-import MajorSubjectChange from './pages/MajorSubjectChange/majorSubjectChange';
 import NoPage from './pages/NoPage/NoPage';
 import Pay from './pages/Pay/Pay';
 import Register from './pages/Register/Register';
@@ -18,6 +16,9 @@ import Specialized from './pages/Specialized/Specialized';
 import TuitionChange from './pages/TuitionChange/TuitionChange';
 import TuitionEdit from './pages/TuitionEdit/TuitionEdit';
 import TuitionMain from './pages/tuitionMain/TuitionMain';
+import MajorSubjectChange from '../src/pages/MajorSubjectChange/MajorSubjectChange'
+import MajorSubjectChangeDetail from '../src/pages/MajorSubjectChange/detail/MajorSubjectChangeDetail'
+
 
 const useRoleListener = () => {
   const [role, setRole] = useState(() => localStorage.getItem('role') || '');
