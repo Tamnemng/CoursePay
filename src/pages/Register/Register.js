@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button, message } from 'antd';
 import Header from '../../components/Header';
-import { generalCourses } from '../../data/coursesData';
+import { generallSubject } from '../../data/coursesData';
 import { studentInfo } from '../../data/studentData';
 import './Register.css';
 
@@ -33,15 +33,7 @@ export default function Register() {
     const [courses, setCourses] = useState([]);
 
     useEffect(() => {
-        const allCourses = generalCourses
-            .filter(semesterData => semesterData.semester === studentInfo.semester )
-            .flatMap(semesterData =>
-                semesterData.courses.map(course => ({
-                    ...course,
-                    semester: semesterData.semester,
-                    major: semesterData.major
-                }))
-            );
+        const allCourses = generallSubject.filter(course => course.semester === studentInfo.semester);
         setCourses(allCourses);
     }, []);
 
@@ -74,11 +66,11 @@ export default function Register() {
     };
 
     const classColumns = [
-        { title: 'Tên Lớp', dataIndex: 'name', className: 'class-name-column' },
-        { title: 'Sĩ Số', dataIndex: 'class_size', className: 'class-size-column' },
-        { title: 'Giảng Viên', dataIndex: 'lecturers', className: 'lecturer-column' },
-        { title: 'Ngày Bắt Đầu', dataIndex: 'started_day', className: 'start-date-column' },
-        { title: 'Ngày Kết Thúc', dataIndex: 'ended_day', className: 'end-date-column' },
+        { title: 'Tên Lớp', dataIndex: 'id', className: 'class-name-column' },
+        { title: 'Sĩ Số', dataIndex: 'enrolled', className: 'class-size-column' },
+        { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
+        { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
+        { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
         {
             title: 'Action',
             render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
@@ -111,7 +103,7 @@ export default function Register() {
                     {selectedCourse && (
                         <Table
                             columns={classColumns}
-                            dataSource={selectedCourse.classes}
+                            dataSource={selectedCourse.classSections}
                             rowKey="id"
                         />
                     )}
@@ -122,7 +114,7 @@ export default function Register() {
                     onOk={handleConfirmRegister}
                     onCancel={handleCancelRegister}
                 >
-                    <p>Bạn có chắc chắn muốn đăng ký lớp {selectedClass?.name} của môn {selectedCourse?.name}?</p>
+                    <p>Bạn có chắc chắn muốn đăng ký lớp {selectedClass?.id} của môn {selectedCourse?.name}?</p>
                 </Modal>
             </div>
         </div>

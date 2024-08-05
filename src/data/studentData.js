@@ -2,8 +2,8 @@ export const studentInfo =
 {
     id: "48.01.104.128",
     name: "Nguyễn Phúc Thịnh",  
-    major: "spa",                   //nganh hoc trong day co 5 nganh chinh trong datatester spa, cntt, spt, ,spnv ,sph
-    semester: 's1n1',               //nam sinh vien s la hoc ki, n la nam. s1n1 la hk1 nam 1
+    major: "Công nghệ thông tin",              
+    semester: 1,               
     fees: [
         { id: 1, name: "Học phí học kỳ", amount: 10000000, paid: false, paymentDate: null },
         { id: 2, name: "Bảo hiểm y tế", amount: 500000, paid: true, paymentDate: "2024-07-15" },

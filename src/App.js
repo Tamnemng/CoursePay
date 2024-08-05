@@ -13,9 +13,9 @@ import Pay from './pages/Pay/Pay';
 
 import Registered from './pages/Registered/Registered';
 import TuitionMajor from './pages/TuitionMajor/TuitionMajor';
-// import Specialized from './pages/Specialized/Specialized';
-// import Register from './pages/Register/Register';
-// import Improve from './pages/Improve/Improve';
+import Specialized from './pages/Specialized/Specialized';
+import Register from './pages/Register/Register';
+import Improve from './pages/Improve/Improve';
 import TuitionEdit from './pages/TuitionEdit/TuitionEdit';
 import TuitionMain from './pages/tuitionMain/TuitionMain';
 import MajorSubjectChange from './pages/MajorSubjectChange';
@@ -84,9 +84,9 @@ export default function App() {
           {/* Routes for Students (Role 1) */}
           <Route path="/tuition/pay" element={<ProtectedRoute><RoleBasedRoute element={Pay} allowedRoles={['1']} /></ProtectedRoute>} />
           <Route path="/tuition/history" element={<ProtectedRoute><RoleBasedRoute element={History} allowedRoles={['1']} /></ProtectedRoute>} />
-          {/* <Route path="/courses/register/general" element={<ProtectedRoute><RoleBasedRoute element={Register} allowedRoles={['1']} /></ProtectedRoute>} />
           <Route path="/courses/register/specialized" element={<ProtectedRoute><RoleBasedRoute element={Specialized} allowedRoles={['1']} /></ProtectedRoute>} />
-          <Route path="/courses/register/improve" element={<ProtectedRoute><RoleBasedRoute element={Improve} allowedRoles={['1']} /></ProtectedRoute>} /> */}
+          <Route path="/courses/register/general" element={<ProtectedRoute><RoleBasedRoute element={Register} allowedRoles={['1']} /></ProtectedRoute>} />
+          <Route path="/courses/register/improve" element={<ProtectedRoute><RoleBasedRoute element={Improve} allowedRoles={['1']} /></ProtectedRoute>} />
           <Route path="/courses/registered" element={<ProtectedRoute><RoleBasedRoute element={Registered} allowedRoles={['1']} /></ProtectedRoute>} />
           <Route path="/contact" element={<ProtectedRoute><RoleBasedRoute element={Contact} allowedRoles={['1']} /></ProtectedRoute>} />
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button, message } from 'antd';
 import Header from '../../components/Header';
-import { coursesData } from '../../data/coursesData';
+import { majorSubject } from '../../data/coursesData';
 import { studentInfo } from '../../data/studentData';
 import './Specialized.css';
 
@@ -17,7 +17,7 @@ const columns = (handleRegisterClick) => [
         className: 'course-id-column',
     },
     {
-        title: 'Action',
+        title: 'Chọn Môn Đăng Ký',
         render: (text, record) => (
             <a onClick={() => handleRegisterClick(record)} className="register-link">Đăng Ký Lớp Học</a>
         ),
@@ -33,15 +33,8 @@ export default function Specialized() {
     const [courses, setCourses] = useState([]);
 
     useEffect(() => {
-        const allCourses = coursesData
-            .filter(semesterData => semesterData.semester === studentInfo.semester && semesterData.major == studentInfo.major)
-            .flatMap(semesterData =>
-                semesterData.courses.map(course => ({
-                    ...course,
-                    semester: semesterData.semester,
-                    major: semesterData.major
-                }))
-            );
+        const allCourses = majorSubject
+            .filter(course => course.semester === studentInfo.semester && course.major === studentInfo.major);
         setCourses(allCourses);
     }, []);
 
@@ -74,13 +67,13 @@ export default function Specialized() {
     };
 
     const classColumns = [
-        { title: 'Tên Lớp', dataIndex: 'name', className: 'class-name-column' },
-        { title: 'Sĩ Số', dataIndex: 'class_size', className: 'class-size-column' },
-        { title: 'Giảng Viên', dataIndex: 'lecturers', className: 'lecturer-column' },
-        { title: 'Ngày Bắt Đầu', dataIndex: 'started_day', className: 'start-date-column' },
-        { title: 'Ngày Kết Thúc', dataIndex: 'ended_day', className: 'end-date-column' },
+        { title: 'Tên Lớp', dataIndex: 'id', className: 'class-name-column' },
+        { title: 'Sĩ Số', dataIndex: 'enrolled', className: 'class-size-column' },
+        { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
+        { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
+        { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
         {
-            title: 'Action',
+            title: 'Chọn Lớp Đăng Ký',
             render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
             className: 'action-column'
         },
@@ -111,7 +104,7 @@ export default function Specialized() {
                     {selectedCourse && (
                         <Table
                             columns={classColumns}
-                            dataSource={selectedCourse.classes}
+                            dataSource={selectedCourse.classSections}
                             rowKey="id"
                         />
                     )}
@@ -122,7 +115,7 @@ export default function Specialized() {
                     onOk={handleConfirmRegister}
                     onCancel={handleCancelRegister}
                 >
-                    <p>Bạn có chắc chắn muốn đăng ký lớp {selectedClass?.name} của môn {selectedCourse?.name}?</p>
+                    <p>Bạn có chắc chắn muốn đăng ký lớp {selectedClass?.id} của môn {selectedCourse?.name}?</p>
                 </Modal>
             </div>
         </div>
