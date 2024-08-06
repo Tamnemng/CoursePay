@@ -2,11 +2,18 @@ import React from "react";
 import './TuitionMajor.css';
 import Header from "../../components/tuitionHeader";
 import Typography from "antd/es/typography/Typography";
-import { Select, Input, Button } from "antd";
+import { Select, Input, Button, DatePicker } from "antd";
 import FeesList from "./FeesList";
 
 const {Title, Text} = Typography;
-
+const {RangePicker} = DatePicker;
+const disabled1Year = (current, { from }) => {
+  if (from) {
+    const yearsDifference = Math.abs(from.year() - current.year());
+    return yearsDifference >= 2;
+  }
+  return false;
+};
 
 export default function TuitionMajor() {
   return (
@@ -19,27 +26,25 @@ export default function TuitionMajor() {
         <div className="frm">
           <Title level={4}>Chi tiết học phí</Title>
           <div className="ops">
-              <Text>Mã phí: </Text>
-              <Input
-                //className="customInp"
-                style={{
-                  width: '30%',
-                  height: '30px',
-                  marginRight: '150px',
-                  marginLeft: '10px',
-                }}
-                placeholder="Mã phí"
-                readOnly
-              />
-              <Text>Tên phí:</Text>
-              <Input
-                style={{
-                  width: '30%',
-                  height: '30px',
-                  marginLeft: '10px',
-                }}
-                placeholder="Tên phí"
-              />
+            <Text>Mã phí: </Text>
+            <Input
+              style={{
+                width: '30%',
+                height: '30px',
+                marginRight: '150px',
+                marginLeft: '10px',
+              }}
+              placeholder="Mã phí"
+              readOnly
+            />
+            <Text>Năm học:</Text>
+            <RangePicker 
+              picker="year"
+              style={{
+                marginLeft: '10px',
+              }}
+              disabledDate={disabled1Year}
+            />
           </div>
           <div className="ops">
               <Text>Thành tiền: </Text>
@@ -51,17 +56,35 @@ export default function TuitionMajor() {
                   marginRight: '150px',
                   marginLeft: '10px',
                 }}
-                placeholder="4 000 000 VND"
+                placeholder="4 000 000"
+                addonAfter="VNĐ"
               />
-              <Text>Ngày hết hạn:</Text>
-              <Input
+              <Text>Học kỳ: </Text>
+              <Select
                 style={{
-                  width: '30%',
-                  height: '30px',
+                  width: '200px',
                   marginLeft: '10px',
                 }}
-                placeholder="2024-01-01"
+                defaultValue={'hk1'}
+                options={[
+                  {
+                    value: 'hk1',
+                    label: 'Học kỳ 1',
+                  },
+                  {
+                    value: 'hk2',
+                    label: 'Học kỳ 2',
+                  },
+                  {
+                    value: 'hk3',
+                    label: 'Học kỳ hè',
+                  }
+                ]}
               />
+          </div>
+          <div className="ops">
+              <Text>Ngày hết hạn: </Text>
+              <DatePicker format={'DD-MM-YYYY'} style={{marginLeft: '10px'}}/>
           </div>
           <div className="btn">
             <Button 
