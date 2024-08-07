@@ -75,7 +75,7 @@ export default function MajorSubjectChange() {
         </h1>
         <div>
           <ContentLayout
-            onCreate={() => navigate("/majorSubjectChange/create")}
+            onCreate={() => navigate("/createSubject")}
           >
             <Table
               dataSource={majorSubject}

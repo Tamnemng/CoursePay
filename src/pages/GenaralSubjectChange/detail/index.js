@@ -37,19 +37,16 @@ export default function GeneralSubjectChangeDetail() {
     setIsModalOpen(false);
   };
 
-  if (!subject) {
-    return (
-      <div className="flex">
-        <Header />
-        <div className="text-3xl my-4 grow flex flex-col">
-          <h1 className="flex justify-center items-center my-4 text-black font-semibold">
-            Thêm học phần
-          </h1>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!subject) {
+      navigate("/*");
+    }
+  }, [subject, navigate]);
 
+  if (!subject) {
+    return null;
+  }
+  
   const columns = [
     {
       title: "Mã lớp học phần",
@@ -186,7 +183,9 @@ export default function GeneralSubjectChangeDetail() {
                       />
                     </Form.Item>
                     <Form.Item name="enrolled" label="Số lượng đăng ký">
-                      <InputNumber defaultValue={currentClassSection.enrolled} />
+                      <InputNumber
+                        defaultValue={currentClassSection.enrolled}
+                      />
                     </Form.Item>
                   </Form>
                 </div>

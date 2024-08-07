@@ -20,6 +20,7 @@ import TuitionEdit from './pages/TuitionEdit/TuitionEdit';
 import TuitionMain from './pages/tuitionMain/TuitionMain';
 import MajorSubjectChange from './pages/MajorSubjectChange';
 import MajorSubjectChangeDetail from './pages/MajorSubjectChange/detail';
+import CreateSubject from './pages/CreateSubject';
 
 
 const useRoleListener = () => {
@@ -96,6 +97,7 @@ export default function App() {
           <Route path="/courseEdit" element={<ProtectedRoute><RoleBasedRoute element={CourseEdit} allowedRoles={['2']} /></ProtectedRoute>} />
           <Route path="/generalSubjectChange" element={<ProtectedRoute><RoleBasedRoute element={GeneralSubjectChange} allowedRoles={['2']} /></ProtectedRoute>} />
           <Route path="/generalSubjectChange/:id" element={<ProtectedRoute><RoleBasedRoute element={MajorSubjectChangeDetail} allowedRoles={['2']} /></ProtectedRoute>} />
+          <Route path="/createSubject" element={<ProtectedRoute><RoleBasedRoute element={CreateSubject} allowedRoles={['2']} /></ProtectedRoute>} />
           <Route path="/classEdit" element={<ProtectedRoute><RoleBasedRoute element={ClassEdit} allowedRoles={['2']} /></ProtectedRoute>} />
 
           {/* Routes for Employee (Role 3) */}

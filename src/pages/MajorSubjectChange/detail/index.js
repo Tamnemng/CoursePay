@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ContentLayout from "../../../components/ContentLayout";
 import Header from "../../../components/courseHeader";
 import {
@@ -37,17 +37,14 @@ export default function MajorSubjectChangeDetail() {
     setIsModalOpen(false);
   };
 
+  useEffect(() => {
+    if (!subject) {
+      navigate("/*");
+    }
+  }, [subject, navigate]);
+
   if (!subject) {
-    return (
-      <div className="flex">
-        <Header />
-        <div className="text-3xl my-4 grow flex flex-col">
-          <h1 className="flex justify-center items-center my-4 text-black font-semibold">
-            Thêm học phần
-          </h1>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   const columns = [
@@ -186,7 +183,9 @@ export default function MajorSubjectChangeDetail() {
                       />
                     </Form.Item>
                     <Form.Item name="enrolled" label="Số lượng đăng ký">
-                      <InputNumber defaultValue={currentClassSection.enrolled} />
+                      <InputNumber
+                        defaultValue={currentClassSection.enrolled}
+                      />
                     </Form.Item>
                   </Form>
                 </div>
