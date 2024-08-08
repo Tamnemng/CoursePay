@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ContentLayout from "../../../components/ContentLayout";
 import Header from "../../../components/courseHeader";
 import {
