@@ -39,7 +39,7 @@ export default function MajorSubjectChangeDetail() {
 
   useEffect(() => {
     if (!subject) {
-      navigate("/*");
+      navigate("/notfound");
     }
   }, [subject, navigate]);
 

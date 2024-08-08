@@ -6,12 +6,15 @@ import { useNavigate } from "react-router-dom";
 import ContentLayout from "../../components/ContentLayout";
 import { render } from "@testing-library/react";
 import { majorSubject } from "../../data/coursesData";
+import { Filter } from "lucide-react";
 
 export default function MajorSubjectChange() {
   const navigate = useNavigate();
 
   // lay danh sach chuyen nganh tu majorSubject
-  const majors = [...new Set(majorSubject.map((course) => course.major))];
+  const majors = [
+    ...new Set(majorSubject ? majorSubject.map((course) => course.major) : []),
+  ];
 
   const columns = [
     {
@@ -74,9 +77,7 @@ export default function MajorSubjectChange() {
           Quản lý học vụ
         </h1>
         <div>
-          <ContentLayout
-            onCreate={() => navigate("/createSubject")}
-          >
+          <ContentLayout onCreate={() => navigate("/createSubject")}>
             <Table
               dataSource={majorSubject}
               columns={columns}

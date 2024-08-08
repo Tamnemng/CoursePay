@@ -21,7 +21,7 @@ export default function CreateSubject() {
               <Form.Item name="name" label="Tên học phần" required>
                 <Input />
               </Form.Item>
-              <Form.Item name="major" label="Chuyên ngành"required>
+              <Form.Item name="major" label="Chuyên ngành">
                 <Input />
               </Form.Item>
               <div className="flex flex-row gap-8">
