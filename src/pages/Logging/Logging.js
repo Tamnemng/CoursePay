@@ -1,13 +1,13 @@
 import "./Logging.css";
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { Input, Button, Radio, Space, message } from "antd";
+import { Input, Button, Radio, Space, message, Form } from "antd";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { login, getUserRole } from "./loggingData";
 
 export default function Logging() {
   const navigate = useNavigate();
   const [value, setValue] = useState(1);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
 
   useEffect(() => {
     localStorage.setItem("isAuthenticated", "false");
@@ -18,42 +18,44 @@ export default function Logging() {
     );
   }, []);
 
-  const checking = async () => {
-    if (!username || !password) {
-      message.error("Vui lòng điền tên đăng nhập và mật khẩu!");
-      return;
-    }
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      if (username === "123" && password === "123") {
-        message.success("Đăng nhập thành công!");
-        localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem(
-          "lastActivityTime",
-          new Date().getTime().toString()
-        );
-        localStorage.setItem("role", value.toString());
-        console.log(
-          "Login successful, isAuthenticated:",
-          localStorage.getItem("isAuthenticated")
-        );
-        console.log("Role set to:", value);
+  const onFinish = async (values) => {
+    const result = await login(values.email, values.password);
 
-        window.dispatchEvent(new CustomEvent("roleChanged", { detail: value }));
-
-        if (value === 1) {
+    if (result.status === "success") {
+      try {
+        const userInfo = await getUserRole();
+        const role = userInfo?.role || value;
+        if (role === 1 && value === 1) {
+          localStorage.setItem("role", value.toString());
+          localStorage.setItem("isAuthenticated", "true");
+          message.success("Đăng nhập thành công");
           navigate("/tuition/pay");
-        } else if (value === 2) {
+
+        } else if (role === 2 && value === 2) {
+          localStorage.setItem("role", value.toString());
+          localStorage.setItem("isAuthenticated", "true");
+          message.success("Đăng nhập thành công");
           navigate("/generalSubjectChange");
-        } else if (value === 3) {
+
+        } else if (role === 3 && value === 3) {
+          localStorage.setItem("role", value.toString());
+          localStorage.setItem("isAuthenticated", "true");
+          message.success("Đăng nhập thành công");
           navigate("/tuitionMain");
+
+        } else {
+          console.log("roleeee: ", role, "valueee: ", value);
         }
-      } else {
-        message.error("Tên đăng nhập hoặc mật khẩu không đúng!");
+      } catch (error) {
+        message.error("Failed to get user role: " + error.message);
       }
-    } catch (error) {
-      message.error("Đã xảy ra lỗi khi đăng nhập");
+    } else {
+      message.error("Sign in failed: " + result.message);
     }
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
   };
 
   const onChange = (e) => {
@@ -61,60 +63,63 @@ export default function Logging() {
     setValue(e.target.value);
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      checking();
-    }
-  };
-
   return (
     <div className="Web">
       <header className="Web-header">
         <div className="Logging">
-          <div className="mb-4">Đăng nhập</div>
-          <div className="">
-            <div className="flex left-0 text-lg">Tên đăng nhập</div>
-            <Input
-              //   placeholder="input username"
-              className="input-field"
-              required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-          <div>
-            <div className="flex left-0 text-lg">Mật khẩu</div>
-            <Input.Password
-              //   placeholder="input password"
-              className="input-field"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyPress={handleKeyPress}
-            />
-          </div>
-          <div className="">
-            <Button
-              type="primary"
-              onClick={checking}
-              className="input-button"
+          <Form
+            name="normal_login"
+            labelCol={{ span: 5 }}
+            className="login-form"
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
+          >
+            <div className="mb-4 text-3xl">Đăng nhập</div>
+            <Form.Item
+              name="email"
+              rules={[
+                { type: "email", message: "Email không hợp lệ" },
+                { required: true, message: "Vui lòng nhập email" },
+              ]}
             >
-              Đăng nhập
-            </Button>
-          </div>
-          <Radio.Group onChange={onChange} value={value}>
-            <Space className="flex justify-center items-center p-4">
-              <Radio value={1} className="radio-button">
-                Sinh Viên
-              </Radio>
-              <Radio value={2} className="radio-button">
-                Phòng giáo vụ
-              </Radio>
-              <Radio value={3} className="radio-button">
-                Phòng tài vụ
-              </Radio>
-            </Space>
-          </Radio.Group>
+              <Input
+                prefix={<UserOutlined className="site-form-item-icon" />}
+                placeholder="Email"
+              />
+            </Form.Item>
+            <Form.Item
+              name="password"
+              rules={[
+                { required: true, message: "Vui lòng nhập mật khẩu" },
+                { min: 6, message: "Mật khẩu phải có tối thiểu 6 ký tự" },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                placeholder="Password"
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" className="input-button" htmlType="submit">
+                Đăng nhập
+              </Button>
+            </Form.Item>
+            <Form.Item>
+              <Radio.Group onChange={onChange} value={value}>
+                <Space className="flex justify-center items-center p-4">
+                  <Radio value={1} className="radio-button">
+                    Sinh Viên
+                  </Radio>
+                  <Radio value={2} className="radio-button">
+                    Phòng giáo vụ
+                  </Radio>
+                  <Radio value={3} className="radio-button">
+                    Phòng tài vụ
+                  </Radio>
+                </Space>
+              </Radio.Group>
+            </Form.Item>
+          </Form>
         </div>
       </header>
     </div>
