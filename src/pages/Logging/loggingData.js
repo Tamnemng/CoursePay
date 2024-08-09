@@ -1,28 +1,19 @@
-import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { Input, Button, Radio, Space, message } from "antd";
 import { initializeApp } from "firebase/app";
 import {
   browserLocalPersistence,
-  createUserWithEmailAndPassword,
-  deleteUser as _deleteUser,
   getAuth,
   onAuthStateChanged,
   setPersistence,
   signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
+  signOut
 } from "firebase/auth";
-import { firebaseConfig } from "../../data/firebaseConfig";
 import {
   child,
   get,
   getDatabase,
-  onValue,
-  ref,
-  set,
-  update,
+  ref
 } from "firebase/database";
+import { firebaseConfig } from "../../data/firebaseConfig";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
