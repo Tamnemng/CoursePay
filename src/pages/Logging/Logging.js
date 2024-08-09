@@ -7,50 +7,48 @@ import { login, getUserRole } from "./loggingData";
 
 export default function Logging() {
   const navigate = useNavigate();
-  const [value, setValue] = useState(1);
+  const [selectedRole, setSelectedRole] = useState(1);
 
   useEffect(() => {
     localStorage.setItem("isAuthenticated", "false");
     localStorage.removeItem("role");
-    console.log(
-      "Initial isAuthenticated:",
-      localStorage.getItem("isAuthenticated")
-    );
+    console.log("Initial isAuthenticated:", localStorage.getItem("isAuthenticated"));
   }, []);
 
   const onFinish = async (values) => {
-    const result = await login(values.email, values.password);
+    try {
+      const result = await login(values.email, values.password);
 
-    if (result.status === "success") {
-      try {
+      if (result.status === "success") {
         const userInfo = await getUserRole();
-        const role = userInfo?.role || value;
-        if (role === 1 && value === 1) {
-          localStorage.setItem("role", value.toString());
+        const userRole = userInfo?.role;
+
+        if (userRole && userRole === selectedRole) {
+          localStorage.setItem("role", userRole.toString());
           localStorage.setItem("isAuthenticated", "true");
           message.success("Đăng nhập thành công");
-          navigate("/tuition/pay");
 
-        } else if (role === 2 && value === 2) {
-          localStorage.setItem("role", value.toString());
-          localStorage.setItem("isAuthenticated", "true");
-          message.success("Đăng nhập thành công");
-          navigate("/generalSubjectChange");
-
-        } else if (role === 3 && value === 3) {
-          localStorage.setItem("role", value.toString());
-          localStorage.setItem("isAuthenticated", "true");
-          message.success("Đăng nhập thành công");
-          navigate("/tuitionMain");
-
+          switch (userRole) {
+            case 1:
+              navigate("/tuition/pay");
+              break;
+            case 2:
+              navigate("/generalSubjectChange");
+              break;
+            case 3:
+              navigate("/tuitionMain");
+              break;
+            default:
+              message.error("Vai trò không hợp lệ");
+          }
         } else {
-          console.log("roleeee: ", role, "valueee: ", value);
+          message.error("Đăng nhập thất bại.");
         }
-      } catch (error) {
-        message.error("Failed to get user role: " + error.message);
+      } else {
+        message.error("Đăng nhập thất bại: " + result.message);
       }
-    } else {
-      message.error("Sign in failed: " + result.message);
+    } catch (error) {
+      message.error("Lỗi khi đăng nhập: " + error.message);
     }
   };
 
@@ -59,8 +57,7 @@ export default function Logging() {
   };
 
   const onChange = (e) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
+    setSelectedRole(e.target.value);
   };
 
   return (
@@ -105,7 +102,7 @@ export default function Logging() {
               </Button>
             </Form.Item>
             <Form.Item>
-              <Radio.Group onChange={onChange} value={value}>
+              <Radio.Group onChange={onChange} value={selectedRole}>
                 <Space className="flex justify-center items-center p-4">
                   <Radio value={1} className="radio-button">
                     Sinh Viên

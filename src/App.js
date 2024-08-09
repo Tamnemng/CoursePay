@@ -71,10 +71,22 @@ export default function App() {
       events.forEach(event => window.removeEventListener(event, updateLastActivityTime));
       clearInterval(intervalId);
     };
+
+    
   }, []);
 
   const RoleBasedRoute = ({ element: Element, allowedRoles }) => {
-    return allowedRoles.includes(role) ? <Element /> : <Navigate to="/unauthorized" replace />;
+    const role = localStorage.getItem('role');
+    
+    if (!role) {
+      return <Navigate to="/" replace />;
+    }
+  
+    if (allowedRoles.includes(role)) {
+      return <Element />;
+    } else {
+      return <Navigate to="/unauthorized" replace />;
+    }
   };
 
   return (
