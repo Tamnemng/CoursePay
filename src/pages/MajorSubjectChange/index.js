@@ -1,30 +1,51 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./CourseChange.css";
 import Header from "../../components/courseHeader";
-import { Table, Button } from "antd";
+import { Table, Button, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import ContentLayout from "../../components/ContentLayout";
-import { render } from "@testing-library/react";
 import { getMajorSubjects } from "../../data/coursesData";
-import { Filter } from "lucide-react";
-const majorSubject = getMajorSubjects();
+
 export default function MajorSubjectChange() {
   const navigate = useNavigate();
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // lay danh sach chuyen nganh tu majorSubject
-  const majors = [
-    ...new Set(majorSubject ? majorSubject.map((course) => course.major) : []),
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const majorSubjects = await getMajorSubjects();
+        if (!majorSubjects) {
+          throw new Error("Failed to fetch major subjects");
+        }
+        const allCourses = Object.entries(majorSubjects).map(([id, course]) => ({
+          id,
+          ...course,
+        }));
+        setCourses(allCourses);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load courses. Please try again later.");
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const columns = [
     {
       title: "Chuyên ngành",
       dataIndex: "major",
       key: "major",
-      filters: majors.map((major) => ({
-        text: major,
-        value: major,
-      })),
+      filters: Array.from(new Set(courses.map((course) => course.major))).map(
+        (major) => ({
+          text: major,
+          value: major,
+        })
+      ),
       onFilter: (value, record) => record.major === value,
     },
     {
@@ -69,6 +90,14 @@ export default function MajorSubjectChange() {
     },
   ];
 
+  if (loading) {
+    return <Spin size="large" />;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
   return (
     <div className="courseChange-container flex">
       <Header />
@@ -79,7 +108,7 @@ export default function MajorSubjectChange() {
         <div>
           <ContentLayout onCreate={() => navigate("/createSubject")}>
             <Table
-              dataSource={majorSubject}
+              dataSource={courses}
               columns={columns}
               tableLayout="auto"
             />

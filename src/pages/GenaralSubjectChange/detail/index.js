@@ -10,22 +10,25 @@ import {
   Table,
   Modal,
   DatePicker,
+  Spin
 } from "antd";
 import { getGeneralSubjects } from "../../../data/coursesData";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
-const generalSubject = getGeneralSubjects();
+
 export default function GeneralSubjectChangeDetail() {
   const { id } = useParams();
   const { RangePicker } = DatePicker;
   const navigate = useNavigate();
-  const subject = generalSubject.find((subject) => subject.id === id);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentClassSection, setCurrentClassSection] = useState(null); // Thêm trạng thái này
+  const [currentClassSection, setCurrentClassSection] = useState(null);
+  const [subject, setSubject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const showModal = (classSection) => {
-    setCurrentClassSection(classSection); // Cập nhật trạng thái với thông tin lớp học phần được chọn
+    setCurrentClassSection(classSection);
     setIsModalOpen(true);
   };
 
@@ -38,15 +41,41 @@ export default function GeneralSubjectChangeDetail() {
   };
 
   useEffect(() => {
-    if (!subject) {
-      navigate("/*");
-    }
-  }, [subject, navigate]);
+    const fetchData = async () => {
+      try {
+        const generalSubjects = await getGeneralSubjects();
+        const selectedSubject = (generalSubjects.classSections).map(([id, section]) => ({
+          id,
+          ...section
+      }));
+        if (!selectedSubject) {
+          throw new Error("Subject not found");
+        }
+        setSubject(selectedSubject);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load subject details. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  if (loading) {
+    return <Spin size="large" />;
+}
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   if (!subject) {
+    navigate("/*");
     return null;
   }
-  
+
   const columns = [
     {
       title: "Mã lớp học phần",
@@ -78,7 +107,7 @@ export default function GeneralSubjectChangeDetail() {
       dataIndex: "id",
       key: "id",
       render: (text, record) => (
-        <Button onClick={() => showModal(record)}>Chi tiết</Button> // Truyền record vào showModal
+        <Button onClick={() => showModal(record)}>Chi tiết</Button>
       ),
     },
   ];
