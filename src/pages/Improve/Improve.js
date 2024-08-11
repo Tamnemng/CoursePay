@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Modal, Button, message, Tabs } from 'antd';
+import { Table, Modal, Button, message, Tabs, Spin } from 'antd';
 import Header from '../../components/Header';
-import { generallSubject, majorSubject } from '../../data/coursesData';
+import { getGeneralSubjects, getMajorSubjects } from '../../data/coursesData';
 import { studentInfo } from '../../data/studentData';
 import './Improve.css';
-
 const { TabPane } = Tabs;
 
 const columns = (handleRegisterClick) => [
@@ -35,15 +34,51 @@ export default function Improve() {
     const [specializedCourses, setSpecializedCourses] = useState([]);
     const [generalCoursesData, setGeneralCoursesData] = useState([]);
     const [activeTab, setActiveTab] = useState('general');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const allSpecializedCourses = majorSubject
-            .filter(course => course.semester === studentInfo.semester && course.major === studentInfo.major);
-        setSpecializedCourses(allSpecializedCourses);
+        const fetchData = async () => {
+            try {
+                const majorSubjects = await getMajorSubjects();
+                if (!majorSubjects) {
+                    throw new Error('Failed to fetch major subjects');
+                }
+                const allCourses = Object.entries(majorSubjects)
+                    .filter(([_, course]) => course.semester === studentInfo.semester && course.major === studentInfo.major)
+                    .map(([id, course]) => ({
+                        id,
+                        ...course
+                    }));
+                setSpecializedCourses(allCourses);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                setError('Failed to load courses. Please try again later.');
+                setLoading(false);
+            }
+            try {
+                const generalSubject = await getGeneralSubjects();
+                if (!generalSubject) {
+                    throw new Error('Failed to fetch major subjects');
+                }
+                const allCourses = Object.entries(generalSubject)
+                    .filter(([_, course]) => course.semester === studentInfo.semester)
+                    .map(([id, course]) => ({
+                        id,
+                        ...course
+                    }));
+                setGeneralCoursesData(allCourses);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                setError('Failed to load courses. Please try again later.');
+                setLoading(false);
+            }
+        };
 
-        const allGeneralCourses = generallSubject
-            .filter(course => course.semester === studentInfo.semester);
-        setGeneralCoursesData(allGeneralCourses);
+
+        fetchData();
     }, []);
 
     const handleRegisterClick = (course) => {
@@ -91,6 +126,14 @@ export default function Improve() {
         },
     ];
 
+    if (loading) {
+        return <Spin size="large" />;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
+
     return (
         <div className='register-container'>
             <Header />
@@ -124,10 +167,13 @@ export default function Improve() {
                         </Button>
                     ]}
                 >
-                    {selectedCourse && (
+                    {selectedCourse && selectedCourse.classSections && (
                         <Table
                             columns={classColumns}
-                            dataSource={selectedCourse.classSections}
+                            dataSource={Object.entries(selectedCourse.classSections).map(([id, section]) => ({
+                                id,
+                                ...section
+                            }))}
                             rowKey="id"
                         />
                     )}

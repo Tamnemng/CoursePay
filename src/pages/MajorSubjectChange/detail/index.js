@@ -13,10 +13,10 @@ import {
   Tabs,
 } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { majorSubject } from "../../../data/coursesData";
+import { getMajorSubjects } from "../../../data/coursesData";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
-
+const majorSubject = getMajorSubjects();
 export default function MajorSubjectChangeDetail() {
   const { id } = useParams();
   const { RangePicker } = DatePicker;

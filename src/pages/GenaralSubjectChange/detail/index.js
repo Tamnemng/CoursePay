@@ -11,15 +11,15 @@ import {
   Modal,
   DatePicker,
 } from "antd";
-import { generallSubject } from "../../../data/coursesData";
+import { getGeneralSubjects } from "../../../data/coursesData";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
-
+const generalSubject = getGeneralSubjects();
 export default function GeneralSubjectChangeDetail() {
   const { id } = useParams();
   const { RangePicker } = DatePicker;
   const navigate = useNavigate();
-  const subject = generallSubject.find((subject) => subject.id === id);
+  const subject = generalSubject.find((subject) => subject.id === id);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentClassSection, setCurrentClassSection] = useState(null); // Thêm trạng thái này

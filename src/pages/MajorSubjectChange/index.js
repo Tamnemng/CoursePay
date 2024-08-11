@@ -5,9 +5,9 @@ import { Table, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import ContentLayout from "../../components/ContentLayout";
 import { render } from "@testing-library/react";
-import { majorSubject } from "../../data/coursesData";
+import { getMajorSubjects } from "../../data/coursesData";
 import { Filter } from "lucide-react";
-
+const majorSubject = getMajorSubjects();
 export default function MajorSubjectChange() {
   const navigate = useNavigate();
 

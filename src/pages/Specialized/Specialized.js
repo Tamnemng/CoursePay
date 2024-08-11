@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Modal, Button, message } from 'antd';
+import { Table, Modal, Button, message, Spin } from 'antd';
 import Header from '../../components/Header';
-import { majorSubject } from '../../data/coursesData';
+import { getMajorSubjects } from '../../data/coursesData';
 import { studentInfo } from '../../data/studentData';
 import './Specialized.css';
 
@@ -15,6 +15,16 @@ const columns = (handleRegisterClick) => [
         title: 'Mã Học Phần',
         dataIndex: 'id',
         className: 'course-id-column',
+    },
+    {
+        title: 'Số tín chỉ',
+        dataIndex: 'credits',
+        className: 'course-credits-column',
+    },
+    {
+        title: 'Loại',
+        dataIndex: 'type',
+        className: 'course-type-column',
     },
     {
         title: 'Chọn Môn Đăng Ký',
@@ -31,11 +41,32 @@ export default function Specialized() {
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
     const [courses, setCourses] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const allCourses = majorSubject
-            .filter(course => course.semester === studentInfo.semester && course.major === studentInfo.major);
-        setCourses(allCourses);
+        const fetchData = async () => {
+            try {
+                const majorSubjects = await getMajorSubjects();
+                if (!majorSubjects) {
+                    throw new Error('Failed to fetch major subjects');
+                }
+                const allCourses = Object.entries(majorSubjects)
+                    .filter(([_, course]) => course.semester === studentInfo.semester && course.major === studentInfo.major)
+                    .map(([id, course]) => ({
+                        id,
+                        ...course
+                    }));
+                setCourses(allCourses);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                setError('Failed to load courses. Please try again later.');
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, []);
 
     const handleRegisterClick = (course) => {
@@ -79,6 +110,14 @@ export default function Specialized() {
         },
     ];
 
+    if (loading) {
+        return <Spin size="large" />;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
+
     return (
         <div className='register-container'>
             <Header />
@@ -101,10 +140,13 @@ export default function Specialized() {
                         </Button>
                     ]}
                 >
-                    {selectedCourse && (
+                    {selectedCourse && selectedCourse.classSections && (
                         <Table
                             columns={classColumns}
-                            dataSource={selectedCourse.classSections}
+                            dataSource={Object.entries(selectedCourse.classSections).map(([id, section]) => ({
+                                id,
+                                ...section
+                            }))}
                             rowKey="id"
                         />
                     )}
@@ -120,4 +162,4 @@ export default function Specialized() {
             </div>
         </div>
     );
-};
+}
