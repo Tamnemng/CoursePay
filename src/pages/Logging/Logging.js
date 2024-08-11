@@ -45,7 +45,7 @@ export default function Logging() {
           message.error("Đăng nhập thất bại.");
         }
       } else {
-        message.error("Đăng nhập thất bại: " + result.message);
+        message.error("Email hoặc mật khẩu không đúng.");
       }
     } catch (error) {
       message.error("Lỗi khi đăng nhập: " + error.message);
@@ -63,7 +63,7 @@ export default function Logging() {
   return (
     <div className="Web">
       <header className="Web-header">
-        <div className="Logging">
+        <div className="Logging bg-white/90">
           <Form
             name="normal_login"
             labelCol={{ span: 5 }}
