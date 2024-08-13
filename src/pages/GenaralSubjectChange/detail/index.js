@@ -12,7 +12,7 @@ import {
   DatePicker,
   Spin
 } from "antd";
-import { getGeneralSubjects } from "../../../data/coursesData";
+import { getAllGeneralSubjects } from "../../../data/coursesData";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 
@@ -43,11 +43,26 @@ export default function GeneralSubjectChangeDetail() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const generalSubjects = await getGeneralSubjects();
-        const selectedSubject = (generalSubjects.classSections).map(([id, section]) => ({
-          id,
-          ...section
-      }));
+        const rawData = await getAllGeneralSubjects();
+        let processedGeneral = [];
+
+        if (Array.isArray(rawData)) {
+          // If rawData is already an array, use it directly
+          processedGeneral = rawData;
+        } else if (typeof rawData === 'object' && rawData !== null) {
+          // If rawData is an object, process it as before
+          processedGeneral = Object.entries(rawData).flatMap(([semester, subjects]) =>
+            Object.entries(subjects).map(([subjectId, course]) => ({
+              id: subjectId,
+              semester,
+              ...course,
+            }))
+          );
+        } else {
+          throw new Error("Unexpected data structure");
+        }
+
+        const selectedSubject = processedGeneral.find(subject => subject.id === id);
         if (!selectedSubject) {
           throw new Error("Subject not found");
         }
@@ -65,7 +80,7 @@ export default function GeneralSubjectChangeDetail() {
 
   if (loading) {
     return <Spin size="large" />;
-}
+  }
 
   if (error) {
     return <div>{error}</div>;

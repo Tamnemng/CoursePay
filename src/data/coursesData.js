@@ -31,35 +31,33 @@ export async function initializeData() {
   }
 }
 
-export function getMajorSubjects() {
-  const semester = studentInfo.semester;
+export function getMajorSubjects(semester) {
   const faculty = studentInfo.faculty;
   const major = studentInfo.major;
-  
+
   if (!firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]?.[semester]) {
     return null;
   }
-  
+
   const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][semester];
 
   return { mandatory, elective };
 }
 
-export function getFacultySubjects() {
-  const semester = studentInfo.semester;
+export function getFacultySubjects(semester) {
   const faculty = studentInfo.faculty;
-  
+
   if (!firebaseData?.subjects?.facultySubjects?.[faculty]?.[semester]) {
     return null;
   }
-  
+
   const { mandatory = {}, elective = {} } = firebaseData.subjects.facultySubjects[faculty][semester];
 
   return { mandatory, elective };
 }
 
 export function getGeneralSubjects() {
-  const  semester = studentInfo.semester;
+  const semester = studentInfo.semester;
   if (!firebaseData || !firebaseData.subjects || !firebaseData.subjects.universityWideSubjects || !firebaseData.subjects.universityWideSubjects[semester]) {
     return null;
   }
@@ -71,43 +69,155 @@ export function getGeneralSubjects() {
   };
 }
 
+
+
 export function getAllMajorSubjects() {
-  const faculty = studentInfo.faculty;
-  const major = studentInfo.major;
-  
-  if (!firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]) {
+  if (!firebaseData?.subjects?.majorSubjects) {
     return null;
   }
   
-  const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][semester];
+  const allMajorSubjects = {};
 
-  return { mandatory, elective };
+  for (const faculty in firebaseData.subjects.majorSubjects) {
+    allMajorSubjects[faculty] = {};
+
+    for (const major in firebaseData.subjects.majorSubjects[faculty]) {
+      allMajorSubjects[faculty][major] = {};
+
+      for (const semester in firebaseData.subjects.majorSubjects[faculty][major]) {
+        const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][semester];
+
+        allMajorSubjects[faculty][major][semester] = {
+          mandatory,
+          elective
+        };
+      }
+    }
+  }
+
+  return allMajorSubjects;
 }
 
 export function getAllFacultySubjects() {
-  const semester = studentInfo.semester;
   const faculty = studentInfo.faculty;
-  
-  if (!firebaseData?.subjects?.facultySubjects?.[faculty]?.[semester]) {
+
+  if (!firebaseData?.subjects?.facultySubjects?.[faculty]) {
     return null;
   }
-  
-  const { mandatory = {}, elective = {} } = firebaseData.subjects.facultySubjects[faculty][semester];
 
-  return { mandatory, elective };
+  const semesters = ['HK1', 'HK2', 'HK3', 'HK4'];
+  const allSubjects = {
+    mandatory: {},
+    elective: {}
+  };
+
+  semesters.forEach(semester => {
+    const semesterData = firebaseData.subjects.facultySubjects[faculty][semester];
+    if (semesterData) {
+
+      Object.entries(semesterData.mandatory || {}).forEach(([subjectCode, subjectData]) => {
+        allSubjects.mandatory[subjectCode] = {
+          ...subjectData,
+          semester: semester
+        };
+      });
+
+      Object.entries(semesterData.elective || {}).forEach(([subjectCode, subjectData]) => {
+        allSubjects.elective[subjectCode] = {
+          ...subjectData,
+          semester: semester
+        };
+      });
+    }
+  });
+
+  return allSubjects;
 }
 
 export function getAllGeneralSubjects() {
-  const  semester = studentInfo.semester;
-  if (!firebaseData || !firebaseData.subjects || !firebaseData.subjects.universityWideSubjects || !firebaseData.subjects.universityWideSubjects[semester]) {
+  if (!firebaseData?.subjects?.universityWideSubjects) {
     return null;
   }
-  const { mandatory, elective } = firebaseData.subjects.universityWideSubjects[semester];
 
-  return {
-    mandatory: mandatory || {},
-    elective: elective || {}
-  };
+  const allGeneralSubjects = {};
+
+  for (const semester in firebaseData.subjects.universityWideSubjects) {
+    const { mandatory = {}, elective = {} } = firebaseData.subjects.universityWideSubjects[semester];
+    
+    const mergedSubjects = { ...mandatory, ...elective };
+    
+    allGeneralSubjects[semester] = Object.entries(mergedSubjects).reduce((acc, [subjectCode, subjectData]) => {
+      acc[subjectCode] = {
+        name: subjectData.name,
+        classSections: subjectData.classSections,
+        credits: subjectData.credits
+      };
+      return acc;
+    }, {});
+  }
+
+  return allGeneralSubjects;
 }
+
+export function getAllStudentSubjects() {
+  const { faculty, major } = studentInfo;
+
+  if (!firebaseData?.subjects?.facultySubjects?.[faculty] || 
+      !firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]) {
+    return null;
+  }
+  
+  const allSubjects = {
+    faculty: {
+      mandatory: {},
+      elective: {}
+    },
+    major: {
+      mandatory: {},
+      elective: {}
+    }
+  };
+
+  const facultyData = firebaseData.subjects.facultySubjects[faculty];
+  for (const semester in facultyData) {
+    const { mandatory = {}, elective = {} } = facultyData[semester];
+
+    Object.entries(mandatory).forEach(([subjectCode, subjectData]) => {
+      allSubjects.faculty.mandatory[subjectCode] = {
+        ...subjectData,
+        semester
+      };
+    });
+
+    Object.entries(elective).forEach(([subjectCode, subjectData]) => {
+      allSubjects.faculty.elective[subjectCode] = {
+        ...subjectData,
+        semester
+      };
+    });
+  }
+
+  const majorData = firebaseData.subjects.majorSubjects[faculty][major];
+  for (const semester in majorData) {
+    const { mandatory = {}, elective = {} } = majorData[semester];
+
+    Object.entries(mandatory).forEach(([subjectCode, subjectData]) => {
+      allSubjects.major.mandatory[subjectCode] = {
+        ...subjectData,
+        semester
+      };
+    });
+
+    Object.entries(elective).forEach(([subjectCode, subjectData]) => {
+      allSubjects.major.elective[subjectCode] = {
+        ...subjectData,
+        semester
+      };
+    });
+  }
+
+  return allSubjects;
+}
+
 
 initializeData();

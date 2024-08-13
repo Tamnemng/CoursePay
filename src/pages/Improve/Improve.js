@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Table, Modal, Button, message, Tabs, Spin } from 'antd';
 import Header from '../../components/Header';
-import { getGeneralSubjects, getMajorSubjects, getFacultySubjects } from '../../data/coursesData';
-import { studentInfo } from '../../data/studentData';
+import { getAllGeneralSubjects, getAllStudentSubjects } from '../../data/coursesData';
 import './Improve.css';
 
 const { TabPane } = Tabs;
@@ -19,11 +18,30 @@ const columns = (handleRegisterClick) => [
         className: 'course-id-column',
     },
     {
-        title: 'Action',
-        render: (text, record) => (
+        title: 'Số tín chỉ',
+        dataIndex: 'credits',
+        className: 'course-credits-column',
+    },
+    {
+        title: 'Chọn Môn Đăng Ký',
+        render: (_, record) => (
             <a onClick={() => handleRegisterClick(record)} className="register-link">Đăng Ký Lớp Học</a>
         ),
         className: 'action-column',
+    },
+];
+
+const classColumns = (handleClassRegister) => [
+    { title: 'Tên Lớp', dataIndex: 'id', className: 'class-name-column' },
+    { title: 'Sĩ Số', dataIndex: 'enrolled', className: 'class-size-column' },
+    { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
+    { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
+    { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
+    { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column' },
+    {
+        title: 'Chọn Lớp Đăng Ký',
+        render: (_, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
+        className: 'action-column'
     },
 ];
 
@@ -32,8 +50,7 @@ export default function Improve() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
-    const [generalCourses, setGeneralCourses] = useState([]);
-    const [specializedCourses, setSpecializedCourses] = useState([]);
+    const [courses, setCourses] = useState({ general: [], specialized: [] });
     const [activeTab, setActiveTab] = useState('general');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -41,41 +58,34 @@ export default function Improve() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [generalSubjectsData, majorSubjectsData, facultySubjectsData] = await Promise.all([
-                    getGeneralSubjects(),
-                    getMajorSubjects(),
-                    getFacultySubjects()
+                const [generalSubjects, studentSubjects] = await Promise.all([
+                    getAllGeneralSubjects(),
+                    getAllStudentSubjects()
                 ]);
 
-                if (!generalSubjectsData || !majorSubjectsData || !facultySubjectsData) {
+                if (!generalSubjects || !studentSubjects) {
                     throw new Error('Failed to fetch subjects data');
                 }
-                
-                const generalCourses = [
-                    ...Object.entries(generalSubjectsData.mandatory || {}),
-                    ...Object.entries(generalSubjectsData.elective || {})
+
+                const processedGeneral = Object.entries(generalSubjects).flatMap(([semester, subjects]) =>
+                    Object.entries(subjects).map(([id, course]) => ({
+                        id,
+                        semester,
+                        ...course,
+                    }))
+                );
+
+                const specializedSubjects = [
+                    ...processSubjects(studentSubjects.faculty.mandatory, 'mandatory', 'faculty'),
+                    ...processSubjects(studentSubjects.faculty.elective, 'elective', 'faculty'),
+                    ...processSubjects(studentSubjects.major.mandatory, 'mandatory', 'major'),
+                    ...processSubjects(studentSubjects.major.elective, 'elective', 'major')
                 ];
 
-                const processedGeneral = generalCourses.map(([id, course]) => ({
-                    id,
-                    ...course,
-                }));
-
-                setGeneralCourses(processedGeneral);
-
-                const majorCourses = [
-                    ...Object.entries(facultySubjectsData.mandatory || {}),
-                    ...Object.entries(majorSubjectsData.elective || {}),
-                    ...Object.entries(majorSubjectsData.mandatory || {}),
-                    ...Object.entries(facultySubjectsData.elective || {})
-                ];
-
-                const processedMajor = majorCourses.map(([id, course]) => ({
-                    id,
-                    ...course,
-                }));
-
-                setSpecializedCourses(processedMajor);
+                setCourses({
+                    general: processedGeneral,
+                    specialized: specializedSubjects
+                });
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -87,58 +97,41 @@ export default function Improve() {
         fetchData();
     }, []);
 
-    const handleRegisterClick = (course) => {
+    const processSubjects = (subjects, type, category) =>
+        Object.entries(subjects).map(([id, course]) => ({
+            id,
+            type,
+            category,
+            ...course,
+        }));
+
+    const handleRegisterClick = useCallback((course) => {
         setSelectedCourse(course);
         setIsModalVisible(true);
-    };
+    }, []);
 
-    const handleOk = () => {
-        setIsModalVisible(false);
-    };
+    const handleOk = useCallback(() => setIsModalVisible(false), []);
+    const handleCancel = useCallback(() => setIsModalVisible(false), []);
 
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
-
-    const handleClassRegister = (classInfo) => {
+    const handleClassRegister = useCallback((classInfo) => {
         setSelectedClass(classInfo);
         setIsConfirmModalVisible(true);
-    };
+    }, []);
 
-    const handleConfirmRegister = () => {
+    const handleConfirmRegister = useCallback(() => {
         message.success('Đăng ký thành công!');
         setIsConfirmModalVisible(false);
         setIsModalVisible(false);
-    };
+    }, []);
 
-    const handleCancelRegister = () => {
-        setIsConfirmModalVisible(false);
-    };
+    const handleCancelRegister = useCallback(() => setIsConfirmModalVisible(false), []);
+    const handleTabChange = useCallback((key) => setActiveTab(key), []);
 
-    const handleTabChange = (key) => {
-        setActiveTab(key);
-    };
+    const memoizedColumns = useMemo(() => columns(handleRegisterClick), [handleRegisterClick]);
+    const memoizedClassColumns = useMemo(() => classColumns(handleClassRegister), [handleClassRegister]);
 
-    const classColumns = [
-        { title: 'Tên Lớp', dataIndex: 'id', className: 'class-name-column' },
-        { title: 'Sĩ Số', dataIndex: 'enrolled', className: 'class-size-column' },
-        { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
-        { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
-        { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
-        {
-            title: 'Action',
-            render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
-            className: 'action-column'
-        },
-    ];
-
-    if (loading) {
-        return <Spin size="large" />;
-    }
-
-    if (error) {
-        return <div>{error}</div>;
-    }
+    if (loading) return <Spin size="large" />;
+    if (error) return <div>{error}</div>;
 
     return (
         <div className='register-container'>
@@ -147,18 +140,10 @@ export default function Improve() {
                 <h1 className='register-title'>Đăng ký môn học</h1>
                 <Tabs activeKey={activeTab} onChange={handleTabChange}>
                     <TabPane tab="Môn Học Chung" key="general">
-                        <Table
-                            columns={columns(handleRegisterClick)}
-                            dataSource={generalCourses}
-                            rowKey="id"
-                        />
+                        <Table columns={memoizedColumns} dataSource={courses.general} rowKey="id" />
                     </TabPane>
                     <TabPane tab="Môn Học Chuyên Ngành" key="specialized">
-                        <Table
-                            columns={columns(handleRegisterClick)}
-                            dataSource={specializedCourses}
-                            rowKey="id"
-                        />
+                        <Table columns={memoizedColumns} dataSource={courses.specialized} rowKey="id" />
                     </TabPane>
                 </Tabs>
                 <Modal
@@ -167,15 +152,11 @@ export default function Improve() {
                     onOk={handleOk}
                     onCancel={handleCancel}
                     width="80%"
-                    footer={[
-                        <Button key="back" onClick={handleCancel}>
-                            Đóng
-                        </Button>
-                    ]}
+                    footer={[<Button key="back" onClick={handleCancel}>Đóng</Button>]}
                 >
                     {selectedCourse && selectedCourse.classSections && (
                         <Table
-                            columns={classColumns}
+                            columns={memoizedClassColumns}
                             dataSource={Object.entries(selectedCourse.classSections).map(([id, section]) => ({
                                 id,
                                 ...section

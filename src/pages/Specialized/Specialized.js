@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getMajorSubjects, getFacultySubjects } from '../../data/coursesData';
+import { studentInfo } from '../../data/studentData';
 import './Specialized.css';
 
 const { TabPane } = Tabs;
@@ -21,11 +22,6 @@ const columns = (handleRegisterClick) => [
         title: 'Số tín chỉ',
         dataIndex: 'credits',
         className: 'course-credits-column',
-    },
-    {
-        title: 'Loại',
-        dataIndex: 'type',
-        className: 'course-type-column',
     },
     {
         title: 'Chọn Môn Đăng Ký',
@@ -62,6 +58,7 @@ export default function Specialized() {
         { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
         { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
         { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
+        { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column'},
         {
             title: 'Chọn Lớp Đăng Ký',
             render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
@@ -72,8 +69,8 @@ export default function Specialized() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const majorSubjectsData = await getMajorSubjects();
-                const facultySubjectsData = await getFacultySubjects();
+                const majorSubjectsData = await getMajorSubjects(studentInfo.semester);
+                const facultySubjectsData = await getFacultySubjects(studentInfo.semester);
 
                 if (!majorSubjectsData || !facultySubjectsData) {
                     throw new Error('Failed to fetch subjects data');

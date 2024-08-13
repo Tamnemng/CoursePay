@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getGeneralSubjects } from '../../data/coursesData';
-
+import { studentInfo } from '../../data/studentData';
 import './Register.css';
 
 const { TabPane } = Tabs;
@@ -24,12 +24,7 @@ const columns = (handleRegisterClick) => [
         className: 'course-credits-column',
     },
     {
-        title: 'Loại',
-        dataIndex: 'type',
-        className: 'course-type-column',
-    },
-    {
-        title: 'Action',
+        title: 'Đăng Ký Môn Học',
         render: (text, record) => (
             <a onClick={() => handleRegisterClick(record)} className="register-link">Đăng Ký Lớp Học</a>
         ),
@@ -60,7 +55,6 @@ export default function Register() {
                     .map(([id, course]) => ({
                         id,
                         ...course,
-                        type: 'Bắt buộc'
                     }));
                 setMandatoryCourses(processedMandatory);
 
@@ -68,7 +62,6 @@ export default function Register() {
                     .map(([id, course]) => ({
                         id,
                         ...course,
-                        type: 'Tự chọn'
                     }));
                 setElectiveCourses(processedElective);
 

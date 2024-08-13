@@ -4,7 +4,7 @@ import { Table, Button, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import ContentLayout from "../../components/ContentLayout";
 import { render } from "@testing-library/react";
-import { getGeneralSubjects } from "../../data/coursesData";
+import { getAllGeneralSubjects } from "../../data/coursesData";
 
 export default function MajorSubjectChange() {
   const navigate = useNavigate();
@@ -15,15 +15,17 @@ export default function MajorSubjectChange() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const generalSubject = await getGeneralSubjects();
-        if (!generalSubject) {
+        const generalSubjects = await getAllGeneralSubjects();
+        if (!generalSubjects) {
           throw new Error('Failed to fetch major subjects');
         }
-        const allCourses = Object.entries(generalSubject)
-          .map(([id, course]) => ({
+        const allCourses = Object.entries(generalSubjects).flatMap(([semester, subjects]) =>
+          Object.entries(subjects).map(([id, course]) => ({
             id,
-            ...course
-          }));
+            semester,
+            ...course,
+          }))
+        );
         setCourses(allCourses);
         setLoading(false);
       } catch (err) {
