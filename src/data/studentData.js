@@ -1,9 +1,12 @@
+import { getFacultySubjects } from "./coursesData";
+
 export const studentInfo =
 {
     id: "48.01.104.128",
     name: "Nguyễn Phúc Thịnh",  
-    major: "Công nghệ thông tin",              
-    semester: 1,               
+    major: "Công Nghệ Thông Tin",     
+    faculty: "Khoa Công Nghệ Thông Tin",         
+    semester: "HK1",               
     fees: [
         { id: 1, name: "Học phí học kỳ", amount: 10000000, paid: false, paymentDate: null },
         { id: 2, name: "Bảo hiểm y tế", amount: 500000, paid: true, paymentDate: "2024-07-15" },

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Modal, Button, message, Spin } from 'antd';
+import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getGeneralSubjects } from '../../data/coursesData';
-import { studentInfo } from '../../data/studentData';
+
 import './Register.css';
+
+const { TabPane } = Tabs;
 
 const columns = (handleRegisterClick) => [
     {
@@ -40,7 +42,8 @@ export default function Register() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
-    const [courses, setCourses] = useState([]);
+    const [mandatoryCourses, setMandatoryCourses] = useState([]);
+    const [electiveCourses, setElectiveCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -51,13 +54,24 @@ export default function Register() {
                 if (!generalSubjects) {
                     throw new Error('Failed to fetch general subjects');
                 }
-                const allCourses = Object.entries(generalSubjects)
-                    .filter(([_, course]) => course.semester === studentInfo.semester)
+                const { mandatory, elective } = generalSubjects;
+
+                const processedMandatory = Object.entries(mandatory)
                     .map(([id, course]) => ({
                         id,
-                        ...course
+                        ...course,
+                        type: 'Bắt buộc'
                     }));
-                setCourses(allCourses);
+                setMandatoryCourses(processedMandatory);
+
+                const processedElective = Object.entries(elective)
+                    .map(([id, course]) => ({
+                        id,
+                        ...course,
+                        type: 'Tự chọn'
+                    }));
+                setElectiveCourses(processedElective);
+
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -103,8 +117,9 @@ export default function Register() {
         { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
         { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
         { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
+        { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column'},
         {
-            title: 'Action',
+            title: 'Đăng Ký',
             render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
             className: 'action-column'
         },
@@ -123,11 +138,22 @@ export default function Register() {
             <Header />
             <div className='register'>
                 <h1 className='register-title'>Đăng ký môn chung</h1>
-                <Table
-                    columns={columns(handleRegisterClick)}
-                    dataSource={courses}
-                    rowKey="id"
-                />
+                <Tabs defaultActiveKey="1">
+                    <TabPane tab="Môn Bắt Buộc" key="1">
+                        <Table
+                            columns={columns(handleRegisterClick)}
+                            dataSource={mandatoryCourses}
+                            rowKey="id"
+                        />
+                    </TabPane>
+                    <TabPane tab="Môn Tự Chọn" key="2">
+                        <Table
+                            columns={columns(handleRegisterClick)}
+                            dataSource={electiveCourses}
+                            rowKey="id"
+                        />
+                    </TabPane>
+                </Tabs>
                 <Modal
                     title={<h2 className="modal-title">Danh sách lớp học - {selectedCourse?.name}</h2>}
                     visible={isModalVisible}

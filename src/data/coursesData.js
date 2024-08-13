@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, get } from 'firebase/database';
 import { firebaseConfig } from './firebaseConfig';
-
+import { studentInfo } from './studentData';
 const app = initializeApp(firebaseConfig);
 
 const database = getDatabase(app);
@@ -32,11 +32,82 @@ export async function initializeData() {
 }
 
 export function getMajorSubjects() {
-  return firebaseData ? firebaseData.majorSubjects : null;
+  const semester = studentInfo.semester;
+  const faculty = studentInfo.faculty;
+  const major = studentInfo.major;
+  
+  if (!firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]?.[semester]) {
+    return null;
+  }
+  
+  const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][semester];
+
+  return { mandatory, elective };
+}
+
+export function getFacultySubjects() {
+  const semester = studentInfo.semester;
+  const faculty = studentInfo.faculty;
+  
+  if (!firebaseData?.subjects?.facultySubjects?.[faculty]?.[semester]) {
+    return null;
+  }
+  
+  const { mandatory = {}, elective = {} } = firebaseData.subjects.facultySubjects[faculty][semester];
+
+  return { mandatory, elective };
 }
 
 export function getGeneralSubjects() {
-  return firebaseData ? firebaseData.generalSubjects : null;
+  const  semester = studentInfo.semester;
+  if (!firebaseData || !firebaseData.subjects || !firebaseData.subjects.universityWideSubjects || !firebaseData.subjects.universityWideSubjects[semester]) {
+    return null;
+  }
+  const { mandatory, elective } = firebaseData.subjects.universityWideSubjects[semester];
+
+  return {
+    mandatory: mandatory || {},
+    elective: elective || {}
+  };
+}
+
+export function getAllMajorSubjects() {
+  const faculty = studentInfo.faculty;
+  const major = studentInfo.major;
+  
+  if (!firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]) {
+    return null;
+  }
+  
+  const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][semester];
+
+  return { mandatory, elective };
+}
+
+export function getAllFacultySubjects() {
+  const semester = studentInfo.semester;
+  const faculty = studentInfo.faculty;
+  
+  if (!firebaseData?.subjects?.facultySubjects?.[faculty]?.[semester]) {
+    return null;
+  }
+  
+  const { mandatory = {}, elective = {} } = firebaseData.subjects.facultySubjects[faculty][semester];
+
+  return { mandatory, elective };
+}
+
+export function getAllGeneralSubjects() {
+  const  semester = studentInfo.semester;
+  if (!firebaseData || !firebaseData.subjects || !firebaseData.subjects.universityWideSubjects || !firebaseData.subjects.universityWideSubjects[semester]) {
+    return null;
+  }
+  const { mandatory, elective } = firebaseData.subjects.universityWideSubjects[semester];
+
+  return {
+    mandatory: mandatory || {},
+    elective: elective || {}
+  };
 }
 
 initializeData();

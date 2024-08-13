@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Modal, Button, message, Spin } from 'antd';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
-import { getMajorSubjects } from '../../data/coursesData';
-import { studentInfo } from '../../data/studentData';
+import { getMajorSubjects, getFacultySubjects } from '../../data/coursesData';
 import './Specialized.css';
+
+const { TabPane } = Tabs;
 
 const columns = (handleRegisterClick) => [
     {
@@ -40,62 +41,20 @@ export default function Specialized() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
-    const [courses, setCourses] = useState([]);
+    const [mandatoryCourses, setMandatoryCourses] = useState([]);
+    const [electiveCourses, setElectiveCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const majorSubjects = await getMajorSubjects();
-                if (!majorSubjects) {
-                    throw new Error('Failed to fetch major subjects');
-                }
-                const allCourses = Object.entries(majorSubjects)
-                    .filter(([_, course]) => course.semester === studentInfo.semester && course.major === studentInfo.major)
-                    .map(([id, course]) => ({
-                        id,
-                        ...course
-                    }));
-                setCourses(allCourses);
-                setLoading(false);
-            } catch (err) {
-                console.error('Error fetching data:', err);
-                setError('Failed to load courses. Please try again later.');
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    const handleRegisterClick = (course) => {
+    const handleRegisterClick = useCallback((course) => {
         setSelectedCourse(course);
         setIsModalVisible(true);
-    };
+    }, []);
 
-    const handleOk = () => {
-        setIsModalVisible(false);
-    };
-
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
-
-    const handleClassRegister = (classInfo) => {
+    const handleClassRegister = useCallback((classInfo) => {
         setSelectedClass(classInfo);
         setIsConfirmModalVisible(true);
-    };
-
-    const handleConfirmRegister = () => {
-        message.success('Đăng ký thành công!');
-        setIsConfirmModalVisible(false);
-        setIsModalVisible(false);
-    };
-
-    const handleCancelRegister = () => {
-        setIsConfirmModalVisible(false);
-    };
+    }, []);
 
     const classColumns = [
         { title: 'Tên Lớp', dataIndex: 'id', className: 'class-name-column' },
@@ -110,6 +69,69 @@ export default function Specialized() {
         },
     ];
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const majorSubjectsData = await getMajorSubjects();
+                const facultySubjectsData = await getFacultySubjects();
+
+                if (!majorSubjectsData || !facultySubjectsData) {
+                    throw new Error('Failed to fetch subjects data');
+                }
+
+                const combinedMandatory = [
+                    ...Object.entries(majorSubjectsData.mandatory || {}),
+                    ...Object.entries(facultySubjectsData.mandatory || {})
+                ];
+
+                const combinedElective = [
+                    ...Object.entries(majorSubjectsData.elective || {}),
+                    ...Object.entries(facultySubjectsData.elective || {})
+                ];
+
+                const processedMandatory = combinedMandatory.map(([id, course]) => ({
+                    id,
+                    ...course,
+                    type: 'Bắt buộc'
+                }));
+
+                const processedElective = combinedElective.map(([id, course]) => ({
+                    id,
+                    ...course,
+                    type: 'Tự chọn'
+                }));
+
+                setMandatoryCourses(processedMandatory);
+                setElectiveCourses(processedElective);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                setError('Failed to load courses. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const handleOk = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleConfirmRegister = () => {
+        message.success('Đăng ký thành công!');
+        setIsConfirmModalVisible(false);
+        setIsModalVisible(false);
+    };
+
+    const handleCancelRegister = () => {
+        setIsConfirmModalVisible(false);
+    };
+
     if (loading) {
         return <Spin size="large" />;
     }
@@ -123,11 +145,22 @@ export default function Specialized() {
             <Header />
             <div className='register'>
                 <h1 className='register-title'>Đăng ký môn chuyên ngành</h1>
-                <Table
-                    columns={columns(handleRegisterClick)}
-                    dataSource={courses}
-                    rowKey="id"
-                />
+                <Tabs defaultActiveKey="1">
+                    <TabPane tab="Môn Bắt Buộc" key="1">
+                        <Table
+                            columns={columns(handleRegisterClick)}
+                            dataSource={mandatoryCourses}
+                            rowKey="id"
+                        />
+                    </TabPane>
+                    <TabPane tab="Môn Tự Chọn" key="2">
+                        <Table
+                            columns={columns(handleRegisterClick)}
+                            dataSource={electiveCourses}
+                            rowKey="id"
+                        />
+                    </TabPane>
+                </Tabs>
                 <Modal
                     title={<h2 className="modal-title">Danh sách lớp học - {selectedCourse?.name}</h2>}
                     visible={isModalVisible}

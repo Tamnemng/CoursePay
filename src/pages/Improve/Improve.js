@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button, message, Tabs, Spin } from 'antd';
 import Header from '../../components/Header';
-import { getGeneralSubjects, getMajorSubjects } from '../../data/coursesData';
+import { getGeneralSubjects, getMajorSubjects, getFacultySubjects } from '../../data/coursesData';
 import { studentInfo } from '../../data/studentData';
 import './Improve.css';
+
 const { TabPane } = Tabs;
 
 const columns = (handleRegisterClick) => [
@@ -31,8 +32,8 @@ export default function Improve() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
+    const [generalCourses, setGeneralCourses] = useState([]);
     const [specializedCourses, setSpecializedCourses] = useState([]);
-    const [generalCoursesData, setGeneralCoursesData] = useState([]);
     const [activeTab, setActiveTab] = useState('general');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -40,35 +41,41 @@ export default function Improve() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const majorSubjects = await getMajorSubjects();
-                if (!majorSubjects) {
-                    throw new Error('Failed to fetch major subjects');
+                const [generalSubjectsData, majorSubjectsData, facultySubjectsData] = await Promise.all([
+                    getGeneralSubjects(),
+                    getMajorSubjects(),
+                    getFacultySubjects()
+                ]);
+
+                if (!generalSubjectsData || !majorSubjectsData || !facultySubjectsData) {
+                    throw new Error('Failed to fetch subjects data');
                 }
-                const allCourses = Object.entries(majorSubjects)
-                    .filter(([_, course]) => course.semester === studentInfo.semester && course.major === studentInfo.major)
-                    .map(([id, course]) => ({
-                        id,
-                        ...course
-                    }));
-                setSpecializedCourses(allCourses);
-                setLoading(false);
-            } catch (err) {
-                console.error('Error fetching data:', err);
-                setError('Failed to load courses. Please try again later.');
-                setLoading(false);
-            }
-            try {
-                const generalSubject = await getGeneralSubjects();
-                if (!generalSubject) {
-                    throw new Error('Failed to fetch major subjects');
-                }
-                const allCourses = Object.entries(generalSubject)
-                    .filter(([_, course]) => course.semester === studentInfo.semester)
-                    .map(([id, course]) => ({
-                        id,
-                        ...course
-                    }));
-                setGeneralCoursesData(allCourses);
+                
+                const generalCourses = [
+                    ...Object.entries(generalSubjectsData.mandatory || {}),
+                    ...Object.entries(generalSubjectsData.elective || {})
+                ];
+
+                const processedGeneral = generalCourses.map(([id, course]) => ({
+                    id,
+                    ...course,
+                }));
+
+                setGeneralCourses(processedGeneral);
+
+                const majorCourses = [
+                    ...Object.entries(facultySubjectsData.mandatory || {}),
+                    ...Object.entries(majorSubjectsData.elective || {}),
+                    ...Object.entries(majorSubjectsData.mandatory || {}),
+                    ...Object.entries(facultySubjectsData.elective || {})
+                ];
+
+                const processedMajor = majorCourses.map(([id, course]) => ({
+                    id,
+                    ...course,
+                }));
+
+                setSpecializedCourses(processedMajor);
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -76,7 +83,6 @@ export default function Improve() {
                 setLoading(false);
             }
         };
-
 
         fetchData();
     }, []);
@@ -143,7 +149,7 @@ export default function Improve() {
                     <TabPane tab="Môn Học Chung" key="general">
                         <Table
                             columns={columns(handleRegisterClick)}
-                            dataSource={generalCoursesData}
+                            dataSource={generalCourses}
                             rowKey="id"
                         />
                     </TabPane>
@@ -189,4 +195,4 @@ export default function Improve() {
             </div>
         </div>
     );
-};
+}
