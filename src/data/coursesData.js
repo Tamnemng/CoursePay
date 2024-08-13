@@ -79,9 +79,9 @@ export function getAllMajorSubjects() {
     return null;
   }
   
-  const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][semester];
+  //const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][semester];
 
-  return { mandatory, elective };
+  //return { mandatory, elective };
 }
 
 export function getAllFacultySubjects() {

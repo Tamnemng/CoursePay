@@ -5,8 +5,6 @@ import moment from 'moment';
 import './History.css';
 import { studentInfo } from '../../data/studentData';
 
-
-
 const paidFees = studentInfo.fees.filter(fee => fee.paid);
 
 const columns = [
