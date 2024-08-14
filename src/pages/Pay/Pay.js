@@ -1,116 +1,138 @@
 import React, { useState, useEffect } from 'react';
+import { Form, Button, message, Typography, Checkbox, Space, Tag, Spin } from 'antd';
 import Header from '../../components/Header';
+import { getStudentPaid, getStudentInfo } from '../../data/studentData';
 import './Pay.css';
-import { Form, Input, InputNumber, Button, Select, message, Typography, Checkbox, Space, Tag } from 'antd';
-import { CreditCardOutlined } from '@ant-design/icons';
-import { studentInfo } from '../../data/studentData';
-const { Option } = Select;
+
 const { Text, Title } = Typography;
 
-
-
-
-export default function Pay() {
+const Pay = () => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [selectedFees, setSelectedFees] = useState([]);
-    const [totalAmount, setTotalAmount] = useState(0);
-    const [studentData, setStudentData] = useState(studentInfo);
-
-    const unpaidFees = studentData.fees.filter(fee => !fee.paid);
+    const [studentData, setStudentData] = useState({});
+    const [unpaidFees, setUnpaidFees] = useState([]);
 
     useEffect(() => {
-        const newTotal = selectedFees.reduce((sum, feeId) => {
-            const fee = studentData.fees.find(f => f.id === feeId);
-            return sum + (fee && !fee.paid ? fee.amount : 0);
-        }, 0);
-        setTotalAmount(newTotal);
-        form.setFieldsValue({ amount: newTotal });
-    }, [selectedFees, form, studentData.fees]);
+        fetchData();
+    }, []);
 
-    const onFinish = (values) => {
+    const fetchData = async () => {
         setLoading(true);
-        console.log('Payment submitted:', { ...values, selectedFees });
-        
-        // Goi Api ra o day de chinh sua thong tin hoc phi sinh vien
-        setTimeout(() => {
-            // Update payment cho sinh vien
-            const updatedFees = studentData.fees.map(fee => {
-                if (selectedFees.includes(fee.id)) {
-                    return { ...fee, paid: true, paymentDate: new Date().toISOString().split('T')[0] };
-                }
-                return fee;
-            });
+        try {
+            const [fees, studentInfo] = await Promise.all([getStudentPaid(), getStudentInfo()]);
 
-            // Update
-            setStudentData(prevData => ({
-                ...prevData,
-                fees: updatedFees
-            }));
+            const processedFees = Object.entries(fees)
+                .filter(([_, fee]) => !fee.paid)
+                .map(([id, fee]) => ({ ...fee, id }));
 
+            setUnpaidFees(processedFees);
+            setStudentData(studentInfo);
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            setError('Failed to load courses. Please try again later.');
+        } finally {
             setLoading(false);
-            message.success('Thanh toán học phí thành công!');
-            form.resetFields();
-            setSelectedFees([]);
-        }, 2000);
+        }
     };
 
     const handleFeeSelection = (checkedValues) => {
         setSelectedFees(checkedValues);
     };
 
+    const onFinish = async () => {
+        setLoading(true);
+        try {
+            // Giả lập API call
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            message.success('Thanh toán học phí thành công!');
+        } catch (error) {
+            message.error('Có lỗi xảy ra khi thanh toán. Vui lòng thử lại.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if(loading){
+        return <div>{Spin}</div>
+    }
+
+    if(error){
+        return <div>{error}</div>;
+    }
+
     return (
         <div className='pay-container'>
             <Header />
             <div className='pay'>
                 <div className='theupper'>
-                    <div className='student-informations'>
-                        <Title level={2}>Thông Tin Sinh Viên</Title>
-                        <Text>
-                            <pre>ID: {studentData.id}</pre>
-                            <pre>Họ và tên: {studentData.name}</pre>
-                            <pre>Ngành học: {studentData.major}</pre>
-                        </Text>
-                        <div className='warning'>
-                            Yêu cầu sinh viên kiểm tra thông tin thật kỹ trước khi đóng tiền học.
-                        </div>
-                    </div>
-                    <div className='pay-informations'>
-                        <Title level={2}>Thanh Toán</Title>
-                        <Form
-                            form={form}
-                            name="tuition_payment"
-                            onFinish={onFinish}
-                            layout="vertical"
-                        >
-                            <Form.Item>
-                                <Button type="primary" htmlType="submit" loading={loading} block disabled={selectedFees.length === 0}>
-                                    Xác nhận thanh toán
-                                </Button>
-                            </Form.Item>
-                        </Form>
-                    </div>
+                    <StudentInfo studentData={studentData} />
+                    <PaymentSection
+                        form={form}
+                        loading={loading}
+                        onFinish={onFinish}
+                        isDisabled={selectedFees.length === 0}
+                    />
                 </div>
-                <div className='fee-selection'>
-                    <Title level={3}>Chọn khoản phí cần thanh toán</Title>
-                    {unpaidFees.length > 0 ? (
-                        <Checkbox.Group onChange={handleFeeSelection} value={selectedFees}>
-                            <Space direction="vertical" style={{ width: '100%' }}>
-                                {unpaidFees.map(fee => (
-                                    <Checkbox key={fee.id} value={fee.id}>
-                                        <Space>
-                                            {fee.name} - {fee.amount.toLocaleString('vi-VN')} VNĐ
-                                            <Tag color="red">Chưa đóng</Tag>
-                                        </Space>
-                                    </Checkbox>
-                                ))}
-                            </Space>
-                        </Checkbox.Group>
-                    ) : (
-                        <Text>Không có khoản phí nào cần thanh toán.</Text>
-                    )}
-                </div>
+                <FeeSelection
+                    unpaidFees={unpaidFees}
+                    selectedFees={selectedFees}
+                    handleFeeSelection={handleFeeSelection}
+                />
             </div>
         </div>
     );
-}
+};
+
+const StudentInfo = ({ studentData }) => (
+    <div className='student-informations'>
+        <Title level={2}>Thông Tin Sinh Viên</Title>
+        <Text>
+            <pre>ID: {studentData.id}</pre>
+            <pre>Họ và tên: {studentData.name}</pre>
+            <pre>Ngành học: {studentData.major}</pre>
+        </Text>
+        <div className='warning'>
+            Yêu cầu sinh viên kiểm tra thông tin thật kỹ trước khi đóng tiền học.
+        </div>
+    </div>
+);
+
+const PaymentSection = ({ form, loading, onFinish, isDisabled }) => (
+    <div className='pay-informations'>
+        <Title level={2}>Thanh Toán</Title>
+        <Form form={form} name="tuition_payment" onFinish={onFinish} layout="vertical">
+            <Form.Item>
+                <Button type="primary" htmlType="submit" loading={loading} block disabled={isDisabled}>
+                    Xác nhận thanh toán
+                </Button>
+            </Form.Item>
+        </Form>
+    </div>
+);
+
+const FeeSelection = ({ unpaidFees, selectedFees, handleFeeSelection }) => (
+    <div className='fee-selection'>
+        <Title level={3}>Chọn khoản phí cần thanh toán</Title>
+        {unpaidFees.length > 0 ? (
+            <Checkbox.Group onChange={handleFeeSelection} value={selectedFees}>
+                <Space direction="vertical" style={{ width: '100%' }}>
+                    {unpaidFees.map(fee => (
+                        <Checkbox key={fee.id} value={fee.id}>
+                            <Space>
+                                {fee.name} - {parseInt(fee.amount).toLocaleString('vi-VN')} VNĐ
+                                <Tag color="red">Chưa đóng</Tag>
+                            </Space>
+                        </Checkbox>
+                    ))}
+                </Space>
+            </Checkbox.Group>
+        ) : (
+            <Text>Không có khoản phí nào cần thanh toán.</Text>
+        )}
+    </div>
+);
+
+export default Pay;

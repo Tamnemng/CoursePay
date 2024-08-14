@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header';
-import { Table, DatePicker } from 'antd';
-import moment from 'moment';
+import { Table, Spin } from 'antd';
 import './History.css';
-import { studentInfo } from '../../data/studentData';
-
-const paidFees = studentInfo.fees.filter(fee => fee.paid);
+import { getStudentPaid } from '../../data/studentData';
 
 const columns = [
     {
         title: 'Mã Hóa Đơn',
         dataIndex: 'id',
-        key: 'id1',
+        key: 'id',
     },
     {
         title: 'Tên Phí',
@@ -31,31 +28,49 @@ const columns = [
 ];
 
 export default function History() {
-    const [filteredFees, setFilteredFees] = useState(paidFees);
+    const [paidFees, setPaidFees] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const fees = await getStudentPaid();
+                if (!fees) {
+                    throw new Error('Failed to fetch general subjects');
+                }
+                const processedFees = Object.entries(fees)
+                    .filter(([_, fees]) => fees.paid === true)
+                    .map(([id, fees]) => ({
+                        ...fees,
+                        id
+                    }));
+                setPaidFees(processedFees);
+                setLoading(false);
+            }
+            catch (err) {
+                console.error('Error fetching data:', err);
+                setError('Failed to load courses. Please try again later.');
+                setLoading(false);
+            }
+        };
 
-    const handleDateChange = (dates) => {
-        if (dates) {
-            const [start, end] = dates;
-            const filtered = paidFees.filter(fee => {
-                const paymentDate = moment(fee.paymentDate);
-                return paymentDate.isBetween(start, end, 'days', '[]');
-            });
-            setFilteredFees(filtered);
-        } else {
-            setFilteredFees(paidFees);
-        }
-    };
+        fetchData();
+    }, [])
 
+    if (loading) {
+        return <div>{Spin}</div>
+    }
+
+    if (error) {
+        return <div>{error}</div>
+    }
     return (
         <div className='history-container'>
             <Header />
             <div className='history'>
                 <h1>Lịch Sử Đóng Tiền</h1>
-                <div className='filter-container'>
-                    <DatePicker.RangePicker onChange={handleDateChange} />
-                </div>
                 <div className='table-container'>
-                    <Table className='displayer' dataSource={filteredFees} columns={columns} rowKey="id" />
+                    <Table className='displayer' dataSource={paidFees} columns={columns} rowKey="id" />
                 </div>
             </div>
         </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getMajorSubjects, getFacultySubjects } from '../../data/coursesData';
-import { studentInfo } from '../../data/studentData';
+import { getStudentSemester } from '../../data/studentData';
 import './Specialized.css';
 
 const { TabPane } = Tabs;
@@ -69,8 +69,9 @@ export default function Specialized() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const majorSubjectsData = await getMajorSubjects(studentInfo.semester);
-                const facultySubjectsData = await getFacultySubjects(studentInfo.semester);
+                const semester =  await getStudentSemester(); //studentInfo.semester;
+                const majorSubjectsData = await getMajorSubjects(semester);
+                const facultySubjectsData = await getFacultySubjects(semester);
 
                 if (!majorSubjectsData || !facultySubjectsData) {
                     throw new Error('Failed to fetch subjects data');

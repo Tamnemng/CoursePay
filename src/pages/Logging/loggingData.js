@@ -75,3 +75,15 @@ export const getUserRole = async () => {
     });
   });
 };
+
+export const getStudentUid = () => {
+  return new Promise((resolve, reject) => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        resolve(user.uid);
+      } else {
+        resolve(null);
+      }
+    });
+  });
+};

@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getGeneralSubjects } from '../../data/coursesData';
-import { studentInfo } from '../../data/studentData';
 import './Register.css';
-
 const { TabPane } = Tabs;
 
 const columns = (handleRegisterClick) => [
@@ -41,20 +39,18 @@ export default function Register() {
     const [electiveCourses, setElectiveCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const generalSubjects = await getGeneralSubjects();
-                console.log("", generalSubjects);
                 if (!generalSubjects) {
                     throw new Error('Failed to fetch general subjects');
                 }
                 const { mandatory, elective } = generalSubjects;
 
                 const processedMandatory = Object.entries(mandatory)
-                .map(([id, course]) => ({
-                    id,
+                    .map(([id, course]) => ({
+                        id,
                         ...course,
                     }));
                 setMandatoryCourses(processedMandatory);
@@ -111,7 +107,7 @@ export default function Register() {
         { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
         { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
         { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
-        { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column'},
+        { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column' },
         {
             title: 'Đăng Ký',
             render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,

@@ -1,8 +1,9 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, get } from 'firebase/database';
 import { firebaseConfig } from './firebaseConfig';
-const app = initializeApp(firebaseConfig);
+import { getStudentUid } from '../pages/Logging/loggingData';
 
+const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
 async function fetchFirebaseData() {
@@ -22,13 +23,78 @@ async function fetchFirebaseData() {
 }
 
 let firebaseData = null;
+let uid = null;
 
 export async function initializeData() {
     firebaseData = await fetchFirebaseData();
     if (!firebaseData) {
         console.error("Không thể khởi tạo dữ liệu từ Firebase");
     }
+
+    try {
+        uid = await getStudentUid();
+        console.log("Student UID:", uid);
+    } catch (error) {
+        console.error("Lỗi khi lấy Student UID:", error);
+    }
 }
+
+export function getStudentFaculty() {
+    if (!firebaseData || !uid) {
+        return null;
+    }
+    const userInfo = firebaseData.users?.[uid];
+    if (!userInfo) {
+        return null;
+    }
+    return userInfo.info.faculty || null;
+}
+
+export function getStudentMajor() {
+    if (!firebaseData || !uid) {
+        return null;
+    }
+    const userInfo = firebaseData.users?.[uid];
+    if (!userInfo) {
+        return null;
+    }
+    return userInfo.info.major || null;
+}
+
+export function getStudentSemester() {
+    if (!firebaseData || !uid) {
+        return null;
+    }
+    const userInfo = firebaseData.users?.[uid];
+    if (!userInfo) {
+        return null;
+    }
+    return userInfo.info.semester || null;
+}
+
+export function getStudentInfo(){
+    if (!firebaseData || !uid) {
+        return null;
+    }
+    const userInfo = firebaseData.users?.[uid];
+    if (!userInfo) {
+        return null;
+    }
+    return userInfo.info || null;
+}
+
+export function getStudentPaid(){
+    if (!firebaseData || !uid) {
+        return null;
+    }
+    const userInfo = firebaseData.users?.[uid];
+    if (!userInfo) {
+        return null;
+    }
+    return userInfo.fees || null;
+}
+
+initializeData();
 
 export const studentInfo =
 {

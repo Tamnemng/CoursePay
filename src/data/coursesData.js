@@ -1,9 +1,9 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, get } from 'firebase/database';
 import { firebaseConfig } from './firebaseConfig';
-import { studentInfo } from './studentData';
-const app = initializeApp(firebaseConfig);
+import { getStudentFaculty, getStudentMajor, getStudentSemester } from './studentData';
 
+const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
 async function fetchFirebaseData() {
@@ -23,17 +23,23 @@ async function fetchFirebaseData() {
 }
 
 let firebaseData = null;
+let faculty = "";
+let major = "";
+let semester = "";
 
 export async function initializeData() {
   firebaseData = await fetchFirebaseData();
+  faculty = await getStudentFaculty();
+  major = await getStudentMajor();
+  semester = await getStudentSemester();
   if (!firebaseData) {
     console.error("Không thể khởi tạo dữ liệu từ Firebase");
   }
+  return { firebaseData, faculty, major, semester };
 }
 
+
 export function getMajorSubjects(semester) {
-  const faculty = studentInfo.faculty;
-  const major = studentInfo.major;
 
   if (!firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]?.[semester]) {
     return null;
@@ -45,7 +51,6 @@ export function getMajorSubjects(semester) {
 }
 
 export function getFacultySubjects(semester) {
-  const faculty = studentInfo.faculty;
   if (!firebaseData?.subjects?.facultySubjects?.[faculty]?.[semester]) {
     return null;
   }
@@ -56,7 +61,6 @@ export function getFacultySubjects(semester) {
 }
 
 export function getGeneralSubjects() {
-  const semester = studentInfo.semester;
   if (!firebaseData || !firebaseData.subjects || !firebaseData.subjects.universityWideSubjects || !firebaseData.subjects.universityWideSubjects[semester]) {
     return null;
   }
@@ -74,9 +78,9 @@ export function getAllGeneralSubjects() {
 
   for (const semester in firebaseData.subjects.universityWideSubjects) {
     const { mandatory = {}, elective = {} } = firebaseData.subjects.universityWideSubjects[semester];
-    
+
     const mergedSubjects = { ...mandatory, ...elective };
-    
+
     allGeneralSubjects[semester] = Object.entries(mergedSubjects).reduce((acc, [subjectCode, subjectData]) => {
       acc[subjectCode] = {
         name: subjectData.name,
@@ -91,13 +95,12 @@ export function getAllGeneralSubjects() {
 }
 
 export function getAllStudentSubjects() {
-  const { faculty, major } = studentInfo;
 
-  if (!firebaseData?.subjects?.facultySubjects?.[faculty] || 
-      !firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]) {
+  if (!firebaseData?.subjects?.facultySubjects?.[faculty] ||
+    !firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]) {
     return null;
   }
-  
+
   const allSubjects = {
     faculty: {
       mandatory: {},
