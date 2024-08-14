@@ -75,7 +75,11 @@ export function getAllMajorSubjects() {
   if (!firebaseData?.subjects?.majorSubjects) {
     return null;
   }
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> e9b95f46a705725a1a3d4c0014e7aca18b284b7d
   const allMajorSubjects = {};
 
   for (const faculty in firebaseData.subjects.majorSubjects) {
@@ -96,6 +100,14 @@ export function getAllMajorSubjects() {
   }
 
   return allMajorSubjects;
+<<<<<<< HEAD
+=======
+
+  //const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][semester];
+
+  //return { mandatory, elective };
+
+>>>>>>> e9b95f46a705725a1a3d4c0014e7aca18b284b7d
 }
 
 export function getAllFacultySubjects() {
