@@ -46,14 +46,15 @@ export default function Register() {
         const fetchData = async () => {
             try {
                 const generalSubjects = await getGeneralSubjects();
+                console.log("", generalSubjects);
                 if (!generalSubjects) {
                     throw new Error('Failed to fetch general subjects');
                 }
                 const { mandatory, elective } = generalSubjects;
 
                 const processedMandatory = Object.entries(mandatory)
-                    .map(([id, course]) => ({
-                        id,
+                .map(([id, course]) => ({
+                    id,
                         ...course,
                     }));
                 setMandatoryCourses(processedMandatory);

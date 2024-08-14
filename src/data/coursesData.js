@@ -46,7 +46,6 @@ export function getMajorSubjects(semester) {
 
 export function getFacultySubjects(semester) {
   const faculty = studentInfo.faculty;
-
   if (!firebaseData?.subjects?.facultySubjects?.[faculty]?.[semester]) {
     return null;
   }
@@ -63,75 +62,7 @@ export function getGeneralSubjects() {
   }
   const { mandatory, elective } = firebaseData.subjects.universityWideSubjects[semester];
 
-  return {
-    mandatory: mandatory || {},
-    elective: elective || {}
-  };
-}
-
-
-
-export function getAllMajorSubjects() {
-  if (!firebaseData?.subjects?.majorSubjects) {
-    return null;
-  }
-  
-  const allMajorSubjects = {};
-
-  for (const faculty in firebaseData.subjects.majorSubjects) {
-    allMajorSubjects[faculty] = {};
-
-    for (const major in firebaseData.subjects.majorSubjects[faculty]) {
-      allMajorSubjects[faculty][major] = {};
-
-      for (const semester in firebaseData.subjects.majorSubjects[faculty][major]) {
-        const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][semester];
-
-        allMajorSubjects[faculty][major][semester] = {
-          mandatory,
-          elective
-        };
-      }
-    }
-  }
-
-  return allMajorSubjects;
-}
-
-export function getAllFacultySubjects() {
-  const faculty = studentInfo.faculty;
-
-  if (!firebaseData?.subjects?.facultySubjects?.[faculty]) {
-    return null;
-  }
-
-  const semesters = ['HK1', 'HK2', 'HK3', 'HK4'];
-  const allSubjects = {
-    mandatory: {},
-    elective: {}
-  };
-
-  semesters.forEach(semester => {
-    const semesterData = firebaseData.subjects.facultySubjects[faculty][semester];
-    if (semesterData) {
-
-      Object.entries(semesterData.mandatory || {}).forEach(([subjectCode, subjectData]) => {
-        allSubjects.mandatory[subjectCode] = {
-          ...subjectData,
-          semester: semester
-        };
-      });
-
-      Object.entries(semesterData.elective || {}).forEach(([subjectCode, subjectData]) => {
-        allSubjects.elective[subjectCode] = {
-          ...subjectData,
-          semester: semester
-        };
-      });
-    }
-  });
-
-  return allSubjects;
+  return { mandatory, elective };
 }
 
 export function getAllGeneralSubjects() {
