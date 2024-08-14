@@ -1,4 +1,3 @@
-import { getFacultySubjects } from "./coursesData";
 
 export const studentInfo =
 {

@@ -1,42 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Header from "../../components/courseHeader";
-import { Table, Button, Spin } from "antd";
+import { Table, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import ContentLayout from "../../components/ContentLayout";
 import { render } from "@testing-library/react";
-import { getAllGeneralSubjects } from "../../data/coursesData";
+//import { generallSubject } from "../../data/coursesData";
+
+const generallSubject = [];
 
 export default function MajorSubjectChange() {
   const navigate = useNavigate();
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const generalSubjects = await getAllGeneralSubjects();
-        if (!generalSubjects) {
-          throw new Error('Failed to fetch major subjects');
-        }
-        const allCourses = Object.entries(generalSubjects).flatMap(([semester, subjects]) =>
-          Object.entries(subjects).map(([id, course]) => ({
-            id,
-            semester,
-            ...course,
-          }))
-        );
-        setCourses(allCourses);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load courses. Please try again later.');
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const columns = [
     {
@@ -81,13 +54,6 @@ export default function MajorSubjectChange() {
     },
   ];
 
-  if (loading) {
-    return <Spin size="large" />;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
   return (
     <div className="courseChange-container flex">
       <Header />
@@ -100,7 +66,7 @@ export default function MajorSubjectChange() {
             onCreate={() => navigate("/createSubject")}
           >
             <Table
-              dataSource={courses}
+              dataSource={generallSubject}
               columns={columns}
               tableLayout="auto"
             />

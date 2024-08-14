@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ContentLayout from "../../../components/ContentLayout";
 import Header from "../../../components/courseHeader";
 import {
@@ -10,25 +10,23 @@ import {
   Table,
   Modal,
   DatePicker,
-  Spin
 } from "antd";
-import { getAllGeneralSubjects } from "../../../data/coursesData";
+//import { majorSubject } from "../../../data/coursesData";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
+const majorSubject = [];
 
-export default function GeneralSubjectChangeDetail() {
+export default function MajorSubjectChangeDetail() {
   const { id } = useParams();
   const { RangePicker } = DatePicker;
   const navigate = useNavigate();
+  const subject = majorSubject.find((subject) => subject.id === id);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentClassSection, setCurrentClassSection] = useState(null);
-  const [subject, setSubject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [currentClassSection, setCurrentClassSection] = useState(null); // Thêm trạng thái này
 
   const showModal = (classSection) => {
-    setCurrentClassSection(classSection);
+    setCurrentClassSection(classSection); // Cập nhật trạng thái với thông tin lớp học phần được chọn
     setIsModalOpen(true);
   };
 
@@ -40,55 +38,17 @@ export default function GeneralSubjectChangeDetail() {
     setIsModalOpen(false);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const rawData = await getAllGeneralSubjects();
-        let processedGeneral = [];
-
-        if (Array.isArray(rawData)) {
-          // If rawData is already an array, use it directly
-          processedGeneral = rawData;
-        } else if (typeof rawData === 'object' && rawData !== null) {
-          // If rawData is an object, process it as before
-          processedGeneral = Object.entries(rawData).flatMap(([semester, subjects]) =>
-            Object.entries(subjects).map(([subjectId, course]) => ({
-              id: subjectId,
-              semester,
-              ...course,
-            }))
-          );
-        } else {
-          throw new Error("Unexpected data structure");
-        }
-
-        const selectedSubject = processedGeneral.find(subject => subject.id === id);
-        if (!selectedSubject) {
-          throw new Error("Subject not found");
-        }
-        setSubject(selectedSubject);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError("Failed to load subject details. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [id]);
-
-  if (loading) {
-    return <Spin size="large" />;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
   if (!subject) {
-    navigate("/*");
-    return null;
+    return (
+      <div className="flex">
+        <Header />
+        <div className="text-3xl my-4 grow flex flex-col">
+          <h1 className="flex justify-center items-center my-4 text-black font-semibold">
+            Thêm học phần
+          </h1>
+        </div>
+      </div>
+    );
   }
 
   const columns = [
@@ -122,7 +82,7 @@ export default function GeneralSubjectChangeDetail() {
       dataIndex: "id",
       key: "id",
       render: (text, record) => (
-        <Button onClick={() => showModal(record)}>Chi tiết</Button>
+        <Button onClick={() => showModal(record)}>Chi tiết</Button> // Truyền record vào showModal
       ),
     },
   ];
@@ -227,9 +187,7 @@ export default function GeneralSubjectChangeDetail() {
                       />
                     </Form.Item>
                     <Form.Item name="enrolled" label="Số lượng đăng ký">
-                      <InputNumber
-                        defaultValue={currentClassSection.enrolled}
-                      />
+                      <InputNumber defaultValue={currentClassSection.enrolled} />
                     </Form.Item>
                   </Form>
                 </div>
