@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, get } from 'firebase/database';
+import { getDatabase, ref, get, update } from 'firebase/database';
 import { firebaseConfig } from './firebaseConfig';
 import { getStudentUid } from '../pages/Logging/loggingData';
 
@@ -72,7 +72,7 @@ export function getStudentSemester() {
     return userInfo.info.semester || null;
 }
 
-export function getStudentInfo(){
+export function getStudentInfo() {
     if (!firebaseData || !uid) {
         return null;
     }
@@ -83,7 +83,7 @@ export function getStudentInfo(){
     return userInfo.info || null;
 }
 
-export function getStudentPaid(){
+export function getStudentPaid() {
     if (!firebaseData || !uid) {
         return null;
     }
@@ -94,7 +94,7 @@ export function getStudentPaid(){
     return userInfo.fees || null;
 }
 
-export function getStudentCourses(){
+export function getStudentCourses() {
     if (!firebaseData || !uid) {
         return null;
     }
@@ -105,26 +105,25 @@ export function getStudentCourses(){
     return userInfo;
 }
 
-initializeData();
 
-export const studentInfo =
-{
-    id: "48.01.104.128",
-    name: "Nguyễn Phúc Thịnh",
-    major: "Công Nghệ Thông Tin",
-    faculty: "Khoa Công Nghệ Thông Tin",
-    semester: "HK1",
-    fees: [
-        { id: 1, name: "Học phí học kỳ", amount: 10000000, paid: false, paymentDate: null },
-        { id: 2, name: "Bảo hiểm y tế", amount: 500000, paid: true, paymentDate: "2024-07-15" },
-        { id: 3, name: "Phí ký túc xá", amount: 2000000, paid: false, paymentDate: null },
-        { id: 4, name: "Phí ăn uống", amount: 300000, paid: true, paymentDate: '2024-07-16' },
-    ],
-    registeredCourses: [
-        { id: 1, name: "Course 1", courseCredits: 2, timeStart: '2024-08-10', timeEnd: '2024-11-10' },
-        { id: 2, name: "Course 2", courseCredits: 3, timeStart: '2024-08-10', timeEnd: '2024-11-10' },
-        { id: 3, name: "Course 3", courseCredits: 1, timeStart: '2024-08-10', timeEnd: '2024-11-10' },
-        { id: 3, name: "Course 3", courseCredits: 1, timeStart: '2024-08-10', timeEnd: '2024-11-10' },
-        { id: 3, name: "Course 3", courseCredits: 1, timeStart: '2024-08-10', timeEnd: '2024-11-10' },
-    ]
-}
+
+export async function updatePaymentStatus(feeId) {
+    if (!firebaseData || !uid || !feeId) {
+      return;
+    }
+  
+    const feeRef = ref(database, `/users/${uid}/fees/${feeId}`);
+    const newPaymentData = {
+      paid: true,
+      paymentDate: new Date().toISOString(),
+    };
+  
+    try {
+      await update(feeRef, newPaymentData);
+    } catch (error) {
+      console.error(`Lỗi khi cập nhật trạng thái thanh toán cho khoản phí ${feeId}:`, error);
+    }
+  }
+
+
+initializeData();

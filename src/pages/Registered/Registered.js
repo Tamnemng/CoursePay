@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../../components/Header';
-import { Table, Spin } from 'antd';
+import { Table, Spin, message } from 'antd';
 import moment from 'moment';
 import './Registered.css';
 import { getStudentCourses } from '../../data/studentData';
@@ -43,38 +43,38 @@ const columns = [
 export default function Registered() {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const coursesData = await getStudentCourses();
-                if (coursesData) {
-                    const processedCourses = Object.entries(coursesData).map(([id, course]) => ({
-                        key: id,
-                        ...course
-                    }));
-                    setCourses(processedCourses);
-                } else {
-                    setError('No courses found.');
-                }
-            } catch (err) {
-                console.error('Error fetching data:', err);
-                setError('Failed to load courses. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
-        };
 
-        fetchData();
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const coursesData = await getStudentCourses();
+            if (coursesData) {
+                const processedCourses = Object.entries(coursesData).map(([id, course]) => ({
+                    key: id,
+                    ...course
+                }));
+                setCourses(processedCourses);
+            } else {
+                message.warning('Không tìm thấy học phần nào.');
+            }
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            message.error('Không thể tải danh sách học phần. Vui lòng thử lại sau.');
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    if (loading) {
-        return <Spin size="large" />;
-    }
+    useEffect(() => {
+        fetchData();
 
-    if (error) {
-        return <div>{error}</div>;
-    }
+        // Thiết lập interval để cập nhật dữ liệu mỗi 5 phút
+        const intervalId = setInterval(fetchData, 5 * 60 * 1000);
+
+        // Cleanup function
+        return () => clearInterval(intervalId);
+    }, [fetchData]);
+
     return (
         <div className='registered-container'>
             <Header />
@@ -86,6 +86,7 @@ export default function Registered() {
                         dataSource={courses}
                         columns={columns}
                         rowKey="id"
+                        loading={loading}
                     />
                 </div>
             </div>

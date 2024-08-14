@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../../components/Header';
-import { Table, Spin } from 'antd';
+import { Table, Spin, message } from 'antd';
 import './History.css';
 import { getStudentPaid } from '../../data/studentData';
 
@@ -19,6 +19,7 @@ const columns = [
         title: 'Số Tiền',
         dataIndex: 'amount',
         key: 'amount',
+        render: (amount) => `${parseInt(amount).toLocaleString('vi-VN')} VNĐ`,
     },
     {
         title: 'Ngày Thanh Toán',
@@ -30,47 +31,49 @@ const columns = [
 export default function History() {
     const [paidFees, setPaidFees] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const fees = await getStudentPaid();
+            if (!fees) {
+                throw new Error('Không thể tải dữ liệu học phí');
+            }
+            const processedFees = Object.entries(fees)
+                .filter(([_, fee]) => fee.paid === true)
+                .map(([id, fee]) => ({
+                    ...fee,
+                    id
+                }));
+            setPaidFees(processedFees);
+        } catch (err) {
+            console.error('Lỗi khi tải dữ liệu:', err);
+            message.error('Không thể tải lịch sử đóng tiền. Vui lòng thử lại sau.');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const fees = await getStudentPaid();
-                if (!fees) {
-                    throw new Error('Failed to fetch general subjects');
-                }
-                const processedFees = Object.entries(fees)
-                    .filter(([_, fees]) => fees.paid === true)
-                    .map(([id, fees]) => ({
-                        ...fees,
-                        id
-                    }));
-                setPaidFees(processedFees);
-                setLoading(false);
-            }
-            catch (err) {
-                console.error('Error fetching data:', err);
-                setError('Failed to load courses. Please try again later.');
-                setLoading(false);
-            }
-        };
-
         fetchData();
-    }, [])
+    }, [fetchData]);
 
-    if (loading) {
-        return <Spin size="large" />
-    }
-
-    if (error) {
-        return <div>{error}</div>
-    }
     return (
         <div className='history-container'>
             <Header />
             <div className='history'>
                 <h1>Lịch Sử Đóng Tiền</h1>
                 <div className='table-container'>
-                    <Table className='displayer' dataSource={paidFees} columns={columns} rowKey="id" />
+                    <Table 
+                        className='displayer' 
+                        dataSource={paidFees} 
+                        columns={columns} 
+                        rowKey="id"
+                        loading={loading}
+                        locale={{
+                            emptyText: 'Không có dữ liệu'
+                        }}
+                    />
                 </div>
             </div>
         </div>

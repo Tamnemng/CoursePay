@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, message, Typography, Checkbox, Space, Tag, Spin } from 'antd';
 import Header from '../../components/Header';
-import { getStudentPaid, getStudentInfo } from '../../data/studentData';
+import { getStudentPaid, getStudentInfo, updatePaymentStatus } from '../../data/studentData';
 import './Pay.css';
 
 const { Text, Title } = Typography;
@@ -42,12 +42,15 @@ const Pay = () => {
     };
 
     const onFinish = async () => {
-        setLoading(true);
         try {
+            setLoading(true);
             // Giả lập API call
             await new Promise(resolve => setTimeout(resolve, 2000));
-
+            await Promise.all(selectedFees.map(feeId => updatePaymentStatus(feeId)));
             message.success('Thanh toán học phí thành công!');
+            // Cập nhật danh sách học phí chưa đóng
+            setUnpaidFees(prevFees => prevFees.filter(fee => !selectedFees.includes(fee.id)));
+            setSelectedFees([]);
         } catch (error) {
             message.error('Có lỗi xảy ra khi thanh toán. Vui lòng thử lại.');
         } finally {
@@ -55,11 +58,11 @@ const Pay = () => {
         }
     };
 
-    if(loading){
-        return <Spin size="large"/>
+    if (loading && unpaidFees.length === 0) {
+        return <Spin size="large" />;
     }
 
-    if(error){
+    if (error) {
         return <div>{error}</div>;
     }
 
