@@ -21,7 +21,7 @@ async function fetchFirebaseData() {
     return null;
   }
 }
-
+  
 let firebaseData = null;
 let faculty = "";
 let major = "";

@@ -58,7 +58,7 @@ export default function History() {
     }, [])
 
     if (loading) {
-        return <div>{Spin}</div>
+        return <Spin size="large" />
     }
 
     if (error) {

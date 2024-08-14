@@ -94,6 +94,17 @@ export function getStudentPaid(){
     return userInfo.fees || null;
 }
 
+export function getStudentCourses(){
+    if (!firebaseData || !uid) {
+        return null;
+    }
+    const userInfo = firebaseData.users?.[uid]?.registeredCourses;
+    if (!userInfo) {
+        return null;
+    }
+    return userInfo;
+}
+
 initializeData();
 
 export const studentInfo =

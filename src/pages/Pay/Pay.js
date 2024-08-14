@@ -46,7 +46,7 @@ const Pay = () => {
         try {
             // Giả lập API call
             await new Promise(resolve => setTimeout(resolve, 2000));
-            
+
             message.success('Thanh toán học phí thành công!');
         } catch (error) {
             message.error('Có lỗi xảy ra khi thanh toán. Vui lòng thử lại.');
@@ -56,7 +56,7 @@ const Pay = () => {
     };
 
     if(loading){
-        return <div>{Spin}</div>
+        return <Spin size="large"/>
     }
 
     if(error){
