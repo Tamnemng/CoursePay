@@ -1,12 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import './TuitionMain.css';
 import Header from "../../components/tuitionHeader";
 import Typography from "antd/es/typography/Typography";
 import { Select, Input, Button, Modal, Form, message, Space, Table, Radio } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
 import Highlighter from "react-highlight-words";
-import firebase from 'firebase/app';
-import 'firebase/database';
+import { getStudents, getFees } from "../../data/TuitionData";
 
 const { Title, Text } = Typography;
 
@@ -14,15 +13,18 @@ export default function TuitionMain() {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
+
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
+  
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText('');
   };
+
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div
@@ -83,7 +85,7 @@ export default function TuitionMain() {
               close();
             }}
           >
-            close
+            Close
           </Button>
         </Space>
       </div>
@@ -120,33 +122,47 @@ export default function TuitionMain() {
 
   const [visible, setVisible] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-  
-  // Hàm xử lý khi click vào hóa đơn
+  const [students, setStudents] = useState([]);
+  const [fees, setFees] = useState([]);
+  const [selectedStudentID, setSelectedStudentID] = useState(null);
+  const [value, setValue] = useState(1);
+
+  useEffect(() => {
+    getStudents((studentsList) => {
+      setStudents(studentsList);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (selectedStudentID) {
+      getFees(selectedStudentID, (feesList) => {
+        setFees(feesList);
+      });
+    }
+  }, [selectedStudentID]);
+
   const handleRowClick = (record) => {
     setSelectedRow(record);
-    
     setVisible(true);
   };
-  // Hàm xử lý đóng popup
+
   const handleCancel = () => {
     setVisible(false);
   };
-  
-  const [value, setValue] = useState(1);
 
   const paymColumns = [
     {
       title: 'Mã hóa đơn',
-      dataIndex: 'id',
-      key: 'id',
-      ...getColumnSearchProps('id'),
+      dataIndex: 'paymID',
+      key: 'paymID',
+      ...getColumnSearchProps('paymID'),
       width: 50,
     },
     {
       title: 'Tên hóa đơn',
-      dataIndex: 'name',
-      key: 'name',
-      ...getColumnSearchProps('name'),
+      dataIndex: 'paymName',
+      key: 'paymName',
+      ...getColumnSearchProps('pYmName'),
       width: 80,
     },
   ];
@@ -161,9 +177,9 @@ export default function TuitionMain() {
     },
     {
       title: 'Họ tên',
-      dataIndex: 'name',
-      key: 'name',
-      ...getColumnSearchProps('name'),
+      dataIndex: 'stuName',
+      key: 'stuName',
+      ...getColumnSearchProps('stuName'),
     },
     {
       title: 'Giảm phí',
@@ -173,7 +189,7 @@ export default function TuitionMain() {
       width: 80,
     },
   ];
- 
+
   return (
     <div className="tuitionMain-container">
       <Header />
@@ -192,7 +208,6 @@ export default function TuitionMain() {
                   marginLeft: 5,
                 }}
                 defaultValue={'all'}
-                
                 options={[
                   { value: 'all', label: 'Tất cả' },
                   { value: 'cntt', label: 'Công nghệ thông tin' },
@@ -201,15 +216,18 @@ export default function TuitionMain() {
                 ]}
               />
             </div>
-            <Table 
+            <Table
               columns={stuColumns}
-              
+              dataSource={students}
               pagination={{
                 pageSize: 10,
               }}
               scroll={{
                 y: 240,
               }}
+              onRow={(record) => ({
+                onClick: () => setSelectedStudentID(record.stuID),
+              })}
             />
           </div>
           <div className="payment">
@@ -246,8 +264,7 @@ export default function TuitionMain() {
               <Text>Mã sinh viên: </Text>
               <Input
                 className="customInp"
-                placeholder="Mã SV"
-                
+                value={selectedStudentID || ''}
                 readOnly
               />
             </div>
@@ -255,8 +272,7 @@ export default function TuitionMain() {
               <Text>Họ tên sinh viên: </Text>
               <Input
                 className="customInp"
-                placeholder="Họ tên SV"
-                
+                value={(students.find(s => s.stuID === selectedStudentID) || {}).stuName || ''}
                 readOnly
               />
             </div>
@@ -267,59 +283,54 @@ export default function TuitionMain() {
                 <Radio value={3}>Chưa đóng</Radio>
               </Radio.Group>
             </div>
-            
-            <div>
-              <Table 
-                columns={paymColumns}
-                pagination={{
-                  pageSize: 50,
-                }}
-                scroll={{
-                  y: 240,
-                }}
-                
-                onRow={(record) => ({
-                  onClick: () => handleRowClick(record),
-                })}
-              />
-              <Modal
-                title="Chi tiết hóa đơn"
-                open={visible}
-                onCancel={handleCancel}
-                footer={[
-                  <Button key={"update"} type="primary" >
-                    Update
-                  </Button>,
-                  <Button key={"delete"} type="dashed" danger >
-                    Delete
-                  </Button>,
-                ]}
-              >
-                {selectedRow ? (
-                  <div>
+            <Table
+              columns={paymColumns}
+              dataSource={fees}
+              pagination={{
+                pageSize: 50,
+              }}
+              scroll={{
+                y: 240,
+              }}
+              onRow={(record) => ({
+                onClick: () => handleRowClick(record),
+              })}
+            />
+            <Modal
+              title="Chi tiết hóa đơn"
+              open={visible}
+              onCancel={handleCancel}
+              footer={[
+                <Button key={"update"} type="primary" >
+                  Update
+                </Button>,
+                <Button key={"delete"} type="dashed" danger >
+                  Delete
+                </Button>,
+              ]}
+            >
+              {selectedRow ? (
+                <div>
                   <p><strong>Mã hóa đơn:</strong> 
-                    <Input value={""} readOnly/>
+                    <Input value={selectedRow.id} readOnly/>
                   </p>
                   <p><strong>Tên hóa đơn:</strong> 
-                    <Input value={""}/>
+                    <Input value={selectedRow.name}/>
                   </p>
-                  <p><strong>Thành tiềnn:</strong> 
-                    <Input value={""}/>
+                  <p><strong>Số tiền:</strong> 
+                    <Input value={selectedRow.amount}/>
                   </p>
                   <p><strong>Tình trạng:</strong> 
-                    <Input value={""}/>
+                    <Input value={selectedRow.paid ? 'Đã thanh toán' : 'Chưa thanh toán'}/>
                   </p>
                   <p><strong>Ngày thanh toán:</strong> 
-                    <Input value={""}/>
+                    <Input value={selectedRow.paymentDate}/>
                   </p>
                 </div>
               ) : (
                 <p>No data available</p>
               )}
-              </Modal>
-              
-            </div>
-            
+            </Modal>
             <Button type={'primary'} >Thêm hóa đơn</Button>
           </div>
         </div>
@@ -327,13 +338,10 @@ export default function TuitionMain() {
         {/* Modal thêm hóa đơn */}
         <Modal
           title="Thêm hóa đơn"
-          
           footer={null}
         >
           <Form
-            
             layout="vertical"
-            
           >
             <Form.Item
               name="name"

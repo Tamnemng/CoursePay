@@ -75,8 +75,7 @@ export function getAllMajorSubjects() {
   if (!firebaseData?.subjects?.majorSubjects) {
     return null;
   }
-  
-<<<<<<< HEAD
+
   const allMajorSubjects = {};
 
   for (const faculty in firebaseData.subjects.majorSubjects) {
@@ -97,11 +96,11 @@ export function getAllMajorSubjects() {
   }
 
   return allMajorSubjects;
-=======
+
   //const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][semester];
 
   //return { mandatory, elective };
->>>>>>> f51a6d1f27ed7d53277c9106ee5238247c639abf
+
 }
 
 export function getAllFacultySubjects() {
