@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ContentLayout from "../../../components/ContentLayout";
 import Header from "../../../components/courseHeader";
 import {
@@ -11,31 +11,143 @@ import {
   Modal,
   DatePicker,
 } from "antd";
-//import { majorSubject } from "../../../data/coursesData";
+import { addClassSection, getMajorSubjectDetail } from "../../../data/subjects";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
-const majorSubject = [];
 
 export default function MajorSubjectChangeDetail() {
   const { id } = useParams();
   const { RangePicker } = DatePicker;
   const navigate = useNavigate();
-  const subject = majorSubject.find((subject) => subject.id === id);
+  const [form] = Form.useForm();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentClassSection, setCurrentClassSection] = useState(null); // Thêm trạng thái này
+  const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
+
+  const [subject, setSubject] = useState(null);
+  const [classSection, setClassSection] = useState(null);
+
+  useEffect(() => {
+    getMajorSubjectDetail(id).then((result) => {
+      if (result.status === "success") {
+        const data = result.data;
+        const classSections = Array.isArray(data.classSections)
+          ? data.classSections
+          : Object.values(data.classSections || {});
+
+        setSubject({ ...data, classSections });
+        form.setFieldsValue({
+          id: data.id,
+          name: data.name,
+          major: data.major,
+          semester: data.semester,
+          credits: data.credits,
+          type: data.type,
+        });
+      } else {
+        console.error(result.message);
+      }
+    });
+  }, [id, form]);
+
+  useEffect(() => {
+    if (classSection) {
+      form.setFieldsValue({
+        id: classSection.id,
+        teacher: classSection.teacher,
+        dateRange: [moment(classSection.startDate), moment(classSection.endDate)],
+        size: classSection.size,
+        enrolled: classSection.enrolled,
+        timetable: classSection.timetable,
+      });
+    }
+  }, [classSection, form]);
 
   const showModal = (classSection) => {
-    setCurrentClassSection(classSection); // Cập nhật trạng thái với thông tin lớp học phần được chọn
+    setClassSection(classSection);
     setIsModalOpen(true);
   };
 
   const handleOk = () => {
     setIsModalOpen(false);
+    setIsModalCreateOpen(false);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setIsModalCreateOpen(false);
+  };
+
+  const showmodalCreate = () => {
+    setIsModalCreateOpen(true);
+  };
+
+  const modalCreate = () => {
+    return (
+      <Modal
+        title="Thêm lớp học phần"
+        open={isModalCreateOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <Form>
+          <Form.Item
+            name="id"
+            label="Mã lớp học phần"
+            rules={[{ required: true, message: "Please enter class ID" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="teacher"
+            label="Giảng viên"
+            rules={[{ required: true, message: "Please enter teacher name" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="dateRange"
+            label="Thời gian"
+            rules={[
+              { required: true, message: "Please select the date range" },
+            ]}
+          >
+            <RangePicker />
+          </Form.Item>
+          <Form.Item
+            name="size"
+            label="Số lượng"
+            rules={[{ required: true, message: "Please enter class size" }]}
+          >
+            <InputNumber min={15} />
+          </Form.Item>
+          <Form.Item
+            name="enrolled"
+            label="Số lượng đã đăng ký"
+            rules={[
+              { required: true, message: "Please enter enrolled number" },
+            ]}
+          >
+            <InputNumber min={0} />
+          </Form.Item>
+          <Form.Item
+            name="timetable"
+            label="Thời khóa biểu"
+            rules={[{ required: true, message: "Please enter timetable" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item className="flex flex-row justify-center">
+            <Button type="primary" htmlType="submit">
+              Thêm
+            </Button>
+            <Button type="primary" danger htmlType="submit" onClick={handleCancel}>
+              Hủy
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    );
   };
 
   if (!subject) {
@@ -73,16 +185,26 @@ export default function MajorSubjectChangeDetail() {
       key: "endDate",
     },
     {
-      title: "Số lượng",
+      title: "Số lượng đăng ký",
       dataIndex: "enrolled",
       key: "enrolled",
+    },
+    {
+      title: "Số lượng",
+      dataIndex: "size",
+      key: "size",
+    },
+    {
+      title: "Thời khóa biểu",
+      dataIndex: "timetable",
+      key: "timetable",
     },
     {
       title: "Thao tác",
       dataIndex: "id",
       key: "id",
       render: (text, record) => (
-        <Button onClick={() => showModal(record)}>Chi tiết</Button> // Truyền record vào showModal
+        <Button onClick={() => showModal(record)}>Chi tiết</Button>
       ),
     },
   ];
@@ -108,6 +230,9 @@ export default function MajorSubjectChangeDetail() {
               <Form.Item name="name" label="Tên học phần">
                 <Input defaultValue={subject.name} />
               </Form.Item>
+              <Form.Item name="faculty" label="Khoa">
+                <Input defaultValue={subject.faculty} />
+              </Form.Item>
               <Form.Item name="major" label="Chuyên ngành">
                 <Input defaultValue={subject.major} />
               </Form.Item>
@@ -124,11 +249,11 @@ export default function MajorSubjectChangeDetail() {
                   defaultValue={subject.type}
                   options={[
                     {
-                      value: "Bắt buộc",
+                      value: "mandatory",
                       label: "Bắt buộc",
                     },
                     {
-                      value: "Tự chọn",
+                      value: "elective",
                       label: "Tự chọn",
                     },
                   ]}
@@ -145,56 +270,67 @@ export default function MajorSubjectChangeDetail() {
           <div>
             <div className="flex flex-row justify-between items-center mx-10">
               <span className="text-2xl m-12">Danh sách các lớp học phần</span>
-              <Button type="primary">Thêm lớp học phần</Button>
+              <Button type="primary" onClick={showmodalCreate}>
+                Thêm lớp học phần
+              </Button>
             </div>
-            <div className="m-10">
-              <Table
-                columns={columns}
-                dataSource={subject.classSections}
-                tableLayout="auto"
-                rowKey="id"
-              />
-            </div>
-            {currentClassSection && (
-              <Modal
-                title="Thông tin lớp học phần"
-                open={isModalOpen}
-                onOk={handleOk}
-                onCancel={handleCancel}
-                footer={[
-                  <Button type="primary" onClick={handleOk}>
-                    Lưu thay đổi
-                  </Button>,
-                  <Button type="primary" danger onClick={handleOk}>
-                    Xóa lớp học phần
-                  </Button>,
-                ]}
-              >
-                <div>
-                  <Form>
-                    <Form.Item name="id" label="Mã lớp học phần">
-                      <Input defaultValue={currentClassSection.id} />
-                    </Form.Item>
-                    <Form.Item name="teacher" label="Giảng viên">
-                      <Input defaultValue={currentClassSection.teacher} />
-                    </Form.Item>
-                    <Form.Item name="dateRange" label="Thời gian">
-                      <RangePicker
-                        defaultValue={[
-                          moment(currentClassSection.startDate),
-                          moment(currentClassSection.endDate),
-                        ]}
-                      />
-                    </Form.Item>
-                    <Form.Item name="enrolled" label="Số lượng đăng ký">
-                      <InputNumber defaultValue={currentClassSection.enrolled} />
-                    </Form.Item>
-                  </Form>
-                </div>
-              </Modal>
-            )}
+            <Table columns={columns} dataSource={subject.classSections} />
           </div>
         </div>
+        {modalCreate()}
+        <Modal
+          title="Chi tiết lớp học phần"
+          open={isModalOpen}
+          onCancel={handleCancel}
+          footer={null}
+        >
+          <Form form={form}>
+            <Form.Item
+              name="id"
+              label="Mã lớp học phần"
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="teacher"
+              label="Giảng viên"
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="dateRange"
+              label="Thời gian"
+            >
+              <RangePicker />
+            </Form.Item>
+            <Form.Item
+              name="size"
+              label="Số lượng"
+            >
+              <InputNumber min={15} />
+            </Form.Item>
+            <Form.Item
+              name="enrolled"
+              label="Số lượng đã đăng ký"
+            >
+              <InputNumber min={0} />
+            </Form.Item>
+            <Form.Item
+              name="timetable"
+              label="Thời khóa biểu"
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item className="flex flex-row justify-center">
+              <Button type="primary" onClick={handleOk}>
+                Xác nhận
+              </Button>
+              <Button type="default" onClick={handleCancel}>
+                Hủy
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
       </div>
     </div>
   );
