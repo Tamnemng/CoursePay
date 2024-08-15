@@ -1,5 +1,13 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, set, get, ref, child } from "firebase/database";
+import {
+  getDatabase,
+  set,
+  get,
+  ref,
+  child,
+  update,
+  remove,
+} from "firebase/database";
 import { firebaseConfig } from "./firebaseConfig";
 
 const app = initializeApp(firebaseConfig);
@@ -37,7 +45,6 @@ export const getMajorSubjectDetail = (subjectId) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         let subjectDetail = null;
-
         for (const faculty in data) {
           for (const major in data[faculty]) {
             for (const semester in data[faculty][major]) {
@@ -96,7 +103,6 @@ export const getMajorSubjectDetail = (subjectId) => {
 export const addClassSection = async (subjectId, newClassSection) => {
   try {
     const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
-
     if (majorSubjectDetail.status !== "success") {
       console.error(
         "Failed to get major subject details:",
@@ -106,7 +112,6 @@ export const addClassSection = async (subjectId, newClassSection) => {
     }
 
     const { faculty, major, semester, type } = majorSubjectDetail.data;
-
     const classSectionsRef = ref(
       database,
       `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}/classSections`
@@ -124,7 +129,6 @@ export const addClassSection = async (subjectId, newClassSection) => {
     }
 
     await set(classIdRef, newClassSection);
-
     console.log("Class section added successfully:", newClassSection);
     return {
       status: "success",
@@ -132,6 +136,88 @@ export const addClassSection = async (subjectId, newClassSection) => {
     };
   } catch (error) {
     console.error("Failed to add class section:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};
+
+export const updateClassSection = async (subjectId, updatedClassSection) => {
+  try {
+    const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
+    if (majorSubjectDetail.status !== "success") {
+      console.error(
+        "Failed to get major subject details:",
+        majorSubjectDetail.message
+      );
+      return majorSubjectDetail;
+    }
+
+    const { faculty, major, semester, type, classSections } =
+      majorSubjectDetail.data;
+    // Kiểm tra nếu classId mới có trùng với lớp học phần khác
+    const isClassIdUnique = classSections.every(
+      (section) =>
+        section.id !== updatedClassSection.id ||
+        section.id === updatedClassSection.originalId
+    );
+
+    if (!isClassIdUnique) {
+      return {
+        status: "error",
+        code: "database/classId_duplicate",
+        message: "ClassId đã tồn tại, vui lòng chọn ClassId khác.",
+      };
+    }
+
+    const classSectionRef = ref(
+      database,
+      `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}/classSections/${updatedClassSection.id}`
+    );
+
+    await update(classSectionRef, updatedClassSection);
+    console.log("Class section updated successfully:", updatedClassSection);
+    return {
+      status: "success",
+      message: "Class section updated successfully.",
+    };
+  } catch (error) {
+    console.error("Failed to update class section:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};
+
+export const deleteClassSection = async (subjectId, classSectionId) => {
+  try {
+    const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
+    if (majorSubjectDetail.status !== "success") {
+      console.error(
+        "Failed to get major subject details:",
+        majorSubjectDetail.message
+      );
+      return majorSubjectDetail;
+    }
+
+    const { faculty, major, semester, type } = majorSubjectDetail.data;
+    const classSectionRef = ref(
+      database,
+      `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}/classSections/${classSectionId}`
+    );
+
+    await remove(classSectionRef);
+    console.log("Class section deleted successfully:", classSectionId);
+    return {
+      status: "success",
+      message: "Class section deleted successfully.",
+    };
+  } catch (error) {
+    console.error("Failed to delete class section:", error);
     return {
       status: "error",
       code: error.code,
