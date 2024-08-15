@@ -100,7 +100,7 @@ export const getMajorSubjectDetail = (subjectId) => {
     });
 };
 
-export const addClassSection = async (subjectId, newClassSection) => {
+export const addMajorClassSection = async (subjectId, newClassSection) => {
   try {
     const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
     if (majorSubjectDetail.status !== "success") {
@@ -144,7 +144,7 @@ export const addClassSection = async (subjectId, newClassSection) => {
   }
 };
 
-export const updateClassSection = async (subjectId, updatedClassSection) => {
+export const updateMajorClassSection = async (subjectId, updatedClassSection) => {
   try {
     const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
     if (majorSubjectDetail.status !== "success") {
@@ -193,7 +193,7 @@ export const updateClassSection = async (subjectId, updatedClassSection) => {
   }
 };
 
-export const deleteClassSection = async (subjectId, classSectionId) => {
+export const deleteMajorClassSection = async (subjectId, classSectionId) => {
   try {
     const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
     if (majorSubjectDetail.status !== "success") {

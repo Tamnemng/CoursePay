@@ -15,24 +15,32 @@ export default function CreateSubject() {
         <div>
           <div className="m-20 mx-96">
             <Form>
-              <Form.Item name="id" label="Mã học phần" required>
+              <Form.Item
+                name="faculty"
+                label="Khoa"
+                rules={[{ required: true, message: "Please enter faculty" }]}
+              >
                 <Input />
               </Form.Item>
-              <Form.Item name="name" label="Tên học phần" required>
+              <Form.Item
+                name="major"
+                label="Chuyên ngành"
+                rules={[{ required: true, message: "Please enter major" }]}
+              >
                 <Input />
               </Form.Item>
-              <Form.Item name="major" label="Chuyên ngành">
+              <Form.Item
+                name="semester"
+                label="Học kỳ"
+                rules={[{ required: true, message: "Please enter semester" }]}
+              >
                 <Input />
               </Form.Item>
-              <div className="flex flex-row gap-8">
-                <Form.Item name="semester" label="Học kỳ" required>
-                  <InputNumber />
-                </Form.Item>
-                <Form.Item name="credits" label="Số tín chỉ" required>
-                  <InputNumber />
-                </Form.Item>
-              </div>
-              <Form.Item name="type" label="Loại học phần" required>
+              <Form.Item
+                name="type"
+                label="Loại học phần"
+                rules={[{ required: true, message: "Please select type" }]}
+              >
                 <Select
                   options={[
                     {
@@ -46,13 +54,34 @@ export default function CreateSubject() {
                   ]}
                 />
               </Form.Item>
+              <Form.Item
+                name="id"
+                label="Mã học phần"
+                rules={[{ required: true, message: "Please enter subject ID" }]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="name"
+                label="Tên học phần"
+                rules={[{ required: true, message: "Please enter class name" }]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="credits"
+                label="Số tín chỉ"
+                rules={[{ required: true, message: "Please enter credits" }]}
+              >
+                <InputNumber min={1} />
+              </Form.Item>
+              <Form.Item>
+                <div className="flex justify-end mb-20 gap-4">
+                  <Button type="primary">Thêm học phần</Button>
+                  <Button onClick={() => navigate(-1)}>Hủy</Button>
+                </div>
+              </Form.Item>
             </Form>
-            <div className="flex justify-end mb-20 gap-4">
-              <Button type="primary">Thêm học phần</Button>
-              <Button type="primary" onClick={() => navigate(-1)}>
-                Trở về
-              </Button>
-            </div>
           </div>
         </div>
       </div>
