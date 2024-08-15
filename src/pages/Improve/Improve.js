@@ -80,8 +80,6 @@ export default function Improve() {
                 );
 
                 const specializedSubjects = [
-                    ...processSubjects(studentSubjects.faculty.mandatory, 'mandatory', 'faculty'),
-                    ...processSubjects(studentSubjects.faculty.elective, 'elective', 'faculty'),
                     ...processSubjects(studentSubjects.major.mandatory, 'mandatory', 'major'),
                     ...processSubjects(studentSubjects.major.elective, 'elective', 'major')
                 ];

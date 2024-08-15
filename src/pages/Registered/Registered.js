@@ -85,7 +85,7 @@ export default function Registered() {
                         dataSource={courses}
                         columns={columns}
                         rowKey="key"
-                        loading={loading}
+                            
                     />
                 </div>
             </div>

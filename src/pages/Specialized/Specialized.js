@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
-import { getMajorSubjects, getFacultySubjects } from '../../data/coursesData';
+import { getMajorSubjects } from '../../data/coursesData';
 import { getStudentSemester, getStudentCourses, updateCoursesList } from '../../data/studentData';
 import './Specialized.css';
 
@@ -66,26 +66,22 @@ export default function Specialized() {
             className: 'action-column'
         },
     ];
-
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const semester = await getStudentSemester(); //studentInfo.semester;
+                const semester = await getStudentSemester();
                 const majorSubjectsData = await getMajorSubjects(semester);
-                const facultySubjectsData = await getFacultySubjects(semester);
-
-                if (!majorSubjectsData || !facultySubjectsData) {
+                console.log("test", majorSubjectsData);
+                if (!majorSubjectsData ) {
                     throw new Error('Failed to fetch subjects data');
                 }
 
                 const combinedMandatory = [
-                    ...Object.entries(majorSubjectsData.mandatory || {}),
-                    ...Object.entries(facultySubjectsData.mandatory || {})
+                    ...Object.entries(majorSubjectsData.mandatory || {})
                 ];
 
                 const combinedElective = [
-                    ...Object.entries(majorSubjectsData.elective || {}),
-                    ...Object.entries(facultySubjectsData.elective || {})
+                    ...Object.entries(majorSubjectsData.elective || {})
                 ];
 
                 const processedMandatory = combinedMandatory.map(([id, course]) => ({

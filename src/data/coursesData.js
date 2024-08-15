@@ -96,40 +96,16 @@ export function getAllGeneralSubjects() {
 
 export function getAllStudentSubjects() {
 
-  if (!firebaseData?.subjects?.facultySubjects?.[faculty] ||
-    !firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]) {
+  if (!firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]) {
     return null;
   }
 
   const allSubjects = {
-    faculty: {
-      mandatory: {},
-      elective: {}
-    },
     major: {
       mandatory: {},
       elective: {}
     }
   };
-
-  const facultyData = firebaseData.subjects.facultySubjects[faculty];
-  for (const semester in facultyData) {
-    const { mandatory = {}, elective = {} } = facultyData[semester];
-
-    Object.entries(mandatory).forEach(([subjectCode, subjectData]) => {
-      allSubjects.faculty.mandatory[subjectCode] = {
-        ...subjectData,
-        semester
-      };
-    });
-
-    Object.entries(elective).forEach(([subjectCode, subjectData]) => {
-      allSubjects.faculty.elective[subjectCode] = {
-        ...subjectData,
-        semester
-      };
-    });
-  }
 
   const majorData = firebaseData.subjects.majorSubjects[faculty][major];
   for (const semester in majorData) {
