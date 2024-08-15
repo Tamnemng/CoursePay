@@ -18,9 +18,9 @@ import {
   QuestionCircleOutlined,
 } from "@ant-design/icons";
 import {
-  addClassSection,
-  updateClassSection,
-  deleteClassSection,
+  addMajorClassSection,
+  updateMajorClassSection,
+  deleteMajorClassSection,
   getMajorSubjectDetail,
 } from "../../../data/subjects";
 import { useNavigate, useParams } from "react-router-dom";
@@ -110,7 +110,7 @@ export default function MajorSubjectChangeDetail() {
         timetable: values.timetable,
       };
 
-      const result = await addClassSection(subject.id, classSectionData);
+      const result = await addMajorClassSection(subject.id, classSectionData);
 
       if (result.status === "success") {
         getMajorSubjectDetail(subject.id).then((result) => {
@@ -150,7 +150,7 @@ export default function MajorSubjectChangeDetail() {
         timetable: values.timetable,
       };
 
-      const result = await updateClassSection(subject.id, updatedClassSection);
+      const result = await updateMajorClassSection(subject.id, updatedClassSection);
 
       if (result.status === "success") {
         setIsModalOpen(false);
@@ -172,7 +172,7 @@ export default function MajorSubjectChangeDetail() {
 
   const handleDeleteClassSection = async (classSectionId) => {
     try {
-      const result = await deleteClassSection(subject.id, classSectionId);
+      const result = await deleteMajorClassSection(subject.id, classSectionId);
 
       if (result.status === "success") {
         console.log(result.message);

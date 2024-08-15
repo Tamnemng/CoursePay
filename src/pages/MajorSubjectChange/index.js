@@ -117,7 +117,7 @@ export default function MajorSubjectChange() {
           Quản lý học vụ
         </h1>
         <div>
-          <ContentLayout onCreate={() => navigate("/createSubject")}>
+          <ContentLayout onCreate={() => navigate("/majorSubjectChange/create")}>
             {loading ? (
               <div className="h-full flex justify-center">
                 <Spin indicator={<LoadingOutlined spin />} size="large" />
