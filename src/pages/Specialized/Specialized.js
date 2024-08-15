@@ -55,14 +55,27 @@ export default function Specialized() {
 
     const classColumns = [
         { title: 'Tên Lớp', dataIndex: 'id', className: 'class-name-column' },
-        { title: 'Sĩ Số', dataIndex: 'enrolled', className: 'class-size-column' },
+        {
+            title: 'Sĩ Số',
+            dataIndex: 'enrolled',
+            className: 'class-size-column',
+            render: (enrolled, record) => `${enrolled}/${record.size}`
+        },
         { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
         { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
         { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
         { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column' },
         {
-            title: 'Chọn Lớp Đăng Ký',
-            render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
+            title: 'Đăng Ký',
+            render: (text, record) => (
+                <Button
+                    onClick={() => handleClassRegister(record)}
+                    disabled={record.enrolled >= record.size}
+                    className="register-class-button"
+                >
+                    {record.enrolled >= record.size ? 'Đã đầy' : 'Đăng Ký'}
+                </Button>
+            ),
             className: 'action-column'
         },
     ];
@@ -72,7 +85,7 @@ export default function Specialized() {
                 const semester = await getStudentSemester();
                 const majorSubjectsData = await getMajorSubjects(semester);
                 console.log("test", majorSubjectsData);
-                if (!majorSubjectsData ) {
+                if (!majorSubjectsData) {
                     throw new Error('Failed to fetch subjects data');
                 }
 

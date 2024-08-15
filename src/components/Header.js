@@ -122,9 +122,6 @@ export default function Header() {
       case 'improve-courses':
         navigate('/courses/register/improve');
         break;
-      case 'contact':
-        navigate('/contact');
-        break;
       case 'logout':
         localStorage.setItem('isAuthenticated', 'false');
         navigate('');

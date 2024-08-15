@@ -65,7 +65,6 @@ export default function Register() {
                     }));
                 setElectiveCourses(processedElective);
 
-                // Fetch registered courses
                 const studentCourses = await getStudentCourses();
                 setRegisteredCourses(studentCourses || []);
 
@@ -186,6 +185,7 @@ export default function Register() {
                             columns={columns(handleRegisterClick)}
                             dataSource={mandatoryCourses}
                             rowKey="id"
+                            loading={loading}
                         />
                     </TabPane>
                     <TabPane tab="Môn Tự Chọn" key="2">

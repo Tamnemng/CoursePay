@@ -7,20 +7,31 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
 let uid = null;
+let initializationPromise = null;
 
-export async function initializeData() {
-    try {
-        uid = await getStudentUid();
-    } catch (error) {
-        console.error("Lỗi khi lấy Student UID:", error);
+export function initializeData() {
+    if (!initializationPromise) {
+        initializationPromise = getStudentUid().then(studentUid => {
+            uid = studentUid;
+            console.log("UID initialized:", uid);
+        }).catch(error => {
+            console.error("Error initializing UID:", error);
+        });
+    }
+    return initializationPromise;
+}
+
+async function ensureInitialized() {
+    if (!uid) {
+        await initializeData();
+    }
+    if (!uid) {
+        throw new Error("UID chưa được khởi tạo");
     }
 }
 
 async function getStudentData() {
-    if (!uid) {
-        console.error("UID chưa được khởi tạo");
-        return null;
-    }
+    await ensureInitialized();
     try {
         const userRef = ref(database, `users/${uid}`);
         const snapshot = await get(userRef);
@@ -67,7 +78,8 @@ export async function getStudentCourses() {
 }
 
 export async function updateCoursesList(course) {
-    if (!uid || !course) {
+    await ensureInitialized();
+    if (!course) {
         throw new Error('Không đủ thông tin để cập nhật danh sách khóa học.');
     }
     const courseRef = ref(database, `users/${uid}/registeredCourses/${course.id}`);
@@ -90,7 +102,8 @@ export async function updateCoursesList(course) {
 }
 
 export async function updatePaymentStatus(feeId) {
-    if (!uid || !feeId) {
+    await ensureInitialized();
+    if (!feeId) {
         throw new Error('Không đủ thông tin để cập nhật trạng thái thanh toán.');
     }
 

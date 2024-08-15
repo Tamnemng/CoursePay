@@ -77,13 +77,24 @@ export const getUserRole = async () => {
 };
 
 export const getStudentUid = () => {
-  return new Promise((resolve, reject) => {
-    onAuthStateChanged(auth, (user) => {
+  return new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe();
       if (user) {
         resolve(user.uid);
       } else {
         resolve(null);
       }
     });
+
+    if (auth.currentUser) {
+      unsubscribe();
+      resolve(auth.currentUser.uid);
+    }
+
+    setTimeout(() => {
+      unsubscribe();
+      resolve(null);
+    }, 5000);
   });
 };

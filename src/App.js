@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import ClassEdit from './pages/ClassEdit/ClassEdit';
-import Contact from './pages/Contact/Contact';
 import CourseEdit from './pages/CourseEdit/CourseEdit';
 import GeneralSubjectChange from './pages/GenaralSubjectChange/ClassChange';
 import History from './pages/History/History';
@@ -102,7 +101,6 @@ export default function App() {
           <Route path="/courses/register/general" element={<ProtectedRoute><RoleBasedRoute element={Register} allowedRoles={['1']} /></ProtectedRoute>} />
           <Route path="/courses/register/improve" element={<ProtectedRoute><RoleBasedRoute element={Improve} allowedRoles={['1']} /></ProtectedRoute>} />
           <Route path="/courses/registered" element={<ProtectedRoute><RoleBasedRoute element={Registered} allowedRoles={['1']} /></ProtectedRoute>} />
-          <Route path="/contact" element={<ProtectedRoute><RoleBasedRoute element={Contact} allowedRoles={['1']} /></ProtectedRoute>} />
 
           {/* Routes for Employee (Role 2) */}
           <Route path="/majorSubjectChange" element={<ProtectedRoute><RoleBasedRoute element={MajorSubjectChange} allowedRoles={['2']} /></ProtectedRoute>} />

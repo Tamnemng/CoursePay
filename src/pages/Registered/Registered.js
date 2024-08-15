@@ -70,10 +70,6 @@ export default function Registered() {
         fetchData();
     }, [fetchData]);
 
-    const handleRefresh = () => {
-        fetchData();
-    };
-
     return (
         <div className='registered-container'>
             <Header />
@@ -85,7 +81,7 @@ export default function Registered() {
                         dataSource={courses}
                         columns={columns}
                         rowKey="key"
-                            
+                        loading={loading}
                     />
                 </div>
             </div>
