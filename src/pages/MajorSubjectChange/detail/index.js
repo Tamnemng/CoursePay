@@ -121,6 +121,7 @@ export default function MajorSubjectChangeDetail() {
               : Object.values(data.classSections || {});
             setSubject({ ...data, classSections });
             message.success("Thêm lớp học phần thành công.");
+            createForm.resetFields();
           } else {
             console.error(result.message);
           }
@@ -239,7 +240,22 @@ export default function MajorSubjectChangeDetail() {
             name="enrolled"
             label="Số lượng đã đăng ký"
             rules={[
-              { required: true, message: "Please enter enrolled number" },
+              {
+                required: true,
+                message: "Please enter enrolled number",
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (value <= getFieldValue("size")) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error(
+                      "Enrolled must be less than or equal to class size"
+                    )
+                  );
+                },
+              }),
             ]}
           >
             <InputNumber min={0} />
@@ -251,13 +267,15 @@ export default function MajorSubjectChangeDetail() {
           >
             <Input />
           </Form.Item>
-          <Form.Item className="flex flex-row justify-center">
-            <Button type="primary" htmlType="submit">
-              Thêm
-            </Button>
-            <Button type="default" danger onClick={handleCancel}>
-              Hủy
-            </Button>
+          <Form.Item>
+            <div className="flex flex-row justify-center gap-4">
+              <Button type="primary" htmlType="submit">
+                Thêm
+              </Button>
+              <Button type="default" onClick={handleCancel}>
+                Hủy
+              </Button>
+            </div>
           </Form.Item>
         </Form>
       </Modal>
@@ -446,7 +464,22 @@ export default function MajorSubjectChangeDetail() {
               name="enrolled"
               label="Số lượng đã đăng ký"
               rules={[
-                { required: true, message: "Please enter enrolled number" },
+                {
+                  required: true,
+                  message: "Please enter enrolled number",
+                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (value <= getFieldValue("size")) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error(
+                        "Enrolled must be less than or equal to class size"
+                      )
+                    );
+                  },
+                }),
               ]}
             >
               <InputNumber min={0} />
@@ -458,13 +491,15 @@ export default function MajorSubjectChangeDetail() {
             >
               <Input />
             </Form.Item>
-            <Form.Item className="flex flex-row justify-center">
-              <Button type="primary" onClick={handleUpdateClassSection}>
-                Cập nhật
-              </Button>
-              <Button type="default" onClick={handleCancel}>
-                Hủy
-              </Button>
+            <Form.Item>
+              <div className="flex flex-row justify-center gap-4">
+                <Button type="primary" onClick={handleUpdateClassSection}>
+                  Cập nhật
+                </Button>
+                <Button type="default" onClick={handleCancel}>
+                  Hủy
+                </Button>
+              </div>
             </Form.Item>
           </Form>
         </Modal>
