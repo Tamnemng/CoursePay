@@ -1,129 +1,112 @@
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, get, update } from 'firebase/database';
+import { getDatabase, ref, get, update, set } from 'firebase/database';
 import { firebaseConfig } from './firebaseConfig';
 import { getStudentUid } from '../pages/Logging/loggingData';
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
-async function fetchFirebaseData() {
-    try {
-        const dataRef = ref(database, '/');
-        const snapshot = await get(dataRef);
-        if (snapshot.exists()) {
-            return snapshot.val();
-        } else {
-            console.log("Không có dữ liệu");
-            return null;
-        }
-    } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu:", error);
-        return null;
-    }
-}
-
-let firebaseData = null;
 let uid = null;
 
 export async function initializeData() {
-    firebaseData = await fetchFirebaseData();
-    if (!firebaseData) {
-        console.error("Không thể khởi tạo dữ liệu từ Firebase");
-    }
-
     try {
         uid = await getStudentUid();
-        console.log("Student UID:", uid);
     } catch (error) {
         console.error("Lỗi khi lấy Student UID:", error);
     }
 }
 
-export function getStudentFaculty() {
-    if (!firebaseData || !uid) {
+async function getStudentData() {
+    if (!uid) {
+        console.error("UID chưa được khởi tạo");
         return null;
     }
-    const userInfo = firebaseData.users?.[uid];
-    if (!userInfo) {
+    try {
+        const userRef = ref(database, `users/${uid}`);
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+            return snapshot.val();
+        } else {
+            console.log("Không tìm thấy dữ liệu cho user");
+            return null;
+        }
+    } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu user:", error);
         return null;
     }
-    return userInfo.info.faculty || null;
 }
 
-export function getStudentMajor() {
-    if (!firebaseData || !uid) {
-        return null;
-    }
-    const userInfo = firebaseData.users?.[uid];
-    if (!userInfo) {
-        return null;
-    }
-    return userInfo.info.major || null;
+export async function getStudentFaculty() {
+    const userData = await getStudentData();
+    return userData?.info?.faculty || null;
 }
 
-export function getStudentSemester() {
-    if (!firebaseData || !uid) {
-        return null;
-    }
-    const userInfo = firebaseData.users?.[uid];
-    if (!userInfo) {
-        return null;
-    }
-    return userInfo.info.semester || null;
+export async function getStudentMajor() {
+    const userData = await getStudentData();
+    return userData?.info?.major || null;
 }
 
-export function getStudentInfo() {
-    if (!firebaseData || !uid) {
-        return null;
-    }
-    const userInfo = firebaseData.users?.[uid];
-    if (!userInfo) {
-        return null;
-    }
-    return userInfo.info || null;
+export async function getStudentSemester() {
+    const userData = await getStudentData();
+    return userData?.info?.semester || null;
 }
 
-export function getStudentPaid() {
-    if (!firebaseData || !uid) {
-        return null;
-    }
-    const userInfo = firebaseData.users?.[uid];
-    if (!userInfo) {
-        return null;
-    }
-    return userInfo.fees || null;
+export async function getStudentInfo() {
+    const userData = await getStudentData();
+    return userData?.info || null;
 }
 
-export function getStudentCourses() {
-    if (!firebaseData || !uid) {
-        return null;
-    }
-    const userInfo = firebaseData.users?.[uid]?.registeredCourses;
-    if (!userInfo) {
-        return null;
-    }
-    return userInfo;
+export async function getStudentPaid() {
+    const userData = await getStudentData();
+    return userData?.fees || null;
 }
 
+export async function getStudentCourses() {
+    const userData = await getStudentData();
+    return userData?.registeredCourses || null;
+}
 
+export async function updateCoursesList(course) {
+    if (!uid || !course) {
+        throw new Error('Không đủ thông tin để cập nhật danh sách khóa học.');
+    }
+    const courseRef = ref(database, `users/${uid}/registeredCourses/${course.id}`);
+    const newCourseData = {
+        credits: course.credits,
+        name: course.name,
+        teacher: course.teacher,
+        timeEnd: course.timeEnd,
+        timeStart: course.timeStart,
+        timetable: course.timetable
+    };
+
+    try {
+        await set(courseRef, newCourseData);
+        console.log('Cập nhật khóa học thành công:', course.id);
+    } catch (error) {
+        console.error('Lỗi khi cập nhật khóa học:', error);
+        throw error;
+    }
+}
 
 export async function updatePaymentStatus(feeId) {
-    if (!firebaseData || !uid || !feeId) {
-      return;
+    if (!uid || !feeId) {
+        throw new Error('Không đủ thông tin để cập nhật trạng thái thanh toán.');
     }
-  
+
     const feeRef = ref(database, `/users/${uid}/fees/${feeId}`);
     const newPaymentData = {
-      paid: true,
-      paymentDate: new Date().toISOString(),
+        paid: true,
+        paymentDate: new Date().toISOString(),
     };
-  
-    try {
-      await update(feeRef, newPaymentData);
-    } catch (error) {
-      console.error(`Lỗi khi cập nhật trạng thái thanh toán cho khoản phí ${feeId}:`, error);
-    }
-  }
 
+    try {
+        await update(feeRef, newPaymentData);
+        console.log('Cập nhật trạng thái thanh toán thành công:', feeId);
+    } catch (error) {
+        console.error(`Lỗi khi cập nhật trạng thái thanh toán cho khoản phí ${feeId}:`, error);
+        throw error;
+    }
+}
 
 initializeData();

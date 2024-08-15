@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../../components/Header';
-import { Table, Spin, message } from 'antd';
+import { Table, message } from 'antd';
 import moment from 'moment';
 import './Registered.css';
 import { getStudentCourses } from '../../data/studentData';
@@ -56,6 +56,7 @@ export default function Registered() {
                 setCourses(processedCourses);
             } else {
                 message.warning('Không tìm thấy học phần nào.');
+                setCourses([]);
             }
         } catch (err) {
             console.error('Error fetching data:', err);
@@ -67,13 +68,11 @@ export default function Registered() {
 
     useEffect(() => {
         fetchData();
-
-        // Thiết lập interval để cập nhật dữ liệu mỗi 5 phút
-        const intervalId = setInterval(fetchData, 5 * 60 * 1000);
-
-        // Cleanup function
-        return () => clearInterval(intervalId);
     }, [fetchData]);
+
+    const handleRefresh = () => {
+        fetchData();
+    };
 
     return (
         <div className='registered-container'>
@@ -85,7 +84,7 @@ export default function Registered() {
                         className='displayer'
                         dataSource={courses}
                         columns={columns}
-                        rowKey="id"
+                        rowKey="key"
                         loading={loading}
                     />
                 </div>

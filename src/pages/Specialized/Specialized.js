@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getMajorSubjects, getFacultySubjects } from '../../data/coursesData';
-import { getStudentSemester } from '../../data/studentData';
+import { getStudentSemester, getStudentCourses, updateCoursesList } from '../../data/studentData';
 import './Specialized.css';
 
 const { TabPane } = Tabs;
@@ -41,6 +41,7 @@ export default function Specialized() {
     const [electiveCourses, setElectiveCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [registeredCourses, setRegisteredCourses] = useState([]);
 
     const handleRegisterClick = useCallback((course) => {
         setSelectedCourse(course);
@@ -58,7 +59,7 @@ export default function Specialized() {
         { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
         { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
         { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
-        { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column'},
+        { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column' },
         {
             title: 'Chọn Lớp Đăng Ký',
             render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
@@ -69,7 +70,7 @@ export default function Specialized() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const semester =  await getStudentSemester(); //studentInfo.semester;
+                const semester = await getStudentSemester(); //studentInfo.semester;
                 const majorSubjectsData = await getMajorSubjects(semester);
                 const facultySubjectsData = await getFacultySubjects(semester);
 
@@ -98,7 +99,8 @@ export default function Specialized() {
                     ...course,
                     type: 'Tự chọn'
                 }));
-
+                const studentCourses = await getStudentCourses();
+                setRegisteredCourses(studentCourses || []);
                 setMandatoryCourses(processedMandatory);
                 setElectiveCourses(processedElective);
             } catch (err) {
@@ -120,19 +122,47 @@ export default function Specialized() {
         setIsModalVisible(false);
     };
 
-    const handleConfirmRegister = () => {
-        message.success('Đăng ký thành công!');
-        setIsConfirmModalVisible(false);
-        setIsModalVisible(false);
+    const handleConfirmRegister = async () => {
+        if (selectedCourse && selectedClass) {
+            try {
+                // Check if the course is already registered
+                if (registeredCourses[selectedCourse.id]) {
+                    message.error('Bạn đã đăng ký khóa học này rồi!');
+                    return;
+                }
+
+                const courseData = {
+                    id: selectedClass.id,
+                    credits: selectedCourse.credits,
+                    name: selectedCourse.name,
+                    teacher: selectedClass.teacher,
+                    timeEnd: selectedClass.endDate,
+                    timeStart: selectedClass.startDate,
+                    timetable: selectedClass.timetable
+                };
+
+                await updateCoursesList(courseData);
+
+                setRegisteredCourses(prev => ({
+                    ...prev,
+                    [selectedCourse.id]: courseData
+                }));
+
+                message.success('Đăng ký khóa học thành công!');
+                setIsConfirmModalVisible(false);
+                setIsModalVisible(false);
+            } catch (error) {
+                console.error('Error registering course:', error);
+                message.error('Không thể đăng ký khóa học. Vui lòng thử lại.');
+            }
+        } else {
+            message.error('Không thể đăng ký khóa học. Vui lòng thử lại.');
+        }
     };
 
     const handleCancelRegister = () => {
         setIsConfirmModalVisible(false);
     };
-
-    if (loading) {
-        return <Spin size="large" />;
-    }
 
     if (error) {
         return <div>{error}</div>;
@@ -149,6 +179,7 @@ export default function Specialized() {
                             columns={columns(handleRegisterClick)}
                             dataSource={mandatoryCourses}
                             rowKey="id"
+                            loading={loading}
                         />
                     </TabPane>
                     <TabPane tab="Môn Tự Chọn" key="2">
@@ -156,6 +187,7 @@ export default function Specialized() {
                             columns={columns(handleRegisterClick)}
                             dataSource={electiveCourses}
                             rowKey="id"
+                            loading={loading}
                         />
                     </TabPane>
                 </Tabs>
@@ -178,6 +210,7 @@ export default function Specialized() {
                                 id,
                                 ...section
                             }))}
+                            loading={loading}
                             rowKey="id"
                         />
                     )}
