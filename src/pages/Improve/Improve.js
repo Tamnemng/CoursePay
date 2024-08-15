@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Table, Modal, Button, message, Tabs, Spin } from 'antd';
 import Header from '../../components/Header';
+import { getStudentCourses, updateCoursesList } from '../../data/studentData';
 import { getAllGeneralSubjects, getAllStudentSubjects } from '../../data/coursesData';
 import './Improve.css';
 
@@ -54,13 +55,16 @@ export default function Improve() {
     const [activeTab, setActiveTab] = useState('general');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [registeredCourses, setRegisteredCourses] = useState([]);
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [generalSubjects, studentSubjects] = await Promise.all([
+                const [generalSubjects, studentSubjects, studentCourses] = await Promise.all([
                     getAllGeneralSubjects(),
-                    getAllStudentSubjects()
+                    getAllStudentSubjects(),
+                    getStudentCourses()
                 ]);
 
                 if (!generalSubjects || !studentSubjects) {
@@ -86,6 +90,7 @@ export default function Improve() {
                     general: processedGeneral,
                     specialized: specializedSubjects
                 });
+                setRegisteredCourses(studentCourses || {});
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -118,19 +123,51 @@ export default function Improve() {
         setIsConfirmModalVisible(true);
     }, []);
 
-    const handleConfirmRegister = useCallback(() => {
-        message.success('Đăng ký thành công!');
-        setIsConfirmModalVisible(false);
-        setIsModalVisible(false);
-    }, []);
+    const handleConfirmRegister = async () => {
+        if (selectedCourse && selectedClass) {
+            try {
+                // Check if the course is already registered
+                if (registeredCourses[selectedCourse.id]) {
+                    message.error('Bạn đã đăng ký khóa học này rồi!');
+                    return;
+                }
+
+                const courseData = {
+                    id: selectedClass.id,
+                    credits: selectedCourse.credits,
+                    name: selectedCourse.name,
+                    teacher: selectedClass.teacher,
+                    timeEnd: selectedClass.endDate,
+                    timeStart: selectedClass.startDate,
+                    timetable: selectedClass.timetable
+                };
+
+                await updateCoursesList(courseData);
+
+                setRegisteredCourses(prev => ({
+                    ...prev,
+                    [selectedCourse.id]: courseData
+                }));
+
+                message.success('Đăng ký khóa học thành công!');
+                setIsConfirmModalVisible(false);
+                setIsModalVisible(false);
+            } catch (error) {
+                console.error('Error registering course:', error);
+                message.error('Không thể đăng ký khóa học. Vui lòng thử lại.');
+            }
+        } else {
+            message.error('Không thể đăng ký khóa học. Vui lòng thử lại.');
+        }
+    };
+
+    const memoizedColumns = useMemo(() => columns(handleRegisterClick, registeredCourses), [handleRegisterClick, registeredCourses]);
 
     const handleCancelRegister = useCallback(() => setIsConfirmModalVisible(false), []);
     const handleTabChange = useCallback((key) => setActiveTab(key), []);
 
-    const memoizedColumns = useMemo(() => columns(handleRegisterClick), [handleRegisterClick]);
     const memoizedClassColumns = useMemo(() => classColumns(handleClassRegister), [handleClassRegister]);
 
-    if (loading) return <Spin size="large" />;
     if (error) return <div>{error}</div>;
 
     return (
@@ -140,10 +177,10 @@ export default function Improve() {
                 <h1 className='register-title'>Đăng ký môn học</h1>
                 <Tabs activeKey={activeTab} onChange={handleTabChange}>
                     <TabPane tab="Môn Học Chung" key="general">
-                        <Table columns={memoizedColumns} dataSource={courses.general} rowKey="id" />
+                        <Table columns={memoizedColumns} dataSource={courses.general} rowKey="id" loading={loading} />
                     </TabPane>
                     <TabPane tab="Môn Học Chuyên Ngành" key="specialized">
-                        <Table columns={memoizedColumns} dataSource={courses.specialized} rowKey="id" />
+                        <Table columns={memoizedColumns} dataSource={courses.specialized} rowKey="id" loading={loading} />
                     </TabPane>
                 </Tabs>
                 <Modal
@@ -162,6 +199,7 @@ export default function Improve() {
                                 ...section
                             }))}
                             rowKey="id"
+                            loading={loading}
                         />
                     )}
                 </Modal>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getGeneralSubjects } from '../../data/coursesData';
+import { updateCoursesList, getStudentCourses } from '../../data/studentData';
 import './Register.css';
 const { TabPane } = Tabs;
 
@@ -39,6 +40,8 @@ export default function Register() {
     const [electiveCourses, setElectiveCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [registeredCourses, setRegisteredCourses] = useState([]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -62,6 +65,10 @@ export default function Register() {
                     }));
                 setElectiveCourses(processedElective);
 
+                // Fetch registered courses
+                const studentCourses = await getStudentCourses();
+                setRegisteredCourses(studentCourses || []);
+
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -72,6 +79,7 @@ export default function Register() {
 
         fetchData();
     }, []);
+
 
     const handleRegisterClick = (course) => {
         setSelectedCourse(course);
@@ -87,14 +95,49 @@ export default function Register() {
     };
 
     const handleClassRegister = (classInfo) => {
-        setSelectedClass(classInfo);
-        setIsConfirmModalVisible(true);
+        if (classInfo.enrolled < classInfo.size) {
+            setSelectedClass(classInfo);
+            setIsConfirmModalVisible(true);
+        } else {
+            message.error('Lớp học đã đầy. Không thể đăng ký.');
+        }
     };
 
-    const handleConfirmRegister = () => {
-        message.success('Đăng ký thành công!');
-        setIsConfirmModalVisible(false);
-        setIsModalVisible(false);
+    const handleConfirmRegister = async () => {
+        if (selectedCourse && selectedClass) {
+            try {
+                if (registeredCourses[selectedCourse.id]) {
+                    message.error('Bạn đã đăng ký khóa học này rồi!');
+                    return;
+                }
+
+                const courseData = {
+                    id: selectedClass.id,
+                    credits: selectedCourse.credits,
+                    name: selectedCourse.name,
+                    teacher: selectedClass.teacher,
+                    timeEnd: selectedClass.endDate,
+                    timeStart: selectedClass.startDate,
+                    timetable: selectedClass.timetable
+                };
+
+                await updateCoursesList(courseData);
+
+                setRegisteredCourses(prev => ({
+                    ...prev,
+                    [selectedCourse.id]: courseData
+                }));
+
+                message.success('Đăng ký khóa học thành công!');
+                setIsConfirmModalVisible(false);
+                setIsModalVisible(false);
+            } catch (error) {
+                console.error('Error registering course:', error);
+                message.error('Không thể đăng ký khóa học. Vui lòng thử lại.');
+            }
+        } else {
+            message.error('Không thể đăng ký khóa học. Vui lòng thử lại.');
+        }
     };
 
     const handleCancelRegister = () => {
@@ -102,22 +145,31 @@ export default function Register() {
     };
 
     const classColumns = [
-        { title: 'Tên Lớp', dataIndex: 'id', className: 'class-name-column' },
-        { title: 'Sĩ Số', dataIndex: 'enrolled', className: 'class-size-column' },
+        { title: 'Mã Lớp', dataIndex: 'id', className: 'class-id-column' },
+        {
+            title: 'Sĩ Số',
+            dataIndex: 'enrolled',
+            className: 'class-size-column',
+            render: (enrolled, record) => `${enrolled}/${record.size}`
+        },
         { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
         { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
         { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
         { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column' },
         {
             title: 'Đăng Ký',
-            render: (text, record) => <a onClick={() => handleClassRegister(record)} className="register-class-link">Đăng Ký</a>,
+            render: (text, record) => (
+                <Button
+                    onClick={() => handleClassRegister(record)}
+                    disabled={record.enrolled >= record.size}
+                    className="register-class-button"
+                >
+                    {record.enrolled >= record.size ? 'Đã đầy' : 'Đăng Ký'}
+                </Button>
+            ),
             className: 'action-column'
         },
     ];
-
-    if (loading) {
-        return <Spin size="large" />;
-    }
 
     if (error) {
         return <div>{error}</div>;
@@ -141,6 +193,7 @@ export default function Register() {
                             columns={columns(handleRegisterClick)}
                             dataSource={electiveCourses}
                             rowKey="id"
+                            loading={loading}
                         />
                     </TabPane>
                 </Tabs>
@@ -163,6 +216,7 @@ export default function Register() {
                                 id,
                                 ...section
                             }))}
+                            loading={loading}
                             rowKey="id"
                         />
                     )}
