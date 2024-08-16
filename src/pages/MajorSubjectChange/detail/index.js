@@ -16,12 +16,15 @@ import {
   DeleteOutlined,
   EditOutlined,
   QuestionCircleOutlined,
+  ExclamationCircleFilled,
 } from "@ant-design/icons";
 import {
   addMajorClassSection,
   updateMajorClassSection,
   deleteMajorClassSection,
   getMajorSubjectDetail,
+  updatedMajorSubject,
+  deletedMajorSubject,
   getClassSectionLength,
 } from "../../../data/subjects";
 import { useNavigate, useParams } from "react-router-dom";
@@ -31,14 +34,16 @@ export default function MajorSubjectChangeDetail() {
   const { id } = useParams();
   const { RangePicker } = DatePicker;
   const navigate = useNavigate();
-  const [form] = Form.useForm();
-  const [createForm] = Form.useForm();
+  const [classDetailForm] = Form.useForm();
+  const [createClassForm] = Form.useForm();
+  const [detailForm] = Form.useForm();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
 
   const [subject, setSubject] = useState(null);
   const [classSection, setClassSection] = useState(null);
+  const { confirm } = Modal;
   const [newClassSectionId, setNewClassSectionId] = useState("");
 
   useEffect(() => {
@@ -50,7 +55,7 @@ export default function MajorSubjectChangeDetail() {
           : Object.values(data.classSections || {});
 
         setSubject({ ...data, classSections });
-        form.setFieldsValue({
+        classDetailForm.setFieldsValue({
           id: data.id,
           name: data.name,
           major: data.major,
@@ -62,11 +67,11 @@ export default function MajorSubjectChangeDetail() {
         console.error(result.message);
       }
     });
-  }, [id, form]);
+  }, [id, classDetailForm]);
 
   useEffect(() => {
     if (classSection) {
-      form.setFieldsValue({
+      classDetailForm.setFieldsValue({
         id: classSection.id,
         teacher: classSection.teacher,
         dateRange: [
@@ -78,7 +83,7 @@ export default function MajorSubjectChangeDetail() {
         timetable: classSection.timetable,
       });
     }
-  }, [classSection, form]);
+  }, [classSection, classDetailForm]);
 
   const showModal = (classSection) => {
     setClassSection(classSection);
@@ -94,17 +99,34 @@ export default function MajorSubjectChangeDetail() {
     setIsModalCreateOpen(true);
   };
 
+  const showDeleteConfirm = () => {
+    confirm({
+      title: "Xác nhận",
+      icon: <ExclamationCircleFilled />,
+      content: "Bạn chắc chắn muốn xóa học phần này ?",
+      okText: "Xóa",
+      okType: "danger",
+      cancelText: "Hủy",
+      onOk() {
+        handleDeleteSubject(subject.id);
+      },
+      onCancel() {},
+    });
+  };
+
   const generateClassSectionId = (subjectId, semester, classSections) => {
     const subjectCode = subjectId;
     const semesterCode = semester.slice(-1);
-    const sequenceNumber = (classSections.length + 1).toString().padStart(2, "0");
-  
+    const sequenceNumber = (classSections.length + 1)
+      .toString()
+      .padStart(2, "0");
+
     return `${subjectCode}${semesterCode}${sequenceNumber}`;
   };
 
   const handleCreateClassSection = async () => {
     try {
-      const values = await createForm.validateFields();
+      const values = await createClassForm.validateFields();
       const classSectionData = {
         classId: values.id,
         teacher: values.teacher,
@@ -126,7 +148,7 @@ export default function MajorSubjectChangeDetail() {
               : Object.values(data.classSections || {});
             setSubject({ ...data, classSections });
             message.success("Thêm lớp học phần thành công.");
-            createForm.resetFields();
+            createClassForm.resetFields();
           } else {
             console.error(result.message);
           }
@@ -143,7 +165,7 @@ export default function MajorSubjectChangeDetail() {
 
   const handleUpdateClassSection = async () => {
     try {
-      const values = await form.validateFields();
+      const values = await classDetailForm.validateFields();
       const updatedClassSection = {
         id: values.id,
         originalId: classSection.id,
@@ -201,9 +223,55 @@ export default function MajorSubjectChangeDetail() {
     }
   };
 
+  const handleUpdateSubject = async () => {
+    try {
+      const values = await detailForm.validateFields();
+      const updatedClassSection = {
+        id: values.id,
+        name: values.name,
+        faculty: values.faculty,
+        major: values.major,
+        semester: values.semester,
+        credits: values.credits,
+        type: values.type,
+      };
+
+      const result = await updatedMajorSubject(subject.id, updatedClassSection);
+
+      if (result.status === "success") {
+        setIsModalOpen(false);
+        message.success("Cập nhật học phần thành công.");
+      } else {
+        message.error("Mã lớp phần đã tồn tại.");
+      }
+    } catch (error) {
+      message.error("Cập nhật học phần thất bại.");
+    }
+  };
+
+  const handleDeleteSubject = async (subjectId) => {
+    try {
+      const result = await deletedMajorSubject(subjectId);
+
+      if (result.status === "success") {
+        console.log(result.message);
+        message.success("Xóa học phần thành công.");
+        navigate("/majorSubjectChange");
+      } else {
+        console.error(result.message);
+      }
+    } catch (error) {
+      message.error("Xóa học phần thất bại.");
+    }
+  };
+
   const modalCreate = () => {
     const classSections = subject.classSections || [];
-    const newClassSectionId = generateClassSectionId(subject.id, subject.semester, classSections);
+    const newClassSectionId = generateClassSectionId(
+      subject.id,
+      subject.semester,
+      classSections
+    );
     return (
       <Modal
         title="Thêm lớp học phần"
@@ -213,7 +281,7 @@ export default function MajorSubjectChangeDetail() {
       >
         <Form
           name="createForm"
-          form={createForm}
+          form={createClassForm}
           onFinish={handleCreateClassSection}
           initialValues={{ id: newClassSectionId }}
         >
@@ -222,7 +290,7 @@ export default function MajorSubjectChangeDetail() {
             label="Mã lớp học phần"
             rules={[{ required: true, message: "Please enter class ID" }]}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
           <Form.Item
             name="teacher"
@@ -353,10 +421,11 @@ export default function MajorSubjectChangeDetail() {
             onClick={() => showModal(record)}
           />
           <Popconfirm
-            title="Xóa học phần"
-            description="Bạn chắc chắn muốn xóa học phần này?"
+            title="Xóa lớp học phần"
+            description="Bạn chắc chắn muốn xóa lớp học phần này?"
             icon={<QuestionCircleOutlined />}
             okText="Xóa"
+            okType="danger"
             cancelText="Hủy"
             onConfirm={() => handleDeleteClassSection(record.id)}
           >
@@ -381,18 +450,18 @@ export default function MajorSubjectChangeDetail() {
             </Button>
           </div>
           <div className="m-20 mx-96">
-            <Form name="subjectDetail" form={form}>
+            <Form name="subjectDetail" form={detailForm}>
               <Form.Item name="id" label="Mã học phần">
-                <Input defaultValue={subject.id} />
+                <Input defaultValue={subject.id} disabled />
               </Form.Item>
               <Form.Item name="name" label="Tên học phần">
                 <Input defaultValue={subject.name} />
               </Form.Item>
               <Form.Item name="faculty" label="Khoa">
-                <Input defaultValue={subject.faculty} />
+                <Input defaultValue={subject.faculty} disabled/>
               </Form.Item>
               <Form.Item name="major" label="Chuyên ngành">
-                <Input defaultValue={subject.major} />
+                <Input defaultValue={subject.major} disabled/>
               </Form.Item>
               <div className="flex flex-row gap-8">
                 <Form.Item name="semester" label="Học kỳ">
@@ -420,8 +489,8 @@ export default function MajorSubjectChangeDetail() {
             </Form>
           </div>
           <div className="flex justify-end mr-10 mb-20 gap-4">
-            <Button type="primary">Lưu thay đổi</Button>
-            <Button type="primary" danger>
+            <Button type="primary" onClick={handleUpdateSubject}>Lưu thay đổi</Button>
+            <Button type="primary" danger onClick={showDeleteConfirm}>
               Xóa học phần
             </Button>
           </div>
@@ -442,13 +511,13 @@ export default function MajorSubjectChangeDetail() {
           onCancel={handleCancel}
           footer={null}
         >
-          <Form name="classDetail" form={form}>
+          <Form name="classDetail" form={classDetailForm}>
             <Form.Item
               name="id"
               label="Mã lớp học phần"
               rules={[{ required: true, message: "Please enter class ID" }]}
             >
-              <Input />
+              <Input disabled />
             </Form.Item>
             <Form.Item
               name="teacher"

@@ -250,10 +250,13 @@ export const getClassSectionLength = async (subjectId) => {
   try {
     const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
     if (majorSubjectDetail.status !== "success") {
-      console.error("Failed to get major subject details:", majorSubjectDetail.message);
+      console.error(
+        "Failed to get major subject details:",
+        majorSubjectDetail.message
+      );
       return 0;
     }
-    
+
     const classSections = majorSubjectDetail.data.classSections || {};
     return Object.keys(classSections).length;
   } catch (error) {
@@ -305,6 +308,79 @@ export const addMajorSubject = async (subjectData) => {
     };
   } catch (error) {
     console.error("Lỗi khi thêm môn học:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};
+
+export const updatedMajorSubject = async (subjectId, updatedSubjectData) => {
+  try {
+    const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
+    if (majorSubjectDetail.status !== "success") {
+      console.error("Failed to get major subject details:", majorSubjectDetail.message);
+      return majorSubjectDetail;
+    }
+
+    const { faculty, major, semester, type } = majorSubjectDetail.data;
+
+    const subjectRef = ref(
+      database,
+      `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}`
+    );
+
+    const { id, ...cleanedUpdatedData } = updatedSubjectData;
+
+    const updatedData = {
+      ...cleanedUpdatedData,
+      classSections: majorSubjectDetail.data.classSections || "",
+    };
+
+    await update(subjectRef, updatedData);
+
+    console.log("Môn học đã được cập nhật thành công:", updatedData);
+    return {
+      status: "success",
+      message: "Môn học đã được cập nhật thành công.",
+    };
+  } catch (error) {
+    console.error("Lỗi khi cập nhật môn học:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};
+
+export const deletedMajorSubject = async (subjectId) => {
+  try {
+    const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
+    if (majorSubjectDetail.status !== "success") {
+      console.error(
+        "Failed to get major subject details:",
+        majorSubjectDetail.message
+      );
+      return majorSubjectDetail;
+    }
+
+    const { faculty, major, semester, type } = majorSubjectDetail.data;
+
+    const subjectRef = ref(
+      database,
+      `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}`
+    );
+
+    await remove(subjectRef);
+
+    return {
+      status: "success",
+      message: "subject deleted successfully.",
+    };
+  } catch (error) {
+    console.error("Failed to delete subject:", error);
     return {
       status: "error",
       code: error.code,
