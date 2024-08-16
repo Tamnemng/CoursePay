@@ -22,6 +22,7 @@ import {
   updateMajorClassSection,
   deleteMajorClassSection,
   getMajorSubjectDetail,
+  getClassSectionLength,
 } from "../../../data/subjects";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
@@ -38,6 +39,7 @@ export default function MajorSubjectChangeDetail() {
 
   const [subject, setSubject] = useState(null);
   const [classSection, setClassSection] = useState(null);
+  const [newClassSectionId, setNewClassSectionId] = useState("");
 
   useEffect(() => {
     getMajorSubjectDetail(id).then((result) => {
@@ -90,6 +92,14 @@ export default function MajorSubjectChangeDetail() {
 
   const showModalCreate = () => {
     setIsModalCreateOpen(true);
+  };
+
+  const generateClassSectionId = (subjectId, semester, classSections) => {
+    const subjectCode = subjectId;
+    const semesterCode = semester.slice(-1);
+    const sequenceNumber = (classSections.length + 1).toString().padStart(2, "0");
+  
+    return `${subjectCode}${semesterCode}${sequenceNumber}`;
   };
 
   const handleCreateClassSection = async () => {
@@ -145,7 +155,10 @@ export default function MajorSubjectChangeDetail() {
         timetable: values.timetable,
       };
 
-      const result = await updateMajorClassSection(subject.id, updatedClassSection);
+      const result = await updateMajorClassSection(
+        subject.id,
+        updatedClassSection
+      );
 
       if (result.status === "success") {
         setIsModalOpen(false);
@@ -189,6 +202,8 @@ export default function MajorSubjectChangeDetail() {
   };
 
   const modalCreate = () => {
+    const classSections = subject.classSections || [];
+    const newClassSectionId = generateClassSectionId(subject.id, subject.semester, classSections);
     return (
       <Modal
         title="Thêm lớp học phần"
@@ -200,6 +215,7 @@ export default function MajorSubjectChangeDetail() {
           name="createForm"
           form={createForm}
           onFinish={handleCreateClassSection}
+          initialValues={{ id: newClassSectionId }}
         >
           <Form.Item
             name="id"
@@ -229,7 +245,7 @@ export default function MajorSubjectChangeDetail() {
             label="Số lượng"
             rules={[{ required: true, message: "Please enter class size" }]}
           >
-            <InputNumber min={15} />
+            <InputNumber min={15} max={150} />
           </Form.Item>
           <Form.Item
             name="enrolled"
