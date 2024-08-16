@@ -1,10 +1,44 @@
-import { Button, Form, Input, InputNumber, Select } from "antd";
 import React from "react";
 import Header from "../../components/courseHeader";
 import { useNavigate } from "react-router-dom";
+import { addMajorSubject } from "../../data/subjects";
+import { Button, Form, Input, InputNumber, Select, message } from "antd";
+import { type } from "@testing-library/user-event/dist/type";
 
 export default function CreateSubject() {
   const navigate = useNavigate();
+  const [createForm] = Form.useForm();
+
+  const handleCreateSubject = async () => {
+    console.log("handleCreateSubject called"); // Log để kiểm tra khi hàm được gọi
+    try {
+      const values = await createForm.validateFields();
+      const subjectData = {
+        faculty: values.faculty,
+        major: values.major,
+        semester: values.semester,
+        type: values.type,
+        id: values.id,
+        name: values.name,
+        credits: values.credits,
+      };
+  
+      const result = await addMajorSubject(subjectData);
+      console.log("addMajorSubject result:", result); // Log để kiểm tra kết quả
+  
+      if (result.status === "success") {
+        message.success("Thêm lớp học phần thành công.");
+        navigate('/majorSubjectChange');
+      } else {
+        console.error(result.message);
+        message.error("Mã học phần đã tồn tại.");
+      }
+    } catch (error) {
+      console.error("Error in handleCreateSubject:", error);
+      message.error("Thêm học phần thất bại.");
+    }
+  };
+  
   return (
     <div className="flex">
       <Header />
@@ -14,7 +48,7 @@ export default function CreateSubject() {
         </h1>
         <div>
           <div className="m-20 mx-96">
-            <Form>
+            <Form form={createForm} onFinish={handleCreateSubject}>
               <Form.Item
                 name="faculty"
                 label="Khoa"
@@ -44,11 +78,11 @@ export default function CreateSubject() {
                 <Select
                   options={[
                     {
-                      value: "Bắt buộc",
+                      value: "mandatory",
                       label: "Bắt buộc",
                     },
                     {
-                      value: "Tự chọn",
+                      value: "elective",
                       label: "Tự chọn",
                     },
                   ]}
@@ -77,7 +111,13 @@ export default function CreateSubject() {
               </Form.Item>
               <Form.Item>
                 <div className="flex justify-end mb-20 gap-4">
-                  <Button type="primary">Thêm học phần</Button>
+                  <Button
+                    type="primary"
+                    onClick={handleCreateSubject}
+                    htmlType="submit"
+                  >
+                    Thêm học phần
+                  </Button>
                   <Button onClick={() => navigate(-1)}>Hủy</Button>
                 </div>
               </Form.Item>

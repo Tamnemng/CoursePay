@@ -83,11 +83,6 @@ export default function MajorSubjectChangeDetail() {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-    setIsModalCreateOpen(false);
-  };
-
   const handleCancel = () => {
     setIsModalOpen(false);
     setIsModalCreateOpen(false);
@@ -288,7 +283,7 @@ export default function MajorSubjectChangeDetail() {
         <Header />
         <div className="text-3xl my-4 grow flex flex-col">
           <h1 className="flex justify-center items-center my-4 text-black font-semibold">
-            Thêm học phần
+            Không tìm thấy thông tin học phần.
           </h1>
         </div>
       </div>

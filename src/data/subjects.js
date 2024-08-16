@@ -225,3 +225,54 @@ export const deleteMajorClassSection = async (subjectId, classSectionId) => {
     };
   }
 };
+
+export const addMajorSubject = async (subjectData) => {
+  try {
+    const subjectsSnapshot = await get(child(dbRef, "/subjects/majorSubjects"));
+
+    if (subjectsSnapshot.exists()) {
+      const allSubjects = subjectsSnapshot.val();
+      for (const faculty in allSubjects) {
+        for (const major in allSubjects[faculty]) {
+          for (const semester in allSubjects[faculty][major]) {
+            for (const type in allSubjects[faculty][major][semester]) {
+              const subjectsInType = allSubjects[faculty][major][semester][type];
+              if (subjectsInType[subjectData.id]) {
+                return {
+                  status: "error",
+                  code: "database/exists",
+                  message: "Mã học phần này đã tồn tại.",
+                };
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const subjectRef = ref(
+      database,
+      `/subjects/majorSubjects/${subjectData.faculty}/${subjectData.major}/${subjectData.semester}/${subjectData.type}/${subjectData.id}`
+    );
+
+    await set(subjectRef, {
+      name: subjectData.name,
+      credits: subjectData.credits,
+      classSections: "",
+    });
+
+    console.log("Môn học đã được thêm thành công:", subjectData);
+    return {
+      status: "success",
+      message: "Môn học đã được thêm thành công.",
+    };
+  } catch (error) {
+    console.error("Lỗi khi thêm môn học:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};
+
