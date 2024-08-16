@@ -153,14 +153,14 @@ export default function TuitionMain() {
   const paymColumns = [
     {
       title: 'Mã hóa đơn',
-      dataIndex: 'paymID',
+      dataIndex: 'id',
       key: 'paymID',
       ...getColumnSearchProps('paymID'),
       width: 50,
     },
     {
       title: 'Tên hóa đơn',
-      dataIndex: 'paymName',
+      dataIndex: 'name',
       key: 'paymName',
       ...getColumnSearchProps('pYmName'),
       width: 80,
@@ -170,24 +170,23 @@ export default function TuitionMain() {
   const stuColumns = [
     {
       title: 'Mã sinh viên',
-      dataIndex: 'stuID',
+      dataIndex: 'id',
       key: 'stuID',
-      ...getColumnSearchProps('stuID'),
+      //...getColumnSearchProps('stuID'),
       width: 120,
     },
     {
       title: 'Họ tên',
-      dataIndex: 'stuName',
+      dataIndex: 'name',
       key: 'stuName',
-      ...getColumnSearchProps('stuName'),
+      //...getColumnSearchProps('stuName'),
     },
     {
-      title: 'Giảm phí',
-      dataIndex: 'spe',
-      key: 'spe',
-      ...getColumnSearchProps('spe'),
-      width: 80,
-    },
+      title: 'Đóng Phí',
+      dataIndex: 'fees',
+      key: 'feeInfo',
+      render: (paidFees, record) => `${paidFees}/${record.size}`
+    }
   ];
 
   return (
@@ -204,15 +203,15 @@ export default function TuitionMain() {
               <Text>Ngành học</Text>
               <Select
                 style={{
-                  width: 200,
+                  width: 250,
                   marginLeft: 5,
                 }}
                 defaultValue={'all'}
                 options={[
                   { value: 'all', label: 'Tất cả' },
-                  { value: 'cntt', label: 'Công nghệ thông tin' },
-                  { value: 'spt', label: 'Sư phạm tin' },
-                  { value: 'spl', label: 'Sư phạm lý' },
+                  { value: 'cntt', label: 'Khoa Công Nghệ Thông Tin' },
+                  { value: 'spt', label: 'Sư Phạm Anh' },
+                  { value: 'spl', label: 'Sư Phạm Toán' },
                 ]}
               />
             </div>
@@ -226,7 +225,7 @@ export default function TuitionMain() {
                 y: 240,
               }}
               onRow={(record) => ({
-                onClick: () => setSelectedStudentID(record.stuID),
+                onClick: () => setSelectedStudentID(record.id),
               })}
             />
           </div>
