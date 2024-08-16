@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getMajorSubjects } from '../../data/coursesData';
-import { getStudentSemester, getStudentCourses, updateCoursesList } from '../../data/studentData';
+import { getStudentSemester, updateCoursesList, checkStudentCourses } from '../../data/studentData';
 import './Specialized.css';
 
 const { TabPane } = Tabs;
@@ -41,7 +41,6 @@ export default function Specialized() {
     const [electiveCourses, setElectiveCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [registeredCourses, setRegisteredCourses] = useState([]);
 
     const handleRegisterClick = useCallback((course) => {
         setSelectedCourse(course);
@@ -108,8 +107,6 @@ export default function Specialized() {
                     ...course,
                     type: 'Tự chọn'
                 }));
-                const studentCourses = await getStudentCourses();
-                setRegisteredCourses(studentCourses || []);
                 setMandatoryCourses(processedMandatory);
                 setElectiveCourses(processedElective);
             } catch (err) {
@@ -134,8 +131,8 @@ export default function Specialized() {
     const handleConfirmRegister = async () => {
         if (selectedCourse && selectedClass) {
             try {
-                // Check if the course is already registered
-                if (registeredCourses[selectedCourse.id]) {
+                const isAlreadyRegistered = await checkStudentCourses(selectedClass.id);
+                if (isAlreadyRegistered) {
                     message.error('Bạn đã đăng ký khóa học này rồi!');
                     return;
                 }
@@ -152,10 +149,6 @@ export default function Specialized() {
 
                 await updateCoursesList(courseData);
 
-                setRegisteredCourses(prev => ({
-                    ...prev,
-                    [selectedCourse.id]: courseData
-                }));
 
                 message.success('Đăng ký khóa học thành công!');
                 setIsConfirmModalVisible(false);

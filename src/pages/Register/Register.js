@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getGeneralSubjects } from '../../data/coursesData';
-import { updateCoursesList, getStudentCourses } from '../../data/studentData';
+import { updateCoursesList, checkStudentCourses } from '../../data/studentData';
 import './Register.css';
 const { TabPane } = Tabs;
 
@@ -40,8 +40,6 @@ export default function Register() {
     const [electiveCourses, setElectiveCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [registeredCourses, setRegisteredCourses] = useState([]);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -64,9 +62,6 @@ export default function Register() {
                         ...course,
                     }));
                 setElectiveCourses(processedElective);
-
-                const studentCourses = await getStudentCourses();
-                setRegisteredCourses(studentCourses || []);
 
                 setLoading(false);
             } catch (err) {
@@ -105,7 +100,8 @@ export default function Register() {
     const handleConfirmRegister = async () => {
         if (selectedCourse && selectedClass) {
             try {
-                if (registeredCourses[selectedCourse.id]) {
+                const isAlreadyRegistered = await checkStudentCourses(selectedClass.id);
+                if (isAlreadyRegistered) {
                     message.error('Bạn đã đăng ký khóa học này rồi!');
                     return;
                 }
@@ -121,12 +117,6 @@ export default function Register() {
                 };
 
                 await updateCoursesList(courseData);
-
-                setRegisteredCourses(prev => ({
-                    ...prev,
-                    [selectedCourse.id]: courseData
-                }));
-
                 message.success('Đăng ký khóa học thành công!');
                 setIsConfirmModalVisible(false);
                 setIsModalVisible(false);

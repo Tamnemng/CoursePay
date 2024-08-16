@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Table, Modal, Button, message, Tabs, Spin } from 'antd';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
-import { getStudentCourses, updateCoursesList } from '../../data/studentData';
 import { getAllGeneralSubjects, getAllStudentSubjects } from '../../data/coursesData';
+import { getStudentSemester, updateCoursesList, checkStudentCourses } from '../../data/studentData';
 import './Improve.css';
 
 const { TabPane } = Tabs;
@@ -32,52 +32,60 @@ const columns = (handleRegisterClick) => [
     },
 ];
 
-const classColumns = (handleClassRegister) => [
-    { title: 'Tên Lớp', dataIndex: 'id', className: 'class-name-column' },
-    {
-        title: 'Sĩ Số',
-        dataIndex: 'enrolled',
-        className: 'class-size-column',
-        render: (enrolled, record) => `${enrolled}/${record.size}`
-    },
-    { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
-    { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
-    { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
-    { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column' },
-    {
-        title: 'Đăng Ký',
-        render: (text, record) => (
-            <Button
-                onClick={() => handleClassRegister(record)}
-                disabled={record.enrolled >= record.size}
-                className="register-class-button"
-            >
-                {record.enrolled >= record.size ? 'Đã đầy' : 'Đăng Ký'}
-            </Button>
-        ),
-        className: 'action-column'
-    },
-];
-
 export default function Improve() {
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [selectedClass, setSelectedClass] = useState(null);
-    const [courses, setCourses] = useState({ general: [], specialized: [] });
-    const [activeTab, setActiveTab] = useState('general');
+    const [generalCourses, setGeneralCourses] = useState([]);
+    const [specializedCourses, setSpecializedCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [registeredCourses, setRegisteredCourses] = useState([]);
 
+    const handleRegisterClick = useCallback((course) => {
+        setSelectedCourse(course);
+        setIsModalVisible(true);
+    }, []);
+
+    const handleClassRegister = useCallback((classInfo) => {
+        setSelectedClass(classInfo);
+        setIsConfirmModalVisible(true);
+    }, []);
+
+    const classColumns = [
+        { title: 'Tên Lớp', dataIndex: 'id', className: 'class-name-column' },
+        {
+            title: 'Sĩ Số',
+            dataIndex: 'enrolled',
+            className: 'class-size-column',
+            render: (enrolled, record) => `${enrolled}/${record.size}`
+        },
+        { title: 'Giảng Viên', dataIndex: 'teacher', className: 'lecturer-column' },
+        { title: 'Ngày Bắt Đầu', dataIndex: 'startDate', className: 'start-date-column' },
+        { title: 'Ngày Kết Thúc', dataIndex: 'endDate', className: 'end-date-column' },
+        { title: "Thời Khóa Biểu", dataIndex: 'timetable', className: 'info-column' },
+        {
+            title: 'Đăng Ký',
+            render: (text, record) => (
+                <Button
+                    onClick={() => handleClassRegister(record)}
+                    disabled={record.enrolled >= record.size}
+                    className="register-class-button"
+                >
+                    {record.enrolled >= record.size ? 'Đã đầy' : 'Đăng Ký'}
+                </Button>
+            ),
+            className: 'action-column'
+        },
+    ];
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [generalSubjects, studentSubjects, studentCourses] = await Promise.all([
+                const semester = await getStudentSemester();
+                const [generalSubjects, studentSubjects] = await Promise.all([
                     getAllGeneralSubjects(),
                     getAllStudentSubjects(),
-                    getStudentCourses()
                 ]);
 
                 if (!generalSubjects || !studentSubjects) {
@@ -92,20 +100,17 @@ export default function Improve() {
                     }))
                 );
 
-                const specializedSubjects = [
+                const processedSpecialized = [
                     ...processSubjects(studentSubjects.major.mandatory, 'mandatory', 'major'),
                     ...processSubjects(studentSubjects.major.elective, 'elective', 'major')
                 ];
 
-                setCourses({
-                    general: processedGeneral,
-                    specialized: specializedSubjects
-                });
-                setRegisteredCourses(studentCourses || {});
-                setLoading(false);
+                setGeneralCourses(processedGeneral);
+                setSpecializedCourses(processedSpecialized);
             } catch (err) {
                 console.error('Error fetching data:', err);
                 setError('Failed to load courses. Please try again later.');
+            } finally {
                 setLoading(false);
             }
         };
@@ -121,24 +126,19 @@ export default function Improve() {
             ...course,
         }));
 
-    const handleRegisterClick = useCallback((course) => {
-        setSelectedCourse(course);
-        setIsModalVisible(true);
-    }, []);
+    const handleOk = () => {
+        setIsModalVisible(false);
+    };
 
-    const handleOk = useCallback(() => setIsModalVisible(false), []);
-    const handleCancel = useCallback(() => setIsModalVisible(false), []);
-
-    const handleClassRegister = useCallback((classInfo) => {
-        setSelectedClass(classInfo);
-        setIsConfirmModalVisible(true);
-    }, []);
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
 
     const handleConfirmRegister = async () => {
         if (selectedCourse && selectedClass) {
             try {
-                // Check if the course is already registered
-                if (registeredCourses[selectedCourse.id]) {
+                const isAlreadyRegistered = await checkStudentCourses(selectedClass.id);
+                if (isAlreadyRegistered) {
                     message.error('Bạn đã đăng ký khóa học này rồi!');
                     return;
                 }
@@ -155,11 +155,6 @@ export default function Improve() {
 
                 await updateCoursesList(courseData);
 
-                setRegisteredCourses(prev => ({
-                    ...prev,
-                    [selectedCourse.id]: courseData
-                }));
-
                 message.success('Đăng ký khóa học thành công!');
                 setIsConfirmModalVisible(false);
                 setIsModalVisible(false);
@@ -172,26 +167,35 @@ export default function Improve() {
         }
     };
 
-    const memoizedColumns = useMemo(() => columns(handleRegisterClick, registeredCourses), [handleRegisterClick, registeredCourses]);
+    const handleCancelRegister = () => {
+        setIsConfirmModalVisible(false);
+    };
 
-    const handleCancelRegister = useCallback(() => setIsConfirmModalVisible(false), []);
-    const handleTabChange = useCallback((key) => setActiveTab(key), []);
-
-    const memoizedClassColumns = useMemo(() => classColumns(handleClassRegister), [handleClassRegister]);
-
-    if (error) return <div>{error}</div>;
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     return (
         <div className='register-container'>
             <Header />
             <div className='register'>
                 <h1 className='register-title'>Đăng ký môn học</h1>
-                <Tabs activeKey={activeTab} onChange={handleTabChange}>
-                    <TabPane tab="Môn Học Chung" key="general">
-                        <Table columns={memoizedColumns} dataSource={courses.general} rowKey="id" loading={loading} />
+                <Tabs defaultActiveKey="1">
+                    <TabPane tab="Môn Học Chung" key="1">
+                        <Table
+                            columns={columns(handleRegisterClick)}
+                            dataSource={generalCourses}
+                            rowKey="id"
+                            loading={loading}
+                        />
                     </TabPane>
-                    <TabPane tab="Môn Học Chuyên Ngành" key="specialized">
-                        <Table columns={memoizedColumns} dataSource={courses.specialized} rowKey="id" loading={loading} />
+                    <TabPane tab="Môn Học Chuyên Ngành" key="2">
+                        <Table
+                            columns={columns(handleRegisterClick)}
+                            dataSource={specializedCourses}
+                            rowKey="id"
+                            loading={loading}
+                        />
                     </TabPane>
                 </Tabs>
                 <Modal
@@ -200,17 +204,21 @@ export default function Improve() {
                     onOk={handleOk}
                     onCancel={handleCancel}
                     width="80%"
-                    footer={[<Button key="back" onClick={handleCancel}>Đóng</Button>]}
+                    footer={[
+                        <Button key="back" onClick={handleCancel}>
+                            Đóng
+                        </Button>
+                    ]}
                 >
                     {selectedCourse && selectedCourse.classSections && (
                         <Table
-                            columns={memoizedClassColumns}
+                            columns={classColumns}
                             dataSource={Object.entries(selectedCourse.classSections).map(([id, section]) => ({
                                 id,
                                 ...section
                             }))}
-                            rowKey="id"
                             loading={loading}
+                            rowKey="id"
                         />
                     )}
                 </Modal>

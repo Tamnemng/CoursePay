@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../../components/Header';
-import { Table, message } from 'antd';
+import { Table } from 'antd';
 import moment from 'moment';
 import './Registered.css';
 import { getStudentCourses } from '../../data/studentData';
@@ -55,12 +55,11 @@ export default function Registered() {
                 }));
                 setCourses(processedCourses);
             } else {
-                message.warning('Không tìm thấy học phần nào.');
                 setCourses([]);
             }
         } catch (err) {
             console.error('Error fetching data:', err);
-            message.error('Không thể tải danh sách học phần. Vui lòng thử lại sau.');
+            setCourses([]);
         } finally {
             setLoading(false);
         }

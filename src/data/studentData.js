@@ -122,4 +122,21 @@ export async function updatePaymentStatus(feeId) {
     }
 }
 
+export async function checkStudentCourses(courseId) {
+    if (!courseId) {
+        throw new Error("courseId is required");
+    }
+
+    try {
+        await ensureInitialized();
+        const userData = await getStudentData();
+        const registeredCourses = userData?.registeredCourses || {};
+        
+        return Object.hasOwnProperty.call(registeredCourses, courseId);
+    } catch (error) {
+        console.error("Error checking student courses:", error);
+        throw error;
+    }
+}
+
 initializeData();
