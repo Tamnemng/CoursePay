@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../../components/Header';
-import { Table, Spin, message } from 'antd';
+import { Table, message } from 'antd';
 import './History.css';
 import { getStudentPaid } from '../../data/studentData';
 

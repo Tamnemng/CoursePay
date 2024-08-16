@@ -54,11 +54,6 @@ const items = [
     ],
   },
   {
-    key: 'contact',
-    label: 'Thông Tin Liên lạc',
-    icon: <ApartmentOutlined />,
-  },
-  {
     key: 'logout',
     label: "Đăng Xuất",
   }
