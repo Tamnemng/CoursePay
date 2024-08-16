@@ -3,14 +3,12 @@ import Header from "../../components/courseHeader";
 import { useNavigate } from "react-router-dom";
 import { addMajorSubject } from "../../data/subjects";
 import { Button, Form, Input, InputNumber, Select, message } from "antd";
-import { type } from "@testing-library/user-event/dist/type";
 
 export default function CreateSubject() {
   const navigate = useNavigate();
   const [createForm] = Form.useForm();
 
   const handleCreateSubject = async () => {
-    console.log("handleCreateSubject called"); // Log để kiểm tra khi hàm được gọi
     try {
       const values = await createForm.validateFields();
       const subjectData = {
@@ -24,10 +22,10 @@ export default function CreateSubject() {
       };
   
       const result = await addMajorSubject(subjectData);
-      console.log("addMajorSubject result:", result); // Log để kiểm tra kết quả
+      console.log("addMajorSubject result:", result);
   
       if (result.status === "success") {
-        message.success("Thêm lớp học phần thành công.");
+        message.success("Thêm học phần thành công.");
         navigate('/majorSubjectChange');
       } else {
         console.error(result.message);
@@ -38,7 +36,7 @@ export default function CreateSubject() {
       message.error("Thêm học phần thất bại.");
     }
   };
-  
+
   return (
     <div className="flex">
       <Header />
@@ -113,7 +111,6 @@ export default function CreateSubject() {
                 <div className="flex justify-end mb-20 gap-4">
                   <Button
                     type="primary"
-                    onClick={handleCreateSubject}
                     htmlType="submit"
                   >
                     Thêm học phần
