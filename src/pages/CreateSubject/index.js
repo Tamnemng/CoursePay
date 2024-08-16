@@ -105,7 +105,7 @@ export default function CreateSubject() {
                 label="Số tín chỉ"
                 rules={[{ required: true, message: "Please enter credits" }]}
               >
-                <InputNumber min={1} />
+                <InputNumber min={1} max={6}/>
               </Form.Item>
               <Form.Item>
                 <div className="flex justify-end mb-20 gap-4">
