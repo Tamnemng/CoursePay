@@ -61,3 +61,10 @@
     margin-left: 10px;
     margin-right: 0px;
 }
+
+:where(.css-dev-only-do-not-override-98ntnt).ant-card .ant-card-body {
+    padding: 24px;
+    border-radius: 0 0 8px 8px;
+    width: 500px;
+    height: 340px;
+}

@@ -1,193 +1,114 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import './TuitionMain.css';
 import Header from "../../components/tuitionHeader";
 import Typography from "antd/es/typography/Typography";
-import { Select, Input, Button, Modal, Form, message, Space, Table, Radio } from "antd";
-import { SearchOutlined } from '@ant-design/icons';
-import Highlighter from "react-highlight-words";
-import { getStudents, getFees } from "../../data/TuitionData";
+import { Select, Input, Table, Card, List, Tabs } from "antd";
+import { getStudents } from "../../data/TuitionData";
 
 const { Title, Text } = Typography;
+const { TabPane } = Tabs;
+
+const encodeStudentId = (id) => {
+  return id.replace(/\./g, '_');
+};
+
+const decodeStudentId = (encodedId) => {
+  return encodedId.replace(/_/g, '.');
+};
 
 export default function TuitionMain() {
-  const [searchText, setSearchText] = useState('');
-  const [searchedColumn, setSearchedColumn] = useState('');
-  const searchInput = useRef(null);
-
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-  };
-  
-  const handleReset = (clearFilters) => {
-    clearFilters();
-    setSearchText('');
-  };
-
-  const getColumnSearchProps = (dataIndex) => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-      <div
-        style={{
-          padding: 8,
-        }}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{
-            marginBottom: 8,
-            display: 'block',
-          }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{
-              width: 90,
-            }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
-            style={{
-              width: 90,
-            }}
-          >
-            Reset
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              confirm({
-                closeDropdown: false,
-              });
-              setSearchText(selectedKeys[0]);
-              setSearchedColumn(dataIndex);
-            }}
-          >
-            Filter
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              close();
-            }}
-          >
-            Close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered) => (
-      <SearchOutlined
-        style={{
-          color: filtered ? '#1677ff' : undefined,
-        }}
-      />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownOpenChange: (visible) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
-    },
-    render: (text) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{
-            backgroundColor: '#ffc069',
-            padding: 0,
-          }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ''}
-        />
-      ) : (
-        text
-      ),
-  });
-
-  const [visible, setVisible] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
   const [students, setStudents] = useState([]);
-  const [fees, setFees] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
   const [selectedStudentID, setSelectedStudentID] = useState(null);
-  const [value, setValue] = useState(1);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [studentIdFilter, setStudentIdFilter] = useState('');
+  const [selectedSemester, setSelectedSemester] = useState('all');
 
   useEffect(() => {
     getStudents((studentsList) => {
+      console.log('Received students:', studentsList);
       setStudents(studentsList);
+      setFilteredStudents(studentsList);
     });
   }, []);
 
   useEffect(() => {
-    if (selectedStudentID) {
-      getFees(selectedStudentID, (feesList) => {
-        setFees(feesList);
-      });
+    filterStudents();
+  }, [selectedDepartment, studentIdFilter, selectedSemester, students]);
+
+  const filterStudents = () => {
+    let filtered = students;
+
+    if (selectedDepartment !== 'all') {
+      filtered = filtered.filter(student => student.faculty === selectedDepartment);
     }
-  }, [selectedStudentID]);
+
+    if (studentIdFilter) {
+      filtered = filtered.filter(student => student.id.toLowerCase().includes(studentIdFilter.toLowerCase()));
+    }
+
+    if (selectedSemester !== 'all') {
+      filtered = filtered.filter(student => student.semester === selectedSemester);
+    }
+
+    setFilteredStudents(filtered);
+  };
 
   const handleRowClick = (record) => {
+    console.log('Row clicked:', record);
+    setSelectedStudentID(record.id);
     setSelectedRow(record);
-    setVisible(true);
   };
-
-  const handleCancel = () => {
-    setVisible(false);
-  };
-
-  const paymColumns = [
-    {
-      title: 'Mã hóa đơn',
-      dataIndex: 'id',
-      key: 'paymID',
-      ...getColumnSearchProps('paymID'),
-      width: 50,
-    },
-    {
-      title: 'Tên hóa đơn',
-      dataIndex: 'name',
-      key: 'paymName',
-      ...getColumnSearchProps('pYmName'),
-      width: 80,
-    },
-  ];
 
   const stuColumns = [
     {
       title: 'Mã sinh viên',
       dataIndex: 'id',
       key: 'stuID',
-      //...getColumnSearchProps('stuID'),
       width: 120,
+      render: (text) => decodeStudentId(text),
     },
     {
       title: 'Họ tên',
       dataIndex: 'name',
       key: 'stuName',
-      //...getColumnSearchProps('stuName'),
+    },
+    {
+      title: 'Khoa',
+      dataIndex: 'faculty',
+      key: 'faculty',
+    },
+    {
+      title: 'Học kỳ',
+      dataIndex: 'semester',
+      key: 'semester',
     },
     {
       title: 'Đóng Phí',
-      dataIndex: 'fees',
       key: 'feeInfo',
-      render: (paidFees, record) => `${paidFees}/${record.size}`
+      render: (_, record) => `${record.paidFees.length}/${record.paidFees.length + record.unpaidFees.length}`
     }
   ];
+
+  const renderFeeList = (fees, isPaid) => (
+    <List
+      dataSource={fees}
+      renderItem={(item) => (
+        <List.Item>
+          <List.Item.Meta
+            title={item.name}
+            description={`Số tiền: ${item.amount}`}
+          />
+          <div>
+            <p>Tình trạng: {isPaid ? 'Đã đóng' : 'Chưa đóng'}</p>
+            {isPaid && <p>Ngày đóng: {item.paymentDate || 'N/A'}</p>}
+          </div>
+        </List.Item>
+      )}
+      locale={{ emptyText: 'Không có hóa đơn nào' }}
+    />
+  );
 
   return (
     <div className="tuitionMain-container">
@@ -206,18 +127,51 @@ export default function TuitionMain() {
                   width: 250,
                   marginLeft: 5,
                 }}
-                defaultValue={'all'}
+                value={selectedDepartment}
+                onChange={(value) => setSelectedDepartment(value)}
                 options={[
                   { value: 'all', label: 'Tất cả' },
-                  { value: 'cntt', label: 'Khoa Công Nghệ Thông Tin' },
-                  { value: 'spt', label: 'Sư Phạm Anh' },
-                  { value: 'spl', label: 'Sư Phạm Toán' },
+                  { value: 'Khoa Công Nghệ Thông Tin', label: 'Khoa Công Nghệ Thông Tin' },
+                  { value: 'Khoa Anh', label: 'Khoa Anh' },
+                  { value: 'Khoa Toán', label: 'Khoa Toán' },
+                ]}
+              />
+            </div>
+            <div className="ops">
+              <Text>Mã sinh viên</Text>
+              <Input
+                style={{
+                  width: 200,
+                  marginLeft: 5,
+                }}
+                value={studentIdFilter}
+                onChange={(e) => setStudentIdFilter(e.target.value)}
+                placeholder="Nhập mã sinh viên"
+              />
+            </div>
+            <div className="ops">
+              <Text>Học kỳ</Text>
+              <Select
+                style={{
+                  width: 150,
+                  marginLeft: 5,
+                }}
+                value={selectedSemester}
+                onChange={(value) => setSelectedSemester(value)}
+                options={[
+                  { value: 'all', label: 'Tất cả' },
+                  { value: 'HK1', label: 'Học kỳ 1' },
+                  { value: 'HK2', label: 'Học kỳ 2' },
+                  { value: 'HK3', label: 'Học kỳ hè' },
                 ]}
               />
             </div>
             <Table
               columns={stuColumns}
-              dataSource={students}
+              dataSource={filteredStudents.map(student => ({
+                ...student,
+                id: encodeStudentId(student.id)
+              }))}
               pagination={{
                 pageSize: 10,
               }}
@@ -225,160 +179,31 @@ export default function TuitionMain() {
                 y: 240,
               }}
               onRow={(record) => ({
-                onClick: () => setSelectedStudentID(record.id),
+                onClick: () => handleRowClick({ ...record, id: decodeStudentId(record.id) }),
               })}
             />
           </div>
           <div className="payment">
-            <Title level={5}>Danh sách hóa đơn</Title>
-            <div className="ops">
-              <Text>Năm học</Text>
-              <Select
-                defaultValue="20232024"
-                style={{
-                  width: 120,
-                  marginRight: 40,
-                  marginLeft: 5,
-                }}
-                options={[
-                  { value: '20222023', label: '2022 - 2023' },
-                  { value: '20232024', label: '2023 - 2024' }
-                ]}
-              />
-              <Text>Học kỳ</Text>
-              <Select
-                defaultValue="1"
-                style={{
-                  width: 110,
-                  marginLeft: 5,
-                }}
-                options={[
-                  { value: '1', label: 'Học kỳ 1' },
-                  { value: '2', label: 'Học kỳ 2' },
-                  { value: '3', label: 'Học kỳ hè' }
-                ]}
-              />
-            </div>
-            <div className="ops">
-              <Text>Mã sinh viên: </Text>
-              <Input
-                className="customInp"
-                value={selectedStudentID || ''}
-                readOnly
-              />
-            </div>
-            <div className="ops">
-              <Text>Họ tên sinh viên: </Text>
-              <Input
-                className="customInp"
-                value={(students.find(s => s.stuID === selectedStudentID) || {}).stuName || ''}
-                readOnly
-              />
-            </div>
-            <div>
-              <Radio.Group value={value}>
-                <Radio value={1}>Tất cả</Radio>
-                <Radio value={2}>Đã đóng</Radio>
-                <Radio value={3}>Chưa đóng</Radio>
-              </Radio.Group>
-            </div>
-            <Table
-              columns={paymColumns}
-              dataSource={fees}
-              pagination={{
-                pageSize: 50,
-              }}
-              scroll={{
-                y: 240,
-              }}
-              onRow={(record) => ({
-                onClick: () => handleRowClick(record),
-              })}
-            />
-            <Modal
-              title="Chi tiết hóa đơn"
-              open={visible}
-              onCancel={handleCancel}
-              footer={[
-                <Button key={"update"} type="primary" >
-                  Update
-                </Button>,
-                <Button key={"delete"} type="dashed" danger >
-                  Delete
-                </Button>,
-              ]}
-            >
-              {selectedRow ? (
-                <div>
-                  <p><strong>Mã hóa đơn:</strong> 
-                    <Input value={selectedRow.id} readOnly/>
-                  </p>
-                  <p><strong>Tên hóa đơn:</strong> 
-                    <Input value={selectedRow.name}/>
-                  </p>
-                  <p><strong>Số tiền:</strong> 
-                    <Input value={selectedRow.amount}/>
-                  </p>
-                  <p><strong>Tình trạng:</strong> 
-                    <Input value={selectedRow.paid ? 'Đã thanh toán' : 'Chưa thanh toán'}/>
-                  </p>
-                  <p><strong>Ngày thanh toán:</strong> 
-                    <Input value={selectedRow.paymentDate}/>
-                  </p>
-                </div>
-              ) : (
-                <p>No data available</p>
-              )}
-            </Modal>
-            <Button type={'primary'} >Thêm hóa đơn</Button>
+            <Title level={5}>Thông tin hóa đơn</Title>
+            {selectedStudentID ? (
+              <Card title={`Thông tin sinh viên: ${selectedRow?.name}`} >
+                <p>Mã sinh viên: {selectedStudentID}</p>
+                <p>Khoa: {selectedRow?.faculty}</p>
+                <p>Học kỳ: {selectedRow?.semester}</p>
+                <Tabs defaultActiveKey="1">
+                  <TabPane tab="Đã đóng" key="1">
+                    {renderFeeList(selectedRow?.paidFees || [], true)}
+                  </TabPane>
+                  <TabPane tab="Chưa đóng" key="2">
+                    {renderFeeList(selectedRow?.unpaidFees || [], false)}
+                  </TabPane>
+                </Tabs>
+              </Card>
+            ) : (
+              <p>Vui lòng chọn một sinh viên để xem thông tin hóa đơn</p>
+            )}
           </div>
         </div>
-
-        {/* Modal thêm hóa đơn */}
-        <Modal
-          title="Thêm hóa đơn"
-          footer={null}
-        >
-          <Form
-            layout="vertical"
-          >
-            <Form.Item
-              name="name"
-              label="Tên hóa đơn"
-              rules={[{ required: true, message: 'Vui lòng nhập tên hóa đơn!' }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="amount"
-              label="Số tiền"
-              rules={[{ required: true, message: 'Vui lòng nhập số tiền!' }]}
-            >
-              <Input type="number" />
-            </Form.Item>
-            <Form.Item
-              name="paid"
-              label="Tình trạng thanh toán"
-              rules={[{ required: true, message: 'Vui lòng chọn tình trạng thanh toán!' }]}
-            >
-              <Select>
-                <Select.Option value="true">Đã thanh toán</Select.Option>
-                <Select.Option value="false">Chưa thanh toán</Select.Option>
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name="paymentDate"
-              label="Ngày thanh toán"
-            >
-              <Input type="date" />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit">
-                Thêm
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
       </div>
     </div>
   );

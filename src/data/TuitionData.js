@@ -12,17 +12,20 @@ export const getStudents = (callback) => {
     const studentsList = Object.entries(data)
       .filter(([, user]) => user.role === 1)
       .map(([id, user]) => {
-        let paidFees = 0;
-        let unpaidFees = 0;
-        let totalFees = 0;
+        const paidFees = [];
+        const unpaidFees = [];
         
         if (user.fees) {
           Object.entries(user.fees).forEach(([feeId, fee]) => {
-            totalFees += fee.amount;
+            const feeInfo = {
+              id: feeId,
+              name: fee.name,
+              amount: fee.amount
+            };
             if (fee.paid) {
-              paidFees += fee.amount;
+              paidFees.push({...feeInfo, paymentDate: fee.paymentDate});
             } else {
-              unpaidFees += fee.amount;
+              unpaidFees.push(feeInfo);
             }
           });
         }
@@ -31,15 +34,14 @@ export const getStudents = (callback) => {
           id,
           ...(user.info || {}),
           role: 1,
-          paidFees,  // This is now a number representing the total paid amount
-          unpaidFees,  // This is now a number representing the total unpaid amount
-          totalFees  // Total fees (paid + unpaid)
+          paidFees,
+          unpaidFees,
+          totalFees: (paidFees.length + unpaidFees.length)
         };
       });
     callback(studentsList);
   });
 };
-
 
 export function getFees(studentID, callback) {
   const studentRef = ref(database, `student/${studentID}/fees`);
