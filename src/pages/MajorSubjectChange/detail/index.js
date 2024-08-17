@@ -11,12 +11,14 @@ import {
   DatePicker,
   message,
   Popconfirm,
+  Spin,
 } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
   QuestionCircleOutlined,
   ExclamationCircleFilled,
+  LoadingOutlined,
 } from "@ant-design/icons";
 import {
   addMajorClassSection,
@@ -31,7 +33,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 
 export default function MajorSubjectChangeDetail() {
-
   const { id } = useParams();
   const { RangePicker } = DatePicker;
   const navigate = useNavigate();
@@ -232,13 +233,14 @@ export default function MajorSubjectChangeDetail() {
         credits: values.credits,
         type: values.type,
       };
-  
+
       const result = await updatedMajorSubject(subject.id, updatedClassSection);
-  
+
       if (result.status === "success") {
         console.log(Object.keys(result));
         setIsModalOpen(false);
         message.success("Cập nhật học phần thành công.");
+        navigate('/majorSubjectChange');
       } else if (result.status === "exists") {
         message.error("Mã lớp phần đã tồn tại.");
       } else {
@@ -277,6 +279,7 @@ export default function MajorSubjectChangeDetail() {
           name="createForm"
           form={createClassForm}
           onFinish={handleCreateClassSection}
+          initialValues={{ enrolled: 0 }}
         >
           <Form.Item
             name="id"
@@ -330,7 +333,7 @@ export default function MajorSubjectChangeDetail() {
               }),
             ]}
           >
-            <InputNumber min={0} />
+            <InputNumber disabled min={0} />
           </Form.Item>
           <Form.Item
             name="timetable"
@@ -356,12 +359,10 @@ export default function MajorSubjectChangeDetail() {
 
   if (!subject) {
     return (
-      <div className="flex">
+      <div className="flex h-screen w-full">
         <Header />
-        <div className="text-3xl my-4 grow flex flex-col">
-          <h1 className="flex justify-center items-center my-4 text-black font-semibold">
-            Không tìm thấy thông tin học phần.
-          </h1>
+        <div className="flex h-full w-full justify-center items-center">
+          <Spin indicator={<LoadingOutlined spin />} size="large" />
         </div>
       </div>
     );
@@ -443,30 +444,33 @@ export default function MajorSubjectChangeDetail() {
             </Button>
           </div>
           <div className="m-20 mx-96">
-            <Form name="subjectDetail" form={detailForm} initialValues={subject}>
+            <Form
+              name="subjectDetail"
+              form={detailForm}
+              initialValues={subject}
+            >
               <Form.Item name="id" label="Mã học phần">
-                <Input defaultValue={subject.id} />
+                <Input className="font-bold" disabled />
               </Form.Item>
               <Form.Item name="name" label="Tên học phần">
-                <Input defaultValue={subject.name} />
+                <Input />
               </Form.Item>
               <Form.Item name="faculty" label="Khoa">
-                <Input defaultValue={subject.faculty} />
+                <Input />
               </Form.Item>
               <Form.Item name="major" label="Chuyên ngành">
-                <Input defaultValue={subject.major} />
+                <Input />
               </Form.Item>
               <div className="flex flex-row gap-8">
                 <Form.Item name="semester" label="Học kỳ">
-                  <Input defaultValue={subject.semester} />
+                  <Input />
                 </Form.Item>
                 <Form.Item name="credits" label="Số tín chỉ">
-                  <InputNumber defaultValue={subject.credits} min={1} max={8} />
+                  <InputNumber min={1} max={8} />
                 </Form.Item>
               </div>
               <Form.Item name="type" label="Loại học phần">
                 <Select
-                  defaultValue={subject.type}
                   options={[
                     {
                       value: "mandatory",
@@ -483,7 +487,7 @@ export default function MajorSubjectChangeDetail() {
           </div>
           <div className="flex justify-end mr-10 mb-20 gap-4">
             <Button type="primary" onClick={handleUpdateSubject}>
-              Lưu thay đổi
+              Cập nhật
             </Button>
             <Button type="primary" danger onClick={showDeleteConfirm}>
               Xóa học phần
