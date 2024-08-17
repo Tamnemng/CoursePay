@@ -31,20 +31,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 
 export default function MajorSubjectChangeDetail() {
+
   const { id } = useParams();
   const { RangePicker } = DatePicker;
   const navigate = useNavigate();
   const [classDetailForm] = Form.useForm();
   const [createClassForm] = Form.useForm();
   const [detailForm] = Form.useForm();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
-
   const [subject, setSubject] = useState(null);
   const [classSection, setClassSection] = useState(null);
   const { confirm } = Modal;
-  const [newClassSectionId, setNewClassSectionId] = useState("");
 
   useEffect(() => {
     getMajorSubjectDetail(id).then((result) => {
@@ -95,7 +93,9 @@ export default function MajorSubjectChangeDetail() {
     setIsModalCreateOpen(false);
   };
 
-  const showModalCreate = () => {
+  const showModalCreate = async () => {
+    const newId = await getNewClassSectionId();
+    createClassForm.setFieldsValue({ id: newId });
     setIsModalCreateOpen(true);
   };
 
@@ -114,14 +114,11 @@ export default function MajorSubjectChangeDetail() {
     });
   };
 
-  const generateClassSectionId = (subjectId, semester, classSections) => {
-    const subjectCode = subjectId;
-    const semesterCode = semester.slice(-1);
-    const sequenceNumber = (classSections.length + 1)
-      .toString()
-      .padStart(2, "0");
-
-    return `${subjectCode}${semesterCode}${sequenceNumber}`;
+  const getNewClassSectionId = async () => {
+    const subjectCode = subject.id;
+    const semesterCode = subject.semester.slice(-1);
+    const classLength = (await getClassSectionLength(subject.id)) + 1;
+    return `${subjectCode}0${semesterCode}0${classLength}`;
   };
 
   const handleCreateClassSection = async () => {
@@ -266,12 +263,6 @@ export default function MajorSubjectChangeDetail() {
   };
 
   const modalCreate = () => {
-    const classSections = subject.classSections || [];
-    const newClassSectionId = generateClassSectionId(
-      subject.id,
-      subject.semester,
-      classSections
-    );
     return (
       <Modal
         title="Thêm lớp học phần"
@@ -283,14 +274,13 @@ export default function MajorSubjectChangeDetail() {
           name="createForm"
           form={createClassForm}
           onFinish={handleCreateClassSection}
-          initialValues={{ id: newClassSectionId }}
         >
           <Form.Item
             name="id"
             label="Mã lớp học phần"
             rules={[{ required: true, message: "Please enter class ID" }]}
           >
-            <Input disabled />
+            <Input className="font-bold" disabled />
           </Form.Item>
           <Form.Item
             name="teacher"
@@ -458,10 +448,10 @@ export default function MajorSubjectChangeDetail() {
                 <Input defaultValue={subject.name} />
               </Form.Item>
               <Form.Item name="faculty" label="Khoa">
-                <Input defaultValue={subject.faculty} disabled/>
+                <Input defaultValue={subject.faculty} disabled />
               </Form.Item>
               <Form.Item name="major" label="Chuyên ngành">
-                <Input defaultValue={subject.major} disabled/>
+                <Input defaultValue={subject.major} disabled />
               </Form.Item>
               <div className="flex flex-row gap-8">
                 <Form.Item name="semester" label="Học kỳ">
@@ -489,7 +479,9 @@ export default function MajorSubjectChangeDetail() {
             </Form>
           </div>
           <div className="flex justify-end mr-10 mb-20 gap-4">
-            <Button type="primary" onClick={handleUpdateSubject}>Lưu thay đổi</Button>
+            <Button type="primary" onClick={handleUpdateSubject}>
+              Lưu thay đổi
+            </Button>
             <Button type="primary" danger onClick={showDeleteConfirm}>
               Xóa học phần
             </Button>

@@ -257,7 +257,7 @@ export const getClassSectionLength = async (subjectId) => {
       return 0;
     }
 
-    const classSections = majorSubjectDetail.data.classSections || {};
+    const classSections = majorSubjectDetail.data.classSections || "";
     return Object.keys(classSections).length;
   } catch (error) {
     console.error("Failed to get class section count:", error);
