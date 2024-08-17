@@ -119,7 +119,7 @@ export default function MajorSubjectChange() {
         <div>
           <ContentLayout onCreate={() => navigate("/majorSubjectChange/create")}>
             {loading ? (
-              <div className="h-full flex justify-center">
+              <div className="flex h-full w-full justify-center items-center">
                 <Spin indicator={<LoadingOutlined spin />} size="large" />
               </div>
             ) : (
