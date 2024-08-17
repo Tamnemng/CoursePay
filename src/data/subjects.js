@@ -316,48 +316,28 @@ export const addMajorSubject = async (subjectData) => {
   }
 };
 
-const removeUndefinedValues = (obj) => {
-  return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
-};
-
 export const updatedMajorSubject = async (subjectId, updatedSubjectData) => {
   try {
     const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
     if (majorSubjectDetail.status !== "success") {
-      console.error("Failed to get major subject details:", majorSubjectDetail.message);
+      console.error(
+        "Failed to get major subject details:",
+        majorSubjectDetail.message
+      );
       return majorSubjectDetail;
     }
 
-    const { faculty, major, semester, type, classSections } = majorSubjectDetail.data;
+    const { faculty, major, semester, type } = majorSubjectDetail.data;
+    // Đường dẫn cũ của học phần
+    const oldPath = `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}`;
 
-    // Kiểm tra xem mã lớp học phần có tồn tại trong classSections hay không, nhưng bỏ qua nếu id đó chính là id đang được cập nhật
-    if (classSections && classSections[updatedSubjectData.id] && updatedSubjectData.id !== subjectId) {
-      return {
-        status: "exists",
-        message: "Mã lớp học phần đã tồn tại.",
-      };
-    }
+    // Xóa học phần cũ
+    const oldSubjectRef = ref(database, oldPath);
+    await remove(oldSubjectRef);
 
-    const subjectRef = ref(
-      database,
-      `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}`
-    );
+    await addMajorSubject(updatedSubjectData);
 
-    const { id, ...cleanedUpdatedData } = updatedSubjectData;
-
-    // Loại bỏ các giá trị undefined
-    const filteredUpdatedData = removeUndefinedValues(cleanedUpdatedData);
-
-    const updatedData = {
-      ...filteredUpdatedData,
-      // classSections: {
-      //   ...classSections || ""
-      // },
-    };
-
-    await update(subjectRef, updatedData);
-
-    console.log("Môn học đã được cập nhật thành công:", updatedData);
+    console.log("Môn học đã được cập nhật thành công:", updatedSubjectData);
     return {
       status: "success",
       message: "Môn học đã được cập nhật thành công.",

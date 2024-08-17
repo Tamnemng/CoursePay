@@ -443,7 +443,7 @@ export default function MajorSubjectChangeDetail() {
             </Button>
           </div>
           <div className="m-20 mx-96">
-            <Form name="subjectDetail" form={detailForm}>
+            <Form name="subjectDetail" form={detailForm} initialValues={subject}>
               <Form.Item name="id" label="Mã học phần">
                 <Input defaultValue={subject.id} disabled />
               </Form.Item>
