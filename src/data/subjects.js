@@ -257,7 +257,7 @@ export const getClassSectionLength = async (subjectId) => {
       return 0;
     }
 
-    const classSections = majorSubjectDetail.data.classSections || {};
+    const classSections = majorSubjectDetail.data.classSections || "";
     return Object.keys(classSections).length;
   } catch (error) {
     console.error("Failed to get class section count:", error);
@@ -316,6 +316,10 @@ export const addMajorSubject = async (subjectData) => {
   }
 };
 
+const removeUndefinedValues = (obj) => {
+  return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
+};
+
 export const updatedMajorSubject = async (subjectId, updatedSubjectData) => {
   try {
     const majorSubjectDetail = await getMajorSubjectDetail(subjectId);
@@ -324,7 +328,15 @@ export const updatedMajorSubject = async (subjectId, updatedSubjectData) => {
       return majorSubjectDetail;
     }
 
-    const { faculty, major, semester, type } = majorSubjectDetail.data;
+    const { faculty, major, semester, type, classSections } = majorSubjectDetail.data;
+
+    // Kiểm tra xem mã lớp học phần có tồn tại trong classSections hay không, nhưng bỏ qua nếu id đó chính là id đang được cập nhật
+    if (classSections && classSections[updatedSubjectData.id] && updatedSubjectData.id !== subjectId) {
+      return {
+        status: "exists",
+        message: "Mã lớp học phần đã tồn tại.",
+      };
+    }
 
     const subjectRef = ref(
       database,
@@ -333,9 +345,14 @@ export const updatedMajorSubject = async (subjectId, updatedSubjectData) => {
 
     const { id, ...cleanedUpdatedData } = updatedSubjectData;
 
+    // Loại bỏ các giá trị undefined
+    const filteredUpdatedData = removeUndefinedValues(cleanedUpdatedData);
+
     const updatedData = {
-      ...cleanedUpdatedData,
-      classSections: majorSubjectDetail.data.classSections || "",
+      ...filteredUpdatedData,
+      // classSections: {
+      //   ...classSections || ""
+      // },
     };
 
     await update(subjectRef, updatedData);
