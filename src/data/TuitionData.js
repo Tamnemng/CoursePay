@@ -82,10 +82,10 @@ export const getFees = (callback) => {
 };
 
 
-export const addFeeToStudents = async (newFee, semester = '') => {
+export const addFeeToStudents = async (newFee, semester = '', faculty = '') => {
   const db = getDatabase();
   const usersRef = ref(db, 'users');
-  
+
   try {
     const snapshot = await get(usersRef);
     const updates = {};
@@ -98,8 +98,9 @@ export const addFeeToStudents = async (newFee, semester = '') => {
 
       if (userData.role === 1) {
         const userSemester = userData.info?.semester;
-        
-        if (semester === '' || userSemester === semester) {
+        const userFaculty = userData.info?.faculty;
+
+        if (semester === '' || userSemester === semester || userFaculty === faculty || faculty === '') {
           const feeExists = Object.values(userData.fees || {}).some(
             (fee) => fee.name === newFee.name
           );
@@ -133,7 +134,7 @@ export const addFeeToStudents = async (newFee, semester = '') => {
 export const removeFeeFromAllStudents = async (feeIdToRemove) => {
   const db = getDatabase();
   const usersRef = ref(db, 'users');
-  
+
   try {
     const snapshot = await get(usersRef);
     const updates = {};
