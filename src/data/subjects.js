@@ -48,25 +48,24 @@ export const getMajorSubjectDetail = (subjectId) => {
         for (const faculty in data) {
           for (const major in data[faculty]) {
             for (const semester in data[faculty][major]) {
-              const types = data[faculty][major][semester];
-              for (const type in types) {
-                const subjectIdList = types[type];
-                if (subjectIdList[subjectId]) {
-                  const classSectionWithId = Object.keys(
-                    subjectIdList[subjectId].classSections
-                  ).map((classId) => ({
+              for (const type in data[faculty][major][semester]) {
+                const subjects = data[faculty][major][semester][type];
+                if (subjects[subjectId]) {
+                  const classSectionWithId = Object.entries(
+                    subjects[subjectId].classSections || {}
+                  ).map(([classId, classData]) => ({
                     id: classId,
-                    ...subjectIdList[subjectId].classSections[classId],
+                    ...classData,
                   }));
 
                   subjectDetail = {
                     id: subjectId,
-                    name: subjectIdList[subjectId].name,
-                    credits: subjectIdList[subjectId].credits,
+                    name: subjects[subjectId].name,
+                    credits: subjects[subjectId].credits,
                     faculty,
                     major,
                     semester,
-                    type: type,
+                    type,
                     classSections: classSectionWithId,
                   };
                   return {
@@ -81,7 +80,7 @@ export const getMajorSubjectDetail = (subjectId) => {
         return {
           status: "error",
           code: "database/not_found",
-          message: "Class not found for this subjectId",
+          message: "Subject not found for this subjectId",
         };
       } else {
         return {
@@ -117,7 +116,6 @@ export const addMajorClassSection = async (subjectId, newClassSection) => {
       `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}/classSections/${newClassSection.classId}`
     );
 
-    // Clone the newClassSection object without the classId property
     const { classId, ...classSectionDataWithoutId } = newClassSection;
 
     const classIdSnapshot = await get(classSectionsRef);
@@ -166,12 +164,10 @@ export const updateMajorClassSection = async (
       `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}/classSections`
     );
 
-    // Use the originalId to identify the class section
     const { originalId, id, ...classSectionDataWithoutId } =
       updatedClassSection;
     const classSectionRef = child(classSectionsRef, originalId);
 
-    // Save the updated data without id and originalId fields
     await set(classSectionRef, {
       ...classSectionDataWithoutId,
     });
@@ -226,7 +222,7 @@ export const deleteMajorClassSection = async (subjectId, classSectionId) => {
         classSections: "",
       });
       console.log(
-        "Class section deleted and classSections set to an empty object."
+        "Class section deleted and classSections set to an empty string."
       );
     } else {
       console.log("Class section deleted successfully:", classSectionId);
@@ -257,8 +253,8 @@ export const getClassSectionLength = async (subjectId) => {
       return 0;
     }
 
-    const classSections = majorSubjectDetail.data.classSections || "";
-    return Object.keys(classSections).length;
+    const classSections = majorSubjectDetail.data.classSections || [];
+    return classSections.length;
   } catch (error) {
     console.error("Failed to get class section count:", error);
     return 0;
@@ -295,11 +291,13 @@ export const addMajorSubject = async (subjectData) => {
       `/subjects/majorSubjects/${subjectData.faculty}/${subjectData.major}/${subjectData.semester}/${subjectData.type}/${subjectData.id}`
     );
 
-    await set(subjectRef, {
+    const subjectDataToSet = {
       name: subjectData.name,
       credits: subjectData.credits,
-      classSections: "",
-    });
+      classSections: subjectData.classSections || "",
+    };
+
+    await set(subjectRef, subjectDataToSet);
 
     console.log("Môn học đã được thêm thành công:", subjectData);
     return {
@@ -328,16 +326,47 @@ export const updatedMajorSubject = async (subjectId, updatedSubjectData) => {
     }
 
     const { faculty, major, semester, type } = majorSubjectDetail.data;
-    // Đường dẫn cũ của học phần
     const oldPath = `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}`;
-
-    // Xóa học phần cũ
     const oldSubjectRef = ref(database, oldPath);
-    await remove(oldSubjectRef);
 
-    await addMajorSubject(updatedSubjectData);
+    // Get the current subject data, including class sections
+    const currentSubjectSnapshot = await get(oldSubjectRef);
+    if (!currentSubjectSnapshot.exists()) {
+      return {
+        status: "error",
+        code: "database/not_found",
+        message: "Subject not found",
+      };
+    }
+    const currentSubjectData = currentSubjectSnapshot.val();
 
-    console.log("Môn học đã được cập nhật thành công:", updatedSubjectData);
+    // Prepare updated subject data
+    const updatedData = {
+      name: updatedSubjectData.name,
+      credits: updatedSubjectData.credits,
+      classSections: currentSubjectData.classSections || "", // Preserve existing class sections
+    };
+
+    // If the subject is being moved to a different location
+    if (
+      updatedSubjectData.faculty !== faculty ||
+      updatedSubjectData.major !== major ||
+      updatedSubjectData.semester !== semester ||
+      updatedSubjectData.type !== type
+    ) {
+      // Remove from old location
+      await remove(oldSubjectRef);
+
+      // Add to new location
+      const newPath = `/subjects/majorSubjects/${updatedSubjectData.faculty}/${updatedSubjectData.major}/${updatedSubjectData.semester}/${updatedSubjectData.type}/${subjectId}`;
+      const newSubjectRef = ref(database, newPath);
+      await set(newSubjectRef, updatedData);
+    } else {
+      // Update in the same location
+      await update(oldSubjectRef, updatedData);
+    }
+
+    console.log("Môn học đã được cập nhật thành công:", updatedData);
     return {
       status: "success",
       message: "Môn học đã được cập nhật thành công.",
@@ -374,7 +403,7 @@ export const deletedMajorSubject = async (subjectId) => {
 
     return {
       status: "success",
-      message: "subject deleted successfully.",
+      message: "Subject deleted successfully.",
     };
   } catch (error) {
     console.error("Failed to delete subject:", error);

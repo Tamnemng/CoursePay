@@ -445,16 +445,16 @@ export default function MajorSubjectChangeDetail() {
           <div className="m-20 mx-96">
             <Form name="subjectDetail" form={detailForm} initialValues={subject}>
               <Form.Item name="id" label="Mã học phần">
-                <Input defaultValue={subject.id} disabled />
+                <Input defaultValue={subject.id} />
               </Form.Item>
               <Form.Item name="name" label="Tên học phần">
                 <Input defaultValue={subject.name} />
               </Form.Item>
               <Form.Item name="faculty" label="Khoa">
-                <Input defaultValue={subject.faculty} disabled />
+                <Input defaultValue={subject.faculty} />
               </Form.Item>
               <Form.Item name="major" label="Chuyên ngành">
-                <Input defaultValue={subject.major} disabled />
+                <Input defaultValue={subject.major} />
               </Form.Item>
               <div className="flex flex-row gap-8">
                 <Form.Item name="semester" label="Học kỳ">
