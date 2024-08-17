@@ -13,19 +13,9 @@ const items = [
         label: 'Trang chủ',
     },
     {
-        key: 'tuition',
+        key: 'major-tuition',
         icon: <MoneyCollectTwoTone />,
         label: 'Học Phí',
-        children: [
-            {
-                key: 'major-tuition',
-                label: 'Học phí học kỳ',
-            },
-            {
-                key: 'edit-tuition',
-                label: 'Học phí khác',
-            },
-        ]
     },
     {
         key: 'logout',
@@ -78,9 +68,6 @@ export default function Header() {
                 break;
             case 'major-tuition':
                 navigate('/tuitionMajor');
-                break;
-            case 'edit-tuition':
-                navigate('/tuitionEdit');
                 break;
             case 'logout':
                 localStorage.setItem('isAuthenticated', 'false');

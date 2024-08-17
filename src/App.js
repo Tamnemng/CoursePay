@@ -15,7 +15,6 @@ import TuitionMajor from './pages/TuitionMajor/TuitionMajor';
 import Specialized from './pages/Specialized/Specialized';
 import Register from './pages/Register/Register';
 import Improve from './pages/Improve/Improve';
-import TuitionEdit from './pages/TuitionEdit/TuitionEdit';
 import TuitionMain from './pages/tuitionMain/TuitionMain';
 import MajorSubjectChange from './pages/MajorSubjectChange';
 import MajorSubjectChangeDetail from './pages/MajorSubjectChange/detail';
@@ -114,7 +113,6 @@ export default function App() {
           {/* Routes for Employee (Role 3) */}
           <Route path="/tuitionMain" element={<ProtectedRoute><RoleBasedRoute element={TuitionMain} allowedRoles={['3']}/></ProtectedRoute>}/>
           <Route path="/tuitionMajor" element={<ProtectedRoute><RoleBasedRoute element={TuitionMajor} allowedRoles={['3']} /></ProtectedRoute>} />
-          <Route path="/tuitionEdit" element={<ProtectedRoute><RoleBasedRoute element={TuitionEdit} allowedRoles={['3']} /></ProtectedRoute>} />
           
           <Route path="*" element={<ProtectedRoute><NoPage role={role} /></ProtectedRoute>} />
         </Routes>

@@ -162,7 +162,10 @@ export default function TuitionMain() {
                   { value: 'all', label: 'Tất cả' },
                   { value: 'HK1', label: 'Học kỳ 1' },
                   { value: 'HK2', label: 'Học kỳ 2' },
-                  { value: 'HK3', label: 'Học kỳ hè' },
+                  { value: 'HK3', label: 'Học kỳ 3' },
+                  { value: 'HK4', label: 'Học kỳ 4' },
+                  { value: 'HK5', label: 'Học kỳ 5' },
+                  { value: 'HK6', label: 'Học kỳ 6' },
                 ]}
               />
             </div>
