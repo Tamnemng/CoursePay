@@ -45,7 +45,7 @@ export default function App() {
   const role = useRoleListener();
 
   useEffect(() => {
-    const sessionTimeout = 5 * 60 * 1000;
+    const sessionTimeout = 30 * 60 * 1000;
 
     const updateLastActivityTime = () => {
       localStorage.setItem('lastActivityTime', new Date().getTime().toString());

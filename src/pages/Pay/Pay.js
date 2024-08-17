@@ -59,9 +59,12 @@ const Pay = () => {
     };
 
     if (loading && unpaidFees.length === 0) {
-        return <Spin size="large" />;
+        return (
+            <div className='flex justify-center items-center h-screen w-full '>
+                <Spin size="large" />
+            </div>
+        );
     }
-
     if (error) {
         return <div>{error}</div>;
     }
@@ -71,7 +74,7 @@ const Pay = () => {
             <Header />
             <div className='pay'>
                 <div className='theupper'>
-                    <StudentInfo studentData={studentData} />
+                    <StudentInfo studentData={studentData} loading={loading} />
                     <PaymentSection
                         form={form}
                         loading={loading}
@@ -83,6 +86,7 @@ const Pay = () => {
                     unpaidFees={unpaidFees}
                     selectedFees={selectedFees}
                     handleFeeSelection={handleFeeSelection}
+                    loading={loading}
                 />
             </div>
         </div>
