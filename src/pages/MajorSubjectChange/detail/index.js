@@ -232,14 +232,17 @@ export default function MajorSubjectChangeDetail() {
         credits: values.credits,
         type: values.type,
       };
-
+  
       const result = await updatedMajorSubject(subject.id, updatedClassSection);
-
+  
       if (result.status === "success") {
+        console.log(Object.keys(result));
         setIsModalOpen(false);
         message.success("Cập nhật học phần thành công.");
-      } else {
+      } else if (result.status === "exists") {
         message.error("Mã lớp phần đã tồn tại.");
+      } else {
+        message.error("Cập nhật học phần thất bại.");
       }
     } catch (error) {
       message.error("Cập nhật học phần thất bại.");
@@ -455,10 +458,10 @@ export default function MajorSubjectChangeDetail() {
               </Form.Item>
               <div className="flex flex-row gap-8">
                 <Form.Item name="semester" label="Học kỳ">
-                  <InputNumber defaultValue={subject.semester} />
+                  <Input defaultValue={subject.semester} />
                 </Form.Item>
                 <Form.Item name="credits" label="Số tín chỉ">
-                  <InputNumber defaultValue={subject.credits} />
+                  <InputNumber defaultValue={subject.credits} min={1} max={8} />
                 </Form.Item>
               </div>
               <Form.Item name="type" label="Loại học phần">
