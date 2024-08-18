@@ -123,20 +123,26 @@ export async function updatePaymentStatus(feeId) {
 }
 
 export async function checkStudentCourses(courseId) {
-    if (!courseId) {
-        throw new Error("courseId is required");
+    if (!uid || !courseId) {
+        throw new Error("Both studentUid and courseId are required");
     }
-
     try {
-        await ensureInitialized();
-        const userData = await getStudentData();
-        const registeredCourses = userData?.registeredCourses || {};
-        
-        return Object.hasOwnProperty.call(registeredCourses, courseId);
+        const db = getDatabase();
+        const studentRef = ref(db, `users/${uid}`);
+        const snapshot = await get(studentRef);
+
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            const registeredCourses = userData.registeredCourses || {};
+            
+            return Object.hasOwnProperty.call(registeredCourses, courseId);
+        } else {
+            console.log("No data available for this student");
+            return false;
+        }
     } catch (error) {
         console.error("Error checking student courses:", error);
         throw error;
     }
 }
-
 initializeData();

@@ -193,3 +193,44 @@ export const editFeeForStudents = async (feeId, updatedFee) => {
     throw error;
   }
 };
+
+export const addCreditBasedFeeToStudents = async (creditCost) => {
+  const db = getDatabase();
+  const usersRef = ref(db, 'users');
+
+  try {
+    const snapshot = await get(usersRef);
+    const updates = {};
+    let addedCount = 0;
+    const newFeeId = `feee_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    snapshot.forEach((childSnapshot) => {
+      const uid = childSnapshot.key;
+      const userData = childSnapshot.val();
+
+      if (userData.role === 1 && userData.registeredCourses) {
+        const totalCredits = Object.values(userData.registeredCourses).reduce((sum, course) => sum + course.credits, 0);
+        const totalFee = totalCredits * creditCost;
+
+        updates[`users/${uid}/fees/${newFeeId}`] = {
+          name: `Học Phí`,
+          amount: totalFee.toFixed(2),
+          paid: false
+        };
+        addedCount++;
+      }
+    });
+
+    if (addedCount > 0) {
+      await update(ref(db), updates);
+      console.log(`Added credit-based fee for ${addedCount} students successfully`);
+    } else {
+      console.log('No students found with registered courses');
+    }
+
+    return addedCount;
+  } catch (error) {
+    console.error('Error adding credit-based fee:', error);
+    throw error;
+  }
+};

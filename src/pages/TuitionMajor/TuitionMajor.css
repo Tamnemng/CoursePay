@@ -13,43 +13,68 @@
     background-color: rgb(255, 255, 255);
     color: rgb(0, 0, 0);
     text-align: center;
+    padding: 20px;
 }
-.tl{
+
+.tl {
     width: 100%;
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 10px;
+    margin-bottom: 20px;
 }
-.frm{
+
+.frm {
     width: 100%;
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 10px;
+    margin-bottom: 20px;
     text-align: left;
 }
-.feesList{
+
+.feesList {
     width: 95%;
 }
-.ops{
-    flex: 1;
+
+.ops {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
-.customInp{
+
+.customInp {
     width: 200px;
     margin-left: 10px;
     margin-right: 200px;
-    
 }
-.btn{
-    flex: 1;
+
+.btn {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     margin-top: 30px;
+}
+
+/* New styles to fix tab pane sizing issue */
+.ant-tabs-content {
+    min-height: 300px; /* Adjust this value as needed */
+}
+
+.ant-tabs-tabpane {
+    padding: 20px;
+}
+
+.ant-tabs-nav {
+    margin-bottom: 0 !important;
+}
+
+.ant-tabs-tab {
+    padding: 12px 16px !important;
+}
+
+.ant-tabs-tab-active {
+    background-color: #f0f0f0;
 }
