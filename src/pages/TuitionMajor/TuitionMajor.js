@@ -1,18 +1,47 @@
 import React, { useState, useEffect } from "react";
-import './TuitionMajor.css';
+import "./TuitionMajor.css";
 import Header from "../../components/tuitionHeader";
-import { Typography, Select, Input, Button, Table, message, Popconfirm, Tabs } from "antd";
-import { getFees, addFeeToStudents, removeFeeFromAllStudents, editFeeForStudents, addCreditBasedFeeToStudents } from "../../data/TuitionData";
+import {
+  Typography,
+  Select,
+  Input,
+  Button,
+  Table,
+  message,
+  Popconfirm,
+  Tabs,
+} from "antd";
+import {
+  getFees,
+  addFeeToStudents,
+  removeFeeFromAllStudents,
+  editFeeForStudents,
+  addCreditBasedFeeToStudents,
+} from "../../data/TuitionData";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
+const isCreditBased = (feeId) => {
+  // Giả sử bạn xác định học phí tín chỉ dựa vào một điều kiện cụ thể
+  return feeId.startsWith("credit_");
+};
+
+const extractCredits = (feeName) => {
+  // Giả sử tên học phí có định dạng "Tên môn - [Số tín chỉ]"
+  const match = feeName.match(/\[(\d+)\]/);
+  if (match) {
+    return parseInt(match[1], 10);
+  }
+  return null; // Không thể trích xuất số tín chỉ
+};
+
 export default function TuitionMajor() {
   const [fees, setFees] = useState([]);
   const [selectedFee, setSelectedFee] = useState(null);
-  const [semester, setSemester] = useState('');
-  const [amount, setAmount] = useState('');
-  const [creditCost, setCreditCost] = useState('');
+  const [semester, setSemester] = useState("");
+  const [amount, setAmount] = useState("");
+  const [creditCost, setCreditCost] = useState("");
 
   useEffect(() => {
     getFees(setFees);
@@ -20,61 +49,56 @@ export default function TuitionMajor() {
 
   const handleAddFee = () => {
     if (!selectedFee || !amount) {
-      message.error('Please fill in all fields');
+      message.error("Vui lòng điền đầy đủ thông tin");
       return;
     }
     const newFee = {
       name: selectedFee,
-      amount: amount
+      amount: amount,
     };
     addFeeToStudents(newFee, semester)
       .then((count) => {
-        message.success(`Fee added successfully to ${count} students`);
+        message.success(`Đã thêm học phí thành công cho ${count} sinh viên`);
         getFees(setFees);
         setSelectedFee(null);
-        setAmount('');
-        setSemester('');
+        setAmount("");
+        setSemester("");
       })
-      .catch(error => {
-        console.error("Error adding fee:", error);
-        message.error('Failed to add fee');
+      .catch((error) => {
+        console.error("Lỗi khi thêm học phí:", error);
+        message.error("Không thể thêm học phí");
       });
   };
 
   const handleAddCreditBasedFee = () => {
     if (!creditCost) {
-      message.error('Please enter the cost per credit');
+      message.error("Vui lòng nhập giá mỗi tín chỉ");
       return;
     }
     addCreditBasedFeeToStudents(parseFloat(creditCost))
       .then((count) => {
-        message.success(`Học Phí added successfully to ${count} students`);
+        message.success(
+          `Đã thêm học phí tín chỉ thành công cho ${count} sinh viên`
+        );
         getFees(setFees);
-        setCreditCost('');
+        setCreditCost("");
       })
-      .catch(error => {
-        console.error("Error adding Học Phí:", error);
-        message.error('Failed to add Học Phí');
+      .catch((error) => {
+        console.error("Lỗi khi thêm học phí tín chỉ:", error);
+        message.error("Không thể thêm học phí tín chỉ");
       });
   };
 
   const handleDeleteFee = (feeId) => {
     removeFeeFromAllStudents(feeId)
       .then((count) => {
-        message.success(`Fee deleted successfully from ${count} students`);
+        message.success(`Đã xóa học phí thành công cho ${count} sinh viên`);
         getFees(setFees);
       })
-      .catch(error => {
-        console.error("Error deleting fee:", error);
-        message.error('Failed to delete fee');
+      .catch((error) => {
+        console.error("Lỗi khi xóa học phí:", error);
+        message.error("Không thể xóa học phí");
       });
-  };
-
-  const isCreditBased = (id) => id.startsWith('feee_');
-
-  const extractCredits = (name) => {
-    const match = name.match(/\d+/);
-    return match ? parseInt(match[0], 10) : null;
   };
 
   const handleEditFee = (feeId, updatedFee) => {
@@ -82,36 +106,40 @@ export default function TuitionMajor() {
     if (isCreditBased(feeId)) {
       const totalCredits = extractCredits(updatedFee.name);
       if (totalCredits === null) {
-        message.error('Invalid credit-based fee name. Unable to extract credit count.');
+        message.error(
+          "Tên học phí tín chỉ không hợp lệ. Không thể trích xuất số tín chỉ."
+        );
         return;
       }
       const newCreditCost = parseFloat(updatedFee.amount);
       newFee = {
         ...updatedFee,
-        amount: (totalCredits * newCreditCost).toFixed(2)
+        amount: (totalCredits * newCreditCost).toFixed(2),
       };
     }
     editFeeForStudents(feeId, newFee)
       .then((count) => {
-        message.success(`Fee updated successfully for ${count} students`);
+        message.success(
+          `Đã cập nhật học phí thành công cho ${count} sinh viên`
+        );
         getFees(setFees);
       })
-      .catch(error => {
-        console.error("Error updating fee:", error);
-        message.error('Failed to update fee');
+      .catch((error) => {
+        console.error("Lỗi khi cập nhật học phí:", error);
+        message.error("Không thể cập nhật học phí");
       });
   };
 
   const columns = [
     {
-      title: 'Fee ID',
-      dataIndex: 'id',
-      key: 'id',
+      title: "Mã Học Phí",
+      dataIndex: "id",
+      key: "id",
     },
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Tên học phí",
+      dataIndex: "name",
+      key: "name",
       render: (text, record) => (
         <Input
           defaultValue={text}
@@ -121,23 +149,26 @@ export default function TuitionMajor() {
       ),
     },
     {
-      title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount',
+      title: "Số Tiền",
+      dataIndex: "amount",
+      key: "amount",
       render: (text, record) => {
         if (isCreditBased(record.id)) {
           const totalCredits = extractCredits(record.name);
           if (totalCredits === null) {
-            return (
-              <Text>Học Phí Chứa Tín Chỉ</Text>
-            );
+            return <Text>Học Phí Tín Chỉ</Text>;
           }
           const creditCost = parseFloat(record.amount) / totalCredits;
           return (
             <Input
               defaultValue={creditCost.toFixed(2)}
-              addonAfter="VNĐ/Credit"
-              onBlur={(e) => handleEditFee(record.id, { amount: e.target.value, name: record.name })}
+              addonAfter="VNĐ/Tín Chỉ"
+              onBlur={(e) =>
+                handleEditFee(record.id, {
+                  amount: e.target.value,
+                  name: record.name,
+                })
+              }
             />
           );
         } else {
@@ -145,117 +176,137 @@ export default function TuitionMajor() {
             <Input
               defaultValue={text}
               addonAfter="VNĐ"
-              onBlur={(e) => handleEditFee(record.id, { amount: e.target.value })}
+              onBlur={(e) =>
+                handleEditFee(record.id, { amount: e.target.value })
+              }
             />
           );
         }
       },
     },
     {
-      title: 'Paid Count',
-      dataIndex: 'paidCount',
-      key: 'paidCount',
+      title: "Số Lượng Đã Nộp",
+      dataIndex: "paidCount",
+      key: "paidCount",
     },
     {
-      title: 'Unpaid Count',
-      dataIndex: 'unpaidCount',
-      key: 'unpaidCount',
+      title: "Số Lượng Chưa Nộp",
+      dataIndex: "unpaidCount",
+      key: "unpaidCount",
     },
     {
-      title: 'Actions',
-      key: 'actions',
+      title: "Thao Tác",
+      key: "actions",
       render: (text, record) => (
         <Popconfirm
-          title="Are you sure you want to delete this fee?"
+          title="Bạn có chắc chắn muốn xóa học phí này?"
           onConfirm={() => handleDeleteFee(record.id)}
-          okText="Yes"
-          cancelText="No"
+          okText="Có"
+          cancelText="Không"
         >
-          <Button type="dashed" danger>Delete</Button>
+          <Button type="dashed" danger>
+            Xóa
+          </Button>
         </Popconfirm>
       ),
     },
   ];
 
-  return (
-    <div className="tuitionMajor-container">
-      <Header />
-      <div className="tuitionMajor">
-        <div className="tl">
-          <Title level={3}>Semester Tuition</Title>
-        </div>
-        <Tabs defaultActiveKey="1">
-          <TabPane tab="Add Fixed Fee" key="1">
-            <div className="frm">
-              <Title level={4}>Fee Details</Title>
-              <div className="ops">
-                <Text>Fee Code: </Text>
-                <Input
-                  style={{ width: '30%', marginRight: '150px', marginLeft: '10px' }}
-                  placeholder="Tên học phí"
-                  onChange={(e) => setSelectedFee(e.target.value)}
-                />
-              </div>
-              <div className="ops">
-                <Text>Amount: </Text>
-                <Input
-                  style={{ width: '30%', marginRight: '150px', marginLeft: '10px' }}
-                  placeholder="Nhập số tiền cần được đóng"
-                  addonAfter="VNĐ"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-                <Text>Semester: </Text>
-                <Select
-                  style={{ width: '200px', marginLeft: '10px' }}
-                  value={semester}
-                  onChange={(value) => setSemester(value)}
-                >
-                  <Select.Option value="">All</Select.Option>
-                  <Select.Option value="HK1">HK1</Select.Option>
-                  <Select.Option value="HK2">HK2</Select.Option>
-                  <Select.Option value="HK3">HK3</Select.Option>
-                  <Select.Option value="HK4">HK4</Select.Option>
-                  <Select.Option value="HK5">HK5</Select.Option>
-                  <Select.Option value="HK6">HK6</Select.Option>
-                </Select>
-              </div>
-              <div className="btn">
-                <Button type="primary" onClick={handleAddFee} style={{ marginRight: '10px' }}>
-                  Add
-                </Button>
-              </div>
-            </div>
-          </TabPane>
-          <TabPane tab="Add Học Phí" key="2">
-            <div className="frm">
-              <Title level={4}>Học Phí Details</Title>
-              <div className="ops">
-                <Text>Cost per Credit: </Text>
-                <Input
-                  style={{ width: '30%', marginRight: '150px', marginLeft: '10px' }}
-                  placeholder="Nhập số tiền cho 1 tín chỉ"
-                  addonAfter="VNĐ"
-                  value={creditCost}
-                  onChange={(e) => setCreditCost(e.target.value)}
-                />
-              </div>
-              <div className="btn">
-                <Button type="primary" onClick={handleAddCreditBasedFee} style={{ marginRight: '10px' }}>
-                  Add Học Phí
-                </Button>
-              </div>
-            </div>
-          </TabPane>
-        </Tabs>
+  const items = [
+    {
+      key: "1",
+      label: "Thêm Học Phí Cố Định",
+      children: (
         <div className="frm">
-          <Title level={4}>Tuition List</Title>
-          <div className="feesList">
-            <Table
-              dataSource={fees}
-              columns={columns}
+          <Title level={4}>Chi Tiết Học Phí</Title>
+          <div className="ops">
+            <Text>Mã Học Phí: </Text>
+            <Input
+              style={{
+                width: "30%",
+                marginRight: "150px",
+                marginLeft: "10px",
+              }}
+              placeholder="Nhập tên học phí"
+              onChange={(e) => setSelectedFee(e.target.value)}
             />
           </div>
+          <div className="ops">
+            <Text>Số Tiền: </Text>
+            <Input
+              style={{
+                width: "30%",
+                marginRight: "150px",
+                marginLeft: "10px",
+              }}
+              placeholder="Nhập số tiền cần đóng"
+              addonAfter="VNĐ"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+            <Text>Học Kỳ: </Text>
+            <Select
+              style={{ width: "200px", marginLeft: "10px" }}
+              value={semester}
+              onChange={(value) => setSemester(value)}
+            >
+              <Select.Option value="">Tất Cả</Select.Option>
+              <Select.Option value="HK1">HK1</Select.Option>
+              <Select.Option value="HK2">HK2</Select.Option>
+              <Select.Option value="HK3">HK3</Select.Option>
+            </Select>
+          </div>
+          <Button type="primary" onClick={handleAddFee}>
+            Thêm Học Phí Cố Định
+          </Button>
+        </div>
+      ),
+    },
+    {
+      key: "2",
+      label: "Thêm Học Phí Tín Chỉ",
+      children: (
+        <div className="frm">
+          <Title level={4}>Chi Tiết Học Phí Tín Chỉ</Title>
+          <div className="ops">
+            <Text>Giá Mỗi Tín Chỉ: </Text>
+            <Input
+              style={{
+                width: "30%",
+                marginRight: "150px",
+                marginLeft: "10px",
+              }}
+              placeholder="Nhập giá mỗi tín chỉ"
+              addonAfter="VNĐ"
+              value={creditCost}
+              onChange={(e) => setCreditCost(e.target.value)}
+            />
+          </div>
+          <Button type="primary" onClick={handleAddCreditBasedFee}>
+            Thêm Học Phí Tín Chỉ
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="tuitionMajor-container flex">
+      <div>
+        <Header />
+      </div>
+      <div className="tuitionMajor">
+        <div className="tl">
+          <Title level={3}>Học Phí Học Kỳ</Title>
+        </div>
+        <div className="w-full">
+          <Tabs defaultActiveKey="1" items={items}></Tabs>
+        </div>
+        <div className="tl">
+          <Title level={3}>Danh Sách Học Phí</Title>
+        </div>
+        <div className="tbl">
+          <Table rowKey="id" dataSource={fees} columns={columns} />
         </div>
       </div>
     </div>
