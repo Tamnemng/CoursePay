@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
+import { Table, Modal, Button, message, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getAllGeneralSubjects, getAllStudentSubjects } from '../../data/coursesData';
 import { getStudentSemester, updateCoursesList, checkStudentCourses } from '../../data/studentData';
+import { updateGeneralClassSection, updateMajorClassSection } from '../../data/subjects';
 import './Improve.css';
 
 const { TabPane } = Tabs;
@@ -33,6 +34,7 @@ const columns = (handleRegisterClick) => [
 ];
 
 export default function Improve() {
+    const [activeTab, setActiveTab] = useState('1');
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
@@ -153,8 +155,27 @@ export default function Improve() {
                     timetable: selectedClass.timetable
                 };
 
-                await updateCoursesList(courseData);
+                const changeClass = {
+                    id: selectedClass.id,
+                    originalId: selectedClass.id,
+                    teacher: selectedClass.teacher,
+                    startDate: selectedClass.startDate,
+                    endDate: selectedClass.endDate,
+                    size: selectedClass.size,
+                    enrolled: selectedClass.enrolled + 1,
+                    timetable: selectedClass.timetable,
+                };
 
+                // Update the class section based on the active tab
+                if (activeTab === '1') {
+                    // General subjects tab
+                    await updateGeneralClassSection(selectedCourse.id, changeClass);
+                } else {
+                    // Specialized subjects tab
+                    await updateMajorClassSection(selectedCourse.id, changeClass);
+                }
+
+                await updateCoursesList(courseData);
                 message.success('Đăng ký khóa học thành công!');
                 setIsConfirmModalVisible(false);
                 setIsModalVisible(false);
@@ -180,7 +201,7 @@ export default function Improve() {
             <Header />
             <div className='register'>
                 <h1 className='register-title'>Đăng ký môn học</h1>
-                <Tabs defaultActiveKey="1">
+                <Tabs defaultActiveKey="1" onChange={(key) => setActiveTab(key)}>
                     <TabPane tab="Môn Học Chung" key="1">
                         <Table
                             columns={columns(handleRegisterClick)}

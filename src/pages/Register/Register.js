@@ -3,6 +3,7 @@ import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getGeneralSubjects } from '../../data/coursesData';
 import { updateCoursesList, checkStudentCourses } from '../../data/studentData';
+import { updateGeneralClassSection } from '../../data/subjects';
 import './Register.css';
 const { TabPane } = Tabs;
 
@@ -115,6 +116,19 @@ export default function Register() {
                     timeStart: selectedClass.startDate,
                     timetable: selectedClass.timetable
                 };
+
+                const changeClass = {
+                    id: selectedClass.id,
+                    originalId: selectedClass.id,
+                    teacher: selectedClass.teacher,
+                    startDate: selectedClass.startDate,
+                    endDate: selectedClass.endDate,
+                    size: selectedClass.size,
+                    enrolled: selectedClass.enrolled + 1,
+                    timetable: selectedClass.timetable,
+                };
+
+                await updateGeneralClassSection(selectedCourse.id ,changeClass);
 
                 await updateCoursesList(courseData);
                 message.success('Đăng ký khóa học thành công!');

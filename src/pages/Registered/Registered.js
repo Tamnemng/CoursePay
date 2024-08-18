@@ -4,41 +4,8 @@ import { Table } from 'antd';
 import moment from 'moment';
 import './Registered.css';
 import { getStudentCourses } from '../../data/studentData';
+import { deleteRegisteredCourse } from '../../data/studentData';
 
-const columns = [
-    {
-        title: 'Tên Môn Học',
-        dataIndex: 'name',
-        key: 'name',
-    },
-    {
-        title: 'Tín Chỉ',
-        dataIndex: 'credits',
-        key: 'credits',
-    },
-    {
-        title: 'Ngày Bắt Đầu',
-        dataIndex: 'timeStart',
-        key: 'timeStart',
-        render: (date) => moment(date).format('DD/MM/YYYY'),
-    },
-    {
-        title: 'Ngày Kết Thúc',
-        dataIndex: 'timeEnd',
-        key: 'timeEnd',
-        render: (date) => moment(date).format('DD/MM/YYYY'),
-    },
-    {
-        title: 'Giảng viên',
-        dataIndex: 'teacher',
-        key: 'teacher',
-    },
-    {
-        title: 'Lịch học',
-        dataIndex: 'timetable',
-        key: 'timetable',
-    },
-];
 
 export default function Registered() {
     const [courses, setCourses] = useState([]);
@@ -68,6 +35,57 @@ export default function Registered() {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    const handleDeleteClick = async (record) => {
+        try {
+            await deleteRegisteredCourse(record.key);
+            fetchData(); // Refresh the data after deletion
+        } catch (error) {
+            console.error('Error deleting course:', error);
+        }
+    };
+
+    const columns = [
+        {
+            title: 'Tên Môn Học',
+            dataIndex: 'name',
+            key: 'name',
+        },
+        {
+            title: 'Tín Chỉ',
+            dataIndex: 'credits',
+            key: 'credits',
+        },
+        {
+            title: 'Ngày Bắt Đầu',
+            dataIndex: 'timeStart',
+            key: 'timeStart',
+            render: (date) => moment(date).format('DD/MM/YYYY'),
+        },
+        {
+            title: 'Ngày Kết Thúc',
+            dataIndex: 'timeEnd',
+            key: 'timeEnd',
+            render: (date) => moment(date).format('DD/MM/YYYY'),
+        },
+        {
+            title: 'Giảng viên',
+            dataIndex: 'teacher',
+            key: 'teacher',
+        },
+        {
+            title: 'Lịch học',
+            dataIndex: 'timetable',
+            key: 'timetable',
+        },
+        {
+            title:'Xóa Môn Học',
+            render: (_, record) => (
+                <a onClick={() => handleDeleteClick(record)} className="delete">Xoá Môn Học</a>
+            ),
+            className: 'action-column',
+        }
+    ];
 
     return (
         <div className='registered-container'>

@@ -3,6 +3,7 @@ import { Table, Modal, Button, message, Spin, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getMajorSubjects } from '../../data/coursesData';
 import { getStudentSemester, updateCoursesList, checkStudentCourses } from '../../data/studentData';
+import { updateMajorClassSection } from '../../data/subjects';
 import './Specialized.css';
 
 const { TabPane } = Tabs;
@@ -146,9 +147,20 @@ export default function Specialized() {
                     timeStart: selectedClass.startDate,
                     timetable: selectedClass.timetable
                 };
+                
+                const changeClass = {
+                    id: selectedClass.id,
+                    originalId: selectedClass.id,
+                    teacher: selectedClass.teacher,
+                    startDate: selectedClass.startDate,
+                    endDate: selectedClass.endDate,
+                    size: selectedClass.size,
+                    enrolled: selectedClass.enrolled + 1,
+                    timetable: selectedClass.timetable,
+                };
 
+                await updateMajorClassSection(selectedCourse.id ,changeClass);
                 await updateCoursesList(courseData);
-
 
                 message.success('Đăng ký khóa học thành công!');
                 setIsConfirmModalVisible(false);

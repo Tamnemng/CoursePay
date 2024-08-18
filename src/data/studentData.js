@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, get, update, set } from 'firebase/database';
+import { getDatabase, ref, get, update, set, remove } from 'firebase/database';
 import { firebaseConfig } from './firebaseConfig';
 import { getStudentUid } from '../pages/Logging/loggingData';
 
@@ -145,4 +145,22 @@ export async function checkStudentCourses(courseId) {
         throw error;
     }
 }
+
+export async function deleteRegisteredCourse(id) {
+    await ensureInitialized();
+    if (!id) {
+        throw new Error('Không đủ thông tin để xóa khóa học.');
+    }
+    
+    const courseRef = ref(database, `users/${uid}/registeredCourses/${id}`);
+    
+    try {
+        await remove(courseRef);
+        console.log('Xóa khóa học thành công:', id);
+    } catch (error) {
+        console.error('Lỗi khi xóa khóa học:', error);
+        throw error;
+    }
+}
+
 initializeData();
