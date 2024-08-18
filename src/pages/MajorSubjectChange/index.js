@@ -51,9 +51,44 @@ export default function MajorSubjectChange() {
     new Set(majorSubjects.map((subject) => subject.faculty))
   ).map((faculty) => ({ text: faculty, value: faculty }));
 
-  const semesterFilters = Array.from(
-    new Set(majorSubjects.map((subject) => subject.semester))
-  ).map((semester) => ({ text: semester, value: semester }));
+  // const semesterFilters = Array.from(
+  //   new Set(majorSubjects.map((subject) => subject.semester))
+  // ).map((semester) => ({ text: semester, value: semester }));
+
+  const semesterFilters = [
+    {
+      value: "HK1",
+      text: "HK1",
+    },
+    {
+      value: "HK2",
+      text: "HK2",
+    },
+    {
+      value: "HK3",
+      text: "HK3",
+    },
+    {
+      value: "HK4",
+      text: "HK4",
+    },
+    {
+      value: "HK5",
+      text: "HK5",
+    },
+    {
+      value: "HK6",
+      text: "HK6",
+    },
+    {
+      value: "HK7",
+      text: "HK7",
+    },
+    {
+      value: "HK8",
+      text: "HK8",
+    },
+  ];
 
   const columns = [
     {
@@ -62,6 +97,11 @@ export default function MajorSubjectChange() {
       key: "faculty",
       filters: facultyFilters,
       onFilter: (value, record) => record.faculty === value,
+    },
+    {
+      title: "Ngành",
+      dataIndex: "major",
+      key: "major",
     },
     {
       title: "Học kỳ",
@@ -84,6 +124,7 @@ export default function MajorSubjectChange() {
       title: "Số tín chỉ",
       dataIndex: "credits",
       key: "credits",
+      sorter: (a, b) => a.credits - b.credits,
     },
     {
       title: "Loại môn học",
@@ -117,7 +158,9 @@ export default function MajorSubjectChange() {
           Quản lý học vụ
         </h1>
         <div>
-          <ContentLayout onCreate={() => navigate("/majorSubjectChange/create")}>
+          <ContentLayout
+            onCreate={() => navigate("/majorSubjectChange/create")}
+          >
             {loading ? (
               <div className="flex h-full w-full justify-center items-center">
                 <Spin indicator={<LoadingOutlined spin />} size="large" />

@@ -20,13 +20,13 @@ export default function CreateSubject() {
         name: values.name,
         credits: values.credits,
       };
-  
+
       const result = await addMajorSubject(subjectData);
       console.log("addMajorSubject result:", result);
-  
+
       if (result.status === "success") {
         message.success("Thêm học phần thành công.");
-        navigate('/majorSubjectChange');
+        navigate("/majorSubjectChange");
       } else {
         console.error(result.message);
         message.error("Mã học phần đã tồn tại.");
@@ -66,7 +66,42 @@ export default function CreateSubject() {
                 label="Học kỳ"
                 rules={[{ required: true, message: "Please enter semester" }]}
               >
-                <Input />
+                <Select
+                  options={[
+                    {
+                      value: "HK1",
+                      label: "HK1",
+                    },
+                    {
+                      value: "HK2",
+                      label: "HK2",
+                    },
+                    {
+                      value: "HK3",
+                      label: "HK3",
+                    },
+                    {
+                      value: "HK4",
+                      label: "HK4",
+                    },
+                    {
+                      value: "HK5",
+                      label: "HK5",
+                    },
+                    {
+                      value: "HK6",
+                      label: "HK6",
+                    },
+                    {
+                      value: "HK7",
+                      label: "HK7",
+                    },
+                    {
+                      value: "HK8",
+                      label: "HK8",
+                    },
+                  ]}
+                />
               </Form.Item>
               <Form.Item
                 name="type"
@@ -105,14 +140,11 @@ export default function CreateSubject() {
                 label="Số tín chỉ"
                 rules={[{ required: true, message: "Please enter credits" }]}
               >
-                <InputNumber min={1} max={6}/>
+                <InputNumber min={1} max={6} />
               </Form.Item>
               <Form.Item>
                 <div className="flex justify-end mb-20 gap-4">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                  >
+                  <Button type="primary" htmlType="submit">
                     Thêm học phần
                   </Button>
                   <Button onClick={() => navigate(-1)}>Hủy</Button>

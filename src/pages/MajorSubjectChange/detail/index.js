@@ -12,6 +12,7 @@ import {
   message,
   Popconfirm,
   Spin,
+  Tabs,
 } from "antd";
 import {
   DeleteOutlined,
@@ -19,6 +20,8 @@ import {
   QuestionCircleOutlined,
   ExclamationCircleFilled,
   LoadingOutlined,
+  PlusOutlined,
+  ArrowLeftOutlined,
 } from "@ant-design/icons";
 import {
   addMajorClassSection,
@@ -87,6 +90,10 @@ export default function MajorSubjectChangeDetail() {
   const showModal = (classSection) => {
     setClassSection(classSection);
     setIsModalOpen(true);
+  };
+
+  const onChange = (key) => {
+    console.log(key);
   };
 
   const handleCancel = () => {
@@ -240,7 +247,7 @@ export default function MajorSubjectChangeDetail() {
         console.log(Object.keys(result));
         setIsModalOpen(false);
         message.success("Cập nhật học phần thành công.");
-        navigate('/majorSubjectChange');
+        // navigate("/majorSubjectChange");
       } else if (result.status === "exists") {
         message.error("Mã lớp phần đã tồn tại.");
       } else {
@@ -430,17 +437,15 @@ export default function MajorSubjectChangeDetail() {
     },
   ];
 
-  return (
-    <div className="flex">
-      <Header />
-      <div className="text-3xl my-4 grow flex flex-col">
-        <h1 className="flex justify-center items-center my-4 text-black font-semibold">
-          Thông tin học phần
-        </h1>
+  const items = [
+    {
+      key: "1",
+      label: "Thông tin học phần",
+      children: (
         <div>
           <div className="flex justify-end mr-10 mb-20 gap-4">
             <Button type="primary" onClick={() => navigate(-1)}>
-              Trở về
+              <ArrowLeftOutlined /> Trở về
             </Button>
           </div>
           <div className="m-20 mx-96">
@@ -463,7 +468,42 @@ export default function MajorSubjectChangeDetail() {
               </Form.Item>
               <div className="flex flex-row gap-8">
                 <Form.Item name="semester" label="Học kỳ">
-                  <Input />
+                  <Select
+                    options={[
+                      {
+                        value: "HK1",
+                        label: "HK1",
+                      },
+                      {
+                        value: "HK2",
+                        label: "HK2",
+                      },
+                      {
+                        value: "HK3",
+                        label: "HK3",
+                      },
+                      {
+                        value: "HK4",
+                        label: "HK4",
+                      },
+                      {
+                        value: "HK5",
+                        label: "HK5",
+                      },
+                      {
+                        value: "HK6",
+                        label: "HK6",
+                      },
+                      {
+                        value: "HK7",
+                        label: "HK7",
+                      },
+                      {
+                        value: "HK8",
+                        label: "HK8",
+                      },
+                    ]}
+                  />
                 </Form.Item>
                 <Form.Item name="credits" label="Số tín chỉ">
                   <InputNumber min={1} max={8} />
@@ -483,105 +523,127 @@ export default function MajorSubjectChangeDetail() {
                   ]}
                 />
               </Form.Item>
+              <div className="flex justify-center m-4">
+                <Form.Item>
+                  <div className="flex justify-end mr-10 mb-20 gap-4">
+                    <Button type="primary" onClick={handleUpdateSubject}>
+                      <EditOutlined /> Cập nhật
+                    </Button>
+                    <Button type="primary" danger onClick={showDeleteConfirm}>
+                      <DeleteOutlined /> Xóa học phần
+                    </Button>
+                  </div>
+                </Form.Item>
+              </div>
             </Form>
           </div>
-          <div className="flex justify-end mr-10 mb-20 gap-4">
-            <Button type="primary" onClick={handleUpdateSubject}>
-              Cập nhật
-            </Button>
-            <Button type="primary" danger onClick={showDeleteConfirm}>
-              Xóa học phần
-            </Button>
-          </div>
+        </div>
+      ),
+    },
+    {
+      key: "2",
+      label: "Danh sách các lớp học phần",
+      children: (
+        <div>
           <div>
-            <div className="flex flex-row justify-between items-center mx-10">
-              <span className="text-2xl m-12">Danh sách các lớp học phần</span>
+            <div className="flex flex-row justify-end m-4 items-center mx-10">
               <Button type="primary" onClick={showModalCreate}>
-                Thêm lớp học phần
+                <PlusOutlined /> Thêm lớp học phần
               </Button>
             </div>
             <Table columns={columns} dataSource={subject.classSections} />
           </div>
-        </div>
-        {modalCreate()}
-        <Modal
-          title="Chi tiết lớp học phần"
-          open={isModalOpen}
-          onCancel={handleCancel}
-          footer={null}
-        >
-          <Form name="classDetail" form={classDetailForm}>
-            <Form.Item
-              name="id"
-              label="Mã lớp học phần"
-              rules={[{ required: true, message: "Please enter class ID" }]}
-            >
-              <Input disabled />
-            </Form.Item>
-            <Form.Item
-              name="teacher"
-              label="Giảng viên"
-              rules={[{ required: true, message: "Please enter teacher name" }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="dateRange"
-              label="Thời gian"
-              rules={[{ required: true, message: "Please enter date range" }]}
-            >
-              <RangePicker />
-            </Form.Item>
-            <Form.Item
-              name="size"
-              label="Số lượng"
-              rules={[{ required: true, message: "Please enter class size" }]}
-            >
-              <InputNumber min={15} />
-            </Form.Item>
-            <Form.Item
-              name="enrolled"
-              label="Số lượng đã đăng ký"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter enrolled number",
-                },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (value <= getFieldValue("size")) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      new Error(
-                        "Enrolled must be less than or equal to class size"
-                      )
-                    );
+          {modalCreate()}
+          <Modal
+            title="Chi tiết lớp học phần"
+            open={isModalOpen}
+            onCancel={handleCancel}
+            footer={null}
+          >
+            <Form name="classDetail" form={classDetailForm}>
+              <Form.Item
+                name="id"
+                label="Mã lớp học phần"
+                rules={[{ required: true, message: "Please enter class ID" }]}
+              >
+                <Input disabled />
+              </Form.Item>
+              <Form.Item
+                name="teacher"
+                label="Giảng viên"
+                rules={[
+                  { required: true, message: "Please enter teacher name" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="dateRange"
+                label="Thời gian"
+                rules={[{ required: true, message: "Please enter date range" }]}
+              >
+                <RangePicker />
+              </Form.Item>
+              <Form.Item
+                name="size"
+                label="Số lượng"
+                rules={[{ required: true, message: "Please enter class size" }]}
+              >
+                <InputNumber min={15} />
+              </Form.Item>
+              <Form.Item
+                name="enrolled"
+                label="Số lượng đã đăng ký"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter enrolled number",
                   },
-                }),
-              ]}
-            >
-              <InputNumber min={0} />
-            </Form.Item>
-            <Form.Item
-              name="timetable"
-              label="Thời khóa biểu"
-              rules={[{ required: true, message: "Please enter timetable" }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item>
-              <div className="flex flex-row justify-center gap-4">
-                <Button type="primary" onClick={handleUpdateClassSection}>
-                  Cập nhật
-                </Button>
-                <Button type="default" onClick={handleCancel}>
-                  Hủy
-                </Button>
-              </div>
-            </Form.Item>
-          </Form>
-        </Modal>
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (value <= getFieldValue("size")) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error(
+                          "Enrolled must be less than or equal to class size"
+                        )
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <InputNumber min={0} />
+              </Form.Item>
+              <Form.Item
+                name="timetable"
+                label="Thời khóa biểu"
+                rules={[{ required: true, message: "Please enter timetable" }]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item>
+                <div className="flex flex-row justify-center gap-4">
+                  <Button type="primary" onClick={handleUpdateClassSection}>
+                    Cập nhật
+                  </Button>
+                  <Button type="default" onClick={handleCancel}>
+                    Hủy
+                  </Button>
+                </div>
+              </Form.Item>
+            </Form>
+          </Modal>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="flex">
+      <Header />
+      <div className="text-3xl my-4 grow flex flex-col">
+        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </div>
     </div>
   );
