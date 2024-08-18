@@ -806,3 +806,139 @@ export const deleteGeneralSubject = async (subjectId) => {
     };
   }
 };
+
+export const increaseMajorEnrolled = async (subjectId, classSectionsId) => {
+  try {
+    const subjectDetail = await getMajorSubjectDetail(subjectId);
+    if (subjectDetail.status !== "success") {
+      console.error(
+        "Failed to get major subject details:",
+        subjectDetail.message
+      );
+      return subjectDetail;
+    }
+
+    const { faculty, major, semester, type } = subjectDetail.data;
+    const enrolledPath = `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}/classSections/${classSectionsId}/enrolled`;
+
+    const enrolledRef = ref(database, enrolledPath);
+    const snapshot = await get(enrolledRef);
+
+    if (snapshot.exists()) {
+      const currentEnrolled = snapshot.val() || 0;
+      await set(enrolledRef, currentEnrolled + 1);
+      return { status: "success", message: "Enrolled increased by 1" };
+    } else {
+      return { status: "error", message: "Enrolled value does not exist" };
+    }
+  } catch (error) {
+    console.error("Failed to increase enrolled:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};
+
+export const decreaseMajorEnrolled = async (subjectId, classSectionsId) => {
+  try {
+    const subjectDetail = await getMajorSubjectDetail(subjectId);
+    if (subjectDetail.status !== "success") {
+      console.error(
+        "Failed to get major subject details:",
+        subjectDetail.message
+      );
+      return subjectDetail;
+    }
+
+    const { faculty, major, semester, type } = subjectDetail.data;
+    const enrolledPath = `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}/classSections/${classSectionsId}/enrolled`;
+
+    const enrolledRef = ref(database, enrolledPath);
+    const snapshot = await get(enrolledRef);
+
+    if (snapshot.exists()) {
+      const currentEnrolled = snapshot.val() || 0;
+      await set(enrolledRef, currentEnrolled - 1);
+      return { status: "success", message: "Enrolled increased by 1" };
+    } else {
+      return { status: "error", message: "Enrolled value does not exist" };
+    }
+  } catch (error) {
+    console.error("Failed to increase enrolled:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};
+
+export const increaseGeneralEnrolled = async (subjectId, classSectionsId) => {
+  try {
+    const SubjectDetail = await getGeneralSubjectDetail(subjectId);
+    if (SubjectDetail.status !== "success") {
+      console.error(
+        "Failed to get general subject details:",
+        SubjectDetail.message
+      );
+      return SubjectDetail;
+    }
+
+    const { semester, type } = SubjectDetail.data;
+    const enrolledPath = `/subjects/universityWideSubjects/${semester}/${type}/${subjectId}/classSections/${classSectionsId}/enrolled`;
+
+    const enrolledRef = ref(database, enrolledPath);
+    const snapshot = await get(enrolledRef);
+
+    if (snapshot.exists()) {
+      const currentEnrolled = snapshot.val() || 0;
+      await set(enrolledRef, currentEnrolled + 1);
+      return { status: "success", message: "Enrolled increased by 1" };
+    } else {
+      return { status: "error", message: "Enrolled value does not exist" };
+    }
+  } catch (error) {
+    console.error("Failed to increase enrolled:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};
+
+export const decreaseGeneralEnrolled = async (subjectId, classSectionsId) => {
+  try {
+    const SubjectDetail = await getGeneralSubjectDetail(subjectId);
+    if (SubjectDetail.status !== "success") {
+      console.error(
+        "Failed to get general subject details:",
+        SubjectDetail.message
+      );
+      return SubjectDetail;
+    }
+
+    const { semester, type } = SubjectDetail.data;
+    const enrolledPath = `/subjects/universityWideSubjects/${semester}/${type}/${subjectId}/classSections/${classSectionsId}/enrolled`;
+
+    const enrolledRef = ref(database, enrolledPath);
+    const snapshot = await get(enrolledRef);
+
+    if (snapshot.exists()) {
+      const currentEnrolled = snapshot.val() || 0;
+      await set(enrolledRef, currentEnrolled - 1);
+      return { status: "success", message: "Enrolled increased by 1" };
+    } else {
+      return { status: "error", message: "Enrolled value does not exist" };
+    }
+  } catch (error) {
+    console.error("Failed to increase enrolled:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};

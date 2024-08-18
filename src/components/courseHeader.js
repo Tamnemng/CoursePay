@@ -1,14 +1,11 @@
-import React, { useState } from "react";
 import {
   BankOutlined,
-  ApartmentOutlined,
   BookOutlined,
-  HomeOutlined,
-  PoweroffOutlined,
+  PoweroffOutlined
 } from "@ant-design/icons";
 import { Menu } from "antd";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { icons } from "lucide-react";
 
 const items = [
   {
@@ -73,15 +70,9 @@ export default function Header() {
       case "add-delete-subject":
         navigate("/majorSubjectChange");
         break;
-        // case 'edit-subject':
-        // navigate("/courseEdit");
-        // break;
       case "add-delete-class":
         navigate("/generalSubjectChange");
         break;
-      // case 'edit-class':
-      //     navigate('/classEdit');
-      //     break;
       case "logout":
         localStorage.setItem("isAuthenticated", "false");
         navigate("");
