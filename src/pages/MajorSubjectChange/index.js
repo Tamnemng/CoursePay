@@ -154,8 +154,8 @@ export default function MajorSubjectChange() {
     <div className="courseChange-container flex">
       <Header />
       <div className="text-3xl my-4 grow flex flex-col">
-        <h1 className="flex justify-center items-center my-4 text-black font-semibold">
-          Quản lý học vụ
+        <h1 className="flex justify-center items-center my-4 font-semibold text-blue-500">
+          Học Phần Chuyên Ngành
         </h1>
         <div>
           <ContentLayout

@@ -30,7 +30,7 @@ import {
   getMajorSubjectDetail,
   updatedMajorSubject,
   deletedMajorSubject,
-  getClassSectionLength,
+  getMajorClassSectionLength,
 } from "../../../data/subjects";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
@@ -125,7 +125,7 @@ export default function MajorSubjectChangeDetail() {
   const getNewClassSectionId = async () => {
     const subjectCode = subject.id;
     const semesterCode = subject.semester.slice(-1);
-    const classLength = (await getClassSectionLength(subject.id)) + 1;
+    const classLength = (await getMajorClassSectionLength(subject.id)) + 1;
     return `${subjectCode}0${semesterCode}0${classLength}`;
   };
 
