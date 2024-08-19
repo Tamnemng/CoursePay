@@ -41,7 +41,7 @@ export default function CreateSubject() {
     <div className="flex">
       <Header />
       <div className="text-3xl my-4 grow flex flex-col">
-        <h1 className="flex justify-center items-center my-4 text-black font-semibold">
+        <h1 className="flex justify-center items-center my-4 text-blue-500 font-semibold">
           Thêm học phần
         </h1>
         <div>

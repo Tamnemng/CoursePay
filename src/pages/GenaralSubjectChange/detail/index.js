@@ -282,7 +282,9 @@ export default function MajorSubjectChangeDetail() {
   const modalCreate = () => {
     return (
       <Modal
-        title="Thêm lớp học phần"
+        title={
+          <h2 className="modal-title">Thêm lớp học phần - {subject.name}</h2>
+        }
         open={isModalCreateOpen}
         onCancel={handleCancel}
         footer={null}
@@ -448,8 +450,13 @@ export default function MajorSubjectChangeDetail() {
       label: "Thông tin học phần",
       children: (
         <div>
-          <div className="flex justify-end mr-10 mb-20 gap-4">
-            <Button type="primary" onClick={() => navigate(-1)}>
+          <div className="flex flex-row  m-4 items-center mx-10">
+            <div className="w-full">
+              <h2 className="text-2xl flex justify-center">
+                Thông tin học phần
+              </h2>
+            </div>
+            <Button type="primary" onClick={showModalCreate}>
               <ArrowLeftOutlined /> Trở về
             </Button>
           </div>
@@ -548,7 +555,12 @@ export default function MajorSubjectChangeDetail() {
       children: (
         <div>
           <div>
-            <div className="flex flex-row justify-end m-4 items-center mx-10">
+            <div className="flex flex-row justify-between m-4 items-center mx-10">
+              <div className="">
+                <h2 className="text-2xl">
+                  Danh sách lớp học phần - {subject.name}
+                </h2>
+              </div>
               <Button type="primary" onClick={showModalCreate}>
                 <PlusOutlined /> Thêm lớp học phần
               </Button>
