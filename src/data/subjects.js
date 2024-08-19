@@ -875,6 +875,94 @@ export const decreaseMajorEnrolled = async (subjectId, classSectionsId) => {
   }
 };
 
+export const getSubjectDetailsFromClassSectionsId = async (classSectionsId) => {
+  try {
+    const majorSubjectsSnapshot = await get(
+      child(dbRef, "/subjects/majorSubjects")
+    );
+    if (majorSubjectsSnapshot.exists()) {
+      const majorSubjectsData = majorSubjectsSnapshot.val();
+      for (const faculty in majorSubjectsData) {
+        for (const major in majorSubjectsData[faculty]) {
+          for (const semester in majorSubjectsData[faculty][major]) {
+            for (const type in majorSubjectsData[faculty][major][semester]) {
+              const subjects =
+                majorSubjectsData[faculty][major][semester][type];
+              for (const subjectId in subjects) {
+                const classSections = subjects[subjectId].classSections || {};
+                if (classSections[classSectionsId]) {
+                  return {
+                    status: "success",
+                    data: {
+                      subjectId,
+                      name: subjects[subjectId].name,
+                      credits: subjects[subjectId].credits,
+                      faculty,
+                      major,
+                      semester,
+                      type,
+                      classSection: {
+                        id: classSectionsId,
+                        ...classSections[classSectionsId],
+                      },
+                    },
+                  };
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const generalSubjectsSnapshot = await get(
+      child(dbRef, "/subjects/universityWideSubjects")
+    );
+    if (generalSubjectsSnapshot.exists()) {
+      const generalSubjectsData = generalSubjectsSnapshot.val();
+      for (const semester in generalSubjectsData) {
+        for (const type in generalSubjectsData[semester]) {
+          const subjects = generalSubjectsData[semester][type];
+          for (const subjectId in subjects) {
+            const classSections = subjects[subjectId].classSections || {};
+            if (classSections[classSectionsId]) {
+              return {
+                status: "success",
+                data: {
+                  subjectId,
+                  name: subjects[subjectId].name,
+                  credits: subjects[subjectId].credits,
+                  faculty: subjects[subjectId].faculty,
+                  semester,
+                  type,
+                  classSection: {
+                    id: classSectionsId,
+                    ...classSections[classSectionsId],
+                  },
+                },
+              };
+            }
+          }
+        }
+      }
+    }
+
+    // Nếu không tìm thấy
+    return {
+      status: "error",
+      code: "database/not_found",
+      message: "Class section not found for this classSectionsId",
+    };
+  } catch (error) {
+    console.error("Failed to get subject details:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};
+
 export const increaseGeneralEnrolled = async (subjectId, classSectionsId) => {
   try {
     const SubjectDetail = await getGeneralSubjectDetail(subjectId);
@@ -935,6 +1023,46 @@ export const decreaseGeneralEnrolled = async (subjectId, classSectionsId) => {
     }
   } catch (error) {
     console.error("Failed to increase enrolled:", error);
+    return {
+      status: "error",
+      code: error.code,
+      message: error.message,
+    };
+  }
+};
+
+export const decreaseEnrolled = async (classSectionsId) => {
+  try {
+    const subjectDetail = await getSubjectDetailsFromClassSectionsId(
+      classSectionsId
+    );
+
+    if (subjectDetail.status !== "success") {
+      console.error("Failed to get subject details:", subjectDetail.message);
+      return subjectDetail;
+    }
+
+    const { subjectId, semester, type, faculty, major } = subjectDetail.data;
+    let enrolledPath;
+
+    if (faculty && major) {
+      enrolledPath = `/subjects/majorSubjects/${faculty}/${major}/${semester}/${type}/${subjectId}/classSections/${classSectionsId}/enrolled`;
+    } else {
+      enrolledPath = `/subjects/universityWideSubjects/${semester}/${type}/${subjectId}/classSections/${classSectionsId}/enrolled`;
+    }
+
+    const enrolledRef = ref(database, enrolledPath);
+    const snapshot = await get(enrolledRef);
+
+    if (snapshot.exists()) {
+      const currentEnrolled = snapshot.val() || 0;
+      await set(enrolledRef, currentEnrolled - 1);
+      return { status: "success", message: "Enrolled decreased by 1" };
+    } else {
+      return { status: "error", message: "Enrolled value does not exist" };
+    }
+  } catch (error) {
+    console.error("Failed to decrease enrolled:", error);
     return {
       status: "error",
       code: error.code,
