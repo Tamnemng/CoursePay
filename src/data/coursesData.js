@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, get } from 'firebase/database';
+import { getDatabase, ref, onValue } from 'firebase/database';
 import { firebaseConfig } from './firebaseConfig';
 import { getStudentFaculty, getStudentMajor, getStudentSemester } from './studentData';
 
@@ -12,43 +12,57 @@ let major = "";
 let semester = "";
 let dataInitialized = false;
 let initializationPromise = null;
+let dataListeners = [];
 
-async function fetchFirebaseData() {
-  try {
-    const dataRef = ref(database, '/');
-    const snapshot = await get(dataRef);
+function notifyListeners() {
+  dataListeners.forEach(listener => listener(firebaseData));
+}
+
+function setupFirebaseListener() {
+  const dataRef = ref(database, '/');
+  onValue(dataRef, (snapshot) => {
     if (snapshot.exists()) {
-      return snapshot.val();
+      firebaseData = snapshot.val();
     } else {
-      console.log("Không có dữ liệu");
-      return null;
+      firebaseData = {};
     }
-  } catch (error) {
-    console.error("Lỗi khi lấy dữ liệu:", error);
-    throw error;
-  }
+    notifyListeners();
+  }, (error) => {
+    console.error("Lỗi khi lắng nghe dữ liệu:", error);
+  });
 }
 
 export async function initializeData() {
   if (!initializationPromise) {
     initializationPromise = (async () => {
       try {
-        firebaseData = await fetchFirebaseData();
+        setupFirebaseListener();
         faculty = await getStudentFaculty();
         major = await getStudentMajor();
         semester = await getStudentSemester();
-        if (!firebaseData) {
-          throw new Error("Không thể khởi tạo dữ liệu từ Firebase");
-        }
         dataInitialized = true;
-        return { firebaseData, faculty, major, semester };
+        return { faculty, major, semester };
       } catch (error) {
         console.error("Lỗi trong quá trình khởi tạo dữ liệu:", error);
-        throw error;
+        return { faculty: "", major: "", semester: "" };
       }
     })();
   }
   return initializationPromise;
+}
+
+export function addDataListener(listener) {
+  dataListeners.push(listener);
+  if (firebaseData) {
+    listener(firebaseData);
+  }
+}
+
+export function removeDataListener(listener) {
+  const index = dataListeners.indexOf(listener);
+  if (index > -1) {
+    dataListeners.splice(index, 1);
+  }
 }
 
 async function ensureDataInitialized() {
@@ -60,46 +74,45 @@ async function ensureDataInitialized() {
 export async function getMajorSubjects(semesterParam) {
   await ensureDataInitialized();
   const sem = semesterParam || semester;
-  if (!firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]?.[sem]) {
-    return null;
-  }
-  const { mandatory = {}, elective = {} } = firebaseData.subjects.majorSubjects[faculty][major][sem];
-  return { mandatory, elective };
+  const majorSubjects = firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]?.[sem] || {};
+  return {
+    mandatory: majorSubjects.mandatory || {},
+    elective: majorSubjects.elective || {}
+  };
 }
 
 export async function getFacultySubjects(semesterParam) {
   await ensureDataInitialized();
   const sem = semesterParam || semester;
-  if (!firebaseData?.subjects?.facultySubjects?.[faculty]?.[sem]) {
-    return null;
-  }
-  const { mandatory = {}, elective = {} } = firebaseData.subjects.facultySubjects[faculty][sem];
-  return { mandatory, elective };
+  const facultySubjects = firebaseData?.subjects?.facultySubjects?.[faculty]?.[sem] || {};
+  return {
+    mandatory: facultySubjects.mandatory || {},
+    elective: facultySubjects.elective || {}
+  };
 }
 
 export async function getGeneralSubjects() {
   await ensureDataInitialized();
-  if (!firebaseData?.subjects?.universityWideSubjects?.[semester]) {
-    return null;
-  }
-  const { mandatory = {}, elective = {} } = firebaseData.subjects.universityWideSubjects[semester];
-  return { mandatory, elective };
+  const generalSubjects = firebaseData?.subjects?.universityWideSubjects?.[semester] || {};
+  return {
+    mandatory: generalSubjects.mandatory || {},
+    elective: generalSubjects.elective || {}
+  };
 }
 
 export async function getAllGeneralSubjects() {
   await ensureDataInitialized();
-  if (!firebaseData?.subjects?.universityWideSubjects) {
-    return null;
-  }
   const allGeneralSubjects = {};
-  for (const sem in firebaseData.subjects.universityWideSubjects) {
-    const { mandatory = {}, elective = {} } = firebaseData.subjects.universityWideSubjects[sem];
+  const universityWideSubjects = firebaseData?.subjects?.universityWideSubjects || {};
+  
+  for (const sem in universityWideSubjects) {
+    const { mandatory = {}, elective = {} } = universityWideSubjects[sem];
     const mergedSubjects = { ...mandatory, ...elective };
     allGeneralSubjects[sem] = Object.entries(mergedSubjects).reduce((acc, [subjectCode, subjectData]) => {
       acc[subjectCode] = {
-        name: subjectData.name,
-        classSections: subjectData.classSections,
-        credits: subjectData.credits
+        name: subjectData.name || '',
+        classSections: subjectData.classSections || [],
+        credits: subjectData.credits || 0
       };
       return acc;
     }, {});
@@ -109,16 +122,14 @@ export async function getAllGeneralSubjects() {
 
 export async function getAllStudentSubjects() {
   await ensureDataInitialized();
-  if (!firebaseData?.subjects?.majorSubjects?.[faculty]?.[major]) {
-    return null;
-  }
   const allSubjects = {
     major: {
       mandatory: {},
       elective: {}
     }
   };
-  const majorData = firebaseData.subjects.majorSubjects[faculty][major];
+  const majorData = firebaseData?.subjects?.majorSubjects?.[faculty]?.[major] || {};
+  
   for (const sem in majorData) {
     const { mandatory = {}, elective = {} } = majorData[sem];
     Object.entries(mandatory).forEach(([subjectCode, subjectData]) => {

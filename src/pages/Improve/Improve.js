@@ -2,8 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Table, Modal, Button, message, Tabs } from 'antd';
 import Header from '../../components/Header';
 import { getAllGeneralSubjects, getAllStudentSubjects } from '../../data/coursesData';
-import { getStudentSemester, updateCoursesList, checkStudentCourses } from '../../data/studentData';
-import { updateGeneralClassSection, updateMajorClassSection } from '../../data/subjects';
+import { getStudentSemester, updateCoursesList, checkStudentCourses, deleteRegisteredCourse } from '../../data/studentData';
+import { increaseGeneralEnrolled, increaseMajorEnrolled, decreaseEnrolled } from '../../data/subjects';
 import './Improve.css';
 
 const { TabPane } = Tabs;
@@ -80,45 +80,44 @@ export default function Improve() {
             className: 'action-column'
         },
     ];
+    const fetchData = useCallback(async () => {
+        try {
+            const semester = await getStudentSemester();
+            const [generalSubjects, studentSubjects] = await Promise.all([
+                getAllGeneralSubjects(),
+                getAllStudentSubjects(),
+            ]);
+
+            if (!generalSubjects || !studentSubjects) {
+                throw new Error('Failed to fetch subjects data');
+            }
+
+            const processedGeneral = Object.entries(generalSubjects).flatMap(([semester, subjects]) =>
+                Object.entries(subjects).map(([id, course]) => ({
+                    id,
+                    semester,
+                    ...course,
+                }))
+            );
+
+            const processedSpecialized = [
+                ...processSubjects(studentSubjects.major.mandatory, 'mandatory', 'major'),
+                ...processSubjects(studentSubjects.major.elective, 'elective', 'major')
+            ];
+
+            setGeneralCourses(processedGeneral);
+            setSpecializedCourses(processedSpecialized);
+        } catch (err) {
+            console.error('Error fetching data:', err);
+            setError('Failed to load courses. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const semester = await getStudentSemester();
-                const [generalSubjects, studentSubjects] = await Promise.all([
-                    getAllGeneralSubjects(),
-                    getAllStudentSubjects(),
-                ]);
-
-                if (!generalSubjects || !studentSubjects) {
-                    throw new Error('Failed to fetch subjects data');
-                }
-
-                const processedGeneral = Object.entries(generalSubjects).flatMap(([semester, subjects]) =>
-                    Object.entries(subjects).map(([id, course]) => ({
-                        id,
-                        semester,
-                        ...course,
-                    }))
-                );
-
-                const processedSpecialized = [
-                    ...processSubjects(studentSubjects.major.mandatory, 'mandatory', 'major'),
-                    ...processSubjects(studentSubjects.major.elective, 'elective', 'major')
-                ];
-
-                setGeneralCourses(processedGeneral);
-                setSpecializedCourses(processedSpecialized);
-            } catch (err) {
-                console.error('Error fetching data:', err);
-                setError('Failed to load courses. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchData();
-    }, []);
+    }, [fetchData]);
 
     const processSubjects = (subjects, type, category) =>
         Object.entries(subjects).map(([id, course]) => ({
@@ -137,54 +136,72 @@ export default function Improve() {
     };
 
     const handleConfirmRegister = async () => {
-        if (selectedCourse && selectedClass) {
-            try {
-                const isAlreadyRegistered = await checkStudentCourses(selectedClass.id);
-                if (isAlreadyRegistered) {
-                    message.error('Bạn đã đăng ký khóa học này rồi!');
-                    return;
-                }
-
-                const courseData = {
-                    id: selectedClass.id,
-                    credits: selectedCourse.credits,
-                    name: selectedCourse.name,
-                    teacher: selectedClass.teacher,
-                    timeEnd: selectedClass.endDate,
-                    timeStart: selectedClass.startDate,
-                    timetable: selectedClass.timetable
-                };
-
-                const changeClass = {
-                    id: selectedClass.id,
-                    originalId: selectedClass.id,
-                    teacher: selectedClass.teacher,
-                    startDate: selectedClass.startDate,
-                    endDate: selectedClass.endDate,
-                    size: selectedClass.size,
-                    enrolled: selectedClass.enrolled + 1,
-                    timetable: selectedClass.timetable,
-                };
-
-                // Update the class section based on the active tab
-                if (activeTab === '1') {
-                    // General subjects tab
-                    await updateGeneralClassSection(selectedCourse.id, changeClass);
-                } else {
-                    // Specialized subjects tab
-                    await updateMajorClassSection(selectedCourse.id, changeClass);
-                }
-
-                await updateCoursesList(courseData);
-                message.success('Đăng ký khóa học thành công!');
-                setIsConfirmModalVisible(false);
-                setIsModalVisible(false);
-            } catch (error) {
-                console.error('Error registering course:', error);
-                message.error('Không thể đăng ký khóa học. Vui lòng thử lại.');
+        if (!selectedCourse || !selectedClass) {
+            message.error("Không thể đăng ký khóa học. Vui lòng thử lại.");
+            return;
+        }
+        try {
+            const isAlreadyRegistered = await checkStudentCourses(selectedClass.id);
+            if (isAlreadyRegistered) {
+                message.error('Bạn đã đăng ký khóa học này rồi!');
+                return;
             }
-        } else {
-            message.error('Không thể đăng ký khóa học. Vui lòng thử lại.');
+
+            const registeredClasses = Object.keys(selectedCourse.classSections);
+            for (const classId of registeredClasses) {
+                if (classId !== selectedClass.id) {
+                    const isRegisteredForOtherClass = await checkStudentCourses(classId);
+                    if (isRegisteredForOtherClass) {
+                        Modal.confirm({
+                            title: 'Thay thế đăng ký hiện tại',
+                            content: `Bạn đã đăng ký lớp ${classId} cho môn học này. Bạn có muốn hủy đăng ký lớp cũ và đăng ký lớp mới không?`,
+                            onOk: async () => {
+                                await deleteRegisteredCourse(classId);
+                                await decreaseEnrolled(classId);
+                                await registerNewCourse();
+                            },
+                            onCancel: () => {
+                                message.info('Đăng ký mới đã bị hủy.');
+                            },
+                        });
+                        return;
+                    }
+                }
+            }
+
+            await registerNewCourse();
+        } catch (error) {
+            console.error("Error checking or registering course:", error);
+            message.error("Không thể đăng ký khóa học. Vui lòng thử lại.");
+            message.error("Không thể đăng ký khóa học. Vui lòng thử lại.");
+        }
+    };
+
+    const registerNewCourse = async () => {
+        try {
+            const courseData = {
+                id: selectedClass.id,
+                credits: selectedCourse.credits,
+                name: selectedCourse.name,
+                teacher: selectedClass.teacher,
+                timeEnd: selectedClass.endDate,
+                timeStart: selectedClass.startDate,
+                timetable: selectedClass.timetable,
+            };
+
+            if (activeTab === '1') {
+                await increaseGeneralEnrolled(selectedCourse.id, selectedClass.id);
+            } else {
+                await increaseMajorEnrolled(selectedCourse.id, selectedClass.id);
+            }
+            await updateCoursesList(courseData);
+            message.success("Đăng ký khóa học thành công!");
+            setIsConfirmModalVisible(false);
+            setIsModalVisible(false);
+            await fetchData();
+        } catch (error) {
+            console.error("Error registering new course:", error);
+            message.error("Không thể đăng ký khóa học mới. Vui lòng thử lại.");
         }
     };
 
