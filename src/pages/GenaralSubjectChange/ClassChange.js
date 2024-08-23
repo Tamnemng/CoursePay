@@ -5,6 +5,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ContentLayout from "../../components/ContentLayout";
 import { getGeneralSubjects } from "../../data/subjects";
+import Nav from "../../components/Nav";
 
 export default function MajorSubjectChange() {
   const [generalSubject, setGeneralSubject] = useState([]);
@@ -25,7 +26,7 @@ export default function MajorSubjectChange() {
               allSubjects.push({
                 id: subjectId,
                 name: subjectList[subjectId].name,
-                faculty:subjectList[subjectId].faculty,
+                faculty: subjectList[subjectId].faculty,
                 credits: subjectList[subjectId].credits,
                 semester,
                 type,
@@ -140,29 +141,32 @@ export default function MajorSubjectChange() {
   ];
 
   return (
-    <div className="courseChange-container flex">
-      <Header />
-      <div className="text-3xl my-4 grow flex flex-col">
-        <h1 className="flex justify-center items-center my-4 font-semibold text-blue-500">
-          Học Phần Chung
-        </h1>
-        <div>
-          <ContentLayout
-            onCreate={() => navigate("/generalSubjectChange/create")}
-          >
-            {loading ? (
-              <div className="flex h-full w-full justify-center items-center">
-                <Spin indicator={<LoadingOutlined spin />} size="large" />
-              </div>
-            ) : (
-              <Table
-                dataSource={generalSubject}
-                columns={columns}
-                tableLayout="auto"
-                rowKey="id"
-              />
-            )}
-          </ContentLayout>
+    <div className="courseChange-container flex flex-col">
+      <Nav />
+      <div className="flex">
+        <Header />
+        <div className="text-3xl my-4 grow flex flex-col">
+          <h1 className="flex justify-center items-center my-4 font-semibold text-blue-500">
+            Học Phần Chung
+          </h1>
+          <div>
+            <ContentLayout
+              onCreate={() => navigate("/generalSubjectChange/create")}
+            >
+              {loading ? (
+                <div className="flex h-full w-full justify-center items-center">
+                  <Spin indicator={<LoadingOutlined spin />} size="large" />
+                </div>
+              ) : (
+                <Table
+                  dataSource={generalSubject}
+                  columns={columns}
+                  tableLayout="auto"
+                  rowKey="id"
+                />
+              )}
+            </ContentLayout>
+          </div>
         </div>
       </div>
     </div>

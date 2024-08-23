@@ -6,6 +6,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ContentLayout from "../../components/ContentLayout";
 import { getMajorSubjects } from "../../data/subjects";
+import Nav from "../../components/Nav";
 
 export default function MajorSubjectChange() {
   const [majorSubjects, setMajorSubjects] = useState([]);
@@ -151,29 +152,32 @@ export default function MajorSubjectChange() {
   ];
 
   return (
-    <div className="courseChange-container flex">
-      <Header />
-      <div className="text-3xl my-4 grow flex flex-col">
-        <h1 className="flex justify-center items-center my-4 font-semibold text-blue-500">
-          Học Phần Chuyên Ngành
-        </h1>
-        <div>
-          <ContentLayout
-            onCreate={() => navigate("/majorSubjectChange/create")}
-          >
-            {loading ? (
-              <div className="flex h-full w-full justify-center items-center">
-                <Spin indicator={<LoadingOutlined spin />} size="large" />
-              </div>
-            ) : (
-              <Table
-                dataSource={majorSubjects}
-                columns={columns}
-                tableLayout="auto"
-                rowKey="id"
-              />
-            )}
-          </ContentLayout>
+    <div className="courseChange-container flex flex-col">
+      <Nav />
+      <div className="flex">
+        <Header />
+        <div className="text-3xl my-4 grow flex flex-col">
+          <h1 className="flex justify-center items-center my-4 font-semibold text-blue-500">
+            Học Phần Chuyên Ngành
+          </h1>
+          <div>
+            <ContentLayout
+              onCreate={() => navigate("/majorSubjectChange/create")}
+            >
+              {loading ? (
+                <div className="flex h-full w-full justify-center items-center">
+                  <Spin indicator={<LoadingOutlined spin />} size="large" />
+                </div>
+              ) : (
+                <Table
+                  dataSource={majorSubjects}
+                  columns={columns}
+                  tableLayout="auto"
+                  rowKey="id"
+                />
+              )}
+            </ContentLayout>
+          </div>
         </div>
       </div>
     </div>

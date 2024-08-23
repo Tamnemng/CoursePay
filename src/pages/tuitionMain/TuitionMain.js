@@ -4,6 +4,7 @@ import Header from "../../components/tuitionHeader";
 import Typography from "antd/es/typography/Typography";
 import { Select, Input, Table, Card, List, Tabs } from "antd";
 import { getStudents } from "../../data/TuitionData";
+import Nav from "../../components/Nav";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -119,95 +120,101 @@ export default function TuitionMain() {
   );
 
   return (
-    <div className="tuitionMain-container flex flex-row">
-      <div>
-        <Header />
-      </div>
-      <div className="tuitionMain  !p-[20px]">
-        <div className="tl flex flex-col items-center justify-center">
-          <Title level={3}>Quản lý học phí</Title>
+    <div className="tuitionMain-container flex flex-col">
+      <Nav />
+      <div className="flex">
+        <div>
+          <Header />
         </div>
-        <div className="info">
-          <div className="student-filter">
-            <Title level={5}>Danh sách sinh viên</Title>
-            <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
-              <div className="mb-2 md:mb-0">
-                <Text>Ngành học</Text>
-                <Select
-                  className="ml-2 w-full md:w-64"
-                  value={selectedDepartment}
-                  onChange={(value) => setSelectedDepartment(value)}
-                  options={[
-                    { value: "all", label: "Tất cả" },
-                    {
-                      value: "Khoa Công Nghệ Thông Tin",
-                      label: "Khoa Công Nghệ Thông Tin",
-                    },
-                    { value: "Khoa Anh", label: "Khoa Anh" },
-                    { value: "Khoa Toán", label: "Khoa Toán" },
-                  ]}
-                />
-              </div>
-              <div className="mb-2 md:mb-0">
-                <Text>Mã sinh viên</Text>
-                <Input
-                  className="ml-2 w-full md:w-64"
-                  value={studentIdFilter}
-                  onChange={(e) => setStudentIdFilter(e.target.value)}
-                  placeholder="Nhập mã sinh viên"
-                />
-              </div>
-              <div className="mb-2 md:mb-0">
-                <Text>Học kỳ</Text>
-                <Select
-                  className="ml-2 w-full md:w-64"
-                  value={selectedSemester}
-                  onChange={(value) => setSelectedSemester(value)}
-                  options={[
-                    { value: "all", label: "Tất cả" },
-                    { value: "HK1", label: "Học kỳ 1" },
-                    { value: "HK2", label: "Học kỳ 2" },
-                    { value: "HK3", label: "Học kỳ 3" },
-                    { value: "HK4", label: "Học kỳ 4" },
-                    { value: "HK5", label: "Học kỳ 5" },
-                    { value: "HK6", label: "Học kỳ 6" },
-                  ]}
-                />
-              </div>
-            </div>
-            <Table
-              columns={stuColumns}
-              dataSource={filteredStudents.map((student) => ({
-                ...student,
-                id: encodeStudentId(student.id),
-              }))}
-              pagination={{ pageSize: 10 }}
-              scroll={{ y: 240 }}
-              onRow={(record) => ({
-                onClick: () =>
-                  handleRowClick({ ...record, id: decodeStudentId(record.id) }),
-              })}
-            />
+        <div className="tuitionMain  !p-[20px]">
+          <div className="tl flex flex-col items-center justify-center">
+            <Title level={3}>Quản lý học phí</Title>
           </div>
-          <div className="payment-info">
-            <Title level={5}>Thông tin hóa đơn</Title>
-            {selectedStudentID ? (
-              <Card title={`Thông tin sinh viên: ${selectedRow?.name}`}>
-                <p>Mã sinh viên: {selectedStudentID}</p>
-                <p>Khoa: {selectedRow?.faculty}</p>
-                <p>Học kỳ: {selectedRow?.semester}</p>
-                <Tabs defaultActiveKey="1">
-                  <TabPane tab="Đã đóng" key="1">
-                    {renderFeeList(selectedRow?.paidFees || [], true)}
-                  </TabPane>
-                  <TabPane tab="Chưa đóng" key="2">
-                    {renderFeeList(selectedRow?.unpaidFees || [], false)}
-                  </TabPane>
-                </Tabs>
-              </Card>
-            ) : (
-              <p>Vui lòng chọn một sinh viên để xem thông tin hóa đơn</p>
-            )}
+          <div className="info">
+            <div className="student-filter">
+              <Title level={5}>Danh sách sinh viên</Title>
+              <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
+                <div className="mb-2 md:mb-0">
+                  <Text>Ngành học</Text>
+                  <Select
+                    className="ml-2 w-full md:w-64"
+                    value={selectedDepartment}
+                    onChange={(value) => setSelectedDepartment(value)}
+                    options={[
+                      { value: "all", label: "Tất cả" },
+                      {
+                        value: "Khoa Công Nghệ Thông Tin",
+                        label: "Khoa Công Nghệ Thông Tin",
+                      },
+                      { value: "Khoa Anh", label: "Khoa Anh" },
+                      { value: "Khoa Toán", label: "Khoa Toán" },
+                    ]}
+                  />
+                </div>
+                <div className="mb-2 md:mb-0">
+                  <Text>Mã sinh viên</Text>
+                  <Input
+                    className="ml-2 w-full md:w-64"
+                    value={studentIdFilter}
+                    onChange={(e) => setStudentIdFilter(e.target.value)}
+                    placeholder="Nhập mã sinh viên"
+                  />
+                </div>
+                <div className="mb-2 md:mb-0">
+                  <Text>Học kỳ</Text>
+                  <Select
+                    className="ml-2 w-full md:w-64"
+                    value={selectedSemester}
+                    onChange={(value) => setSelectedSemester(value)}
+                    options={[
+                      { value: "all", label: "Tất cả" },
+                      { value: "HK1", label: "Học kỳ 1" },
+                      { value: "HK2", label: "Học kỳ 2" },
+                      { value: "HK3", label: "Học kỳ 3" },
+                      { value: "HK4", label: "Học kỳ 4" },
+                      { value: "HK5", label: "Học kỳ 5" },
+                      { value: "HK6", label: "Học kỳ 6" },
+                    ]}
+                  />
+                </div>
+              </div>
+              <Table
+                columns={stuColumns}
+                dataSource={filteredStudents.map((student) => ({
+                  ...student,
+                  id: encodeStudentId(student.id),
+                }))}
+                pagination={{ pageSize: 10 }}
+                scroll={{ y: 240 }}
+                onRow={(record) => ({
+                  onClick: () =>
+                    handleRowClick({
+                      ...record,
+                      id: decodeStudentId(record.id),
+                    }),
+                })}
+              />
+            </div>
+            <div className="payment-info">
+              <Title level={5}>Thông tin hóa đơn</Title>
+              {selectedStudentID ? (
+                <Card title={`Thông tin sinh viên: ${selectedRow?.name}`}>
+                  <p>Mã sinh viên: {selectedStudentID}</p>
+                  <p>Khoa: {selectedRow?.faculty}</p>
+                  <p>Học kỳ: {selectedRow?.semester}</p>
+                  <Tabs defaultActiveKey="1">
+                    <TabPane tab="Đã đóng" key="1">
+                      {renderFeeList(selectedRow?.paidFees || [], true)}
+                    </TabPane>
+                    <TabPane tab="Chưa đóng" key="2">
+                      {renderFeeList(selectedRow?.unpaidFees || [], false)}
+                    </TabPane>
+                  </Tabs>
+                </Card>
+              ) : (
+                <p>Vui lòng chọn một sinh viên để xem thông tin hóa đơn</p>
+              )}
+            </div>
           </div>
         </div>
       </div>

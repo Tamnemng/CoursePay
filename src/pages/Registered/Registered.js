@@ -6,6 +6,7 @@ import "./Registered.css";
 import { getStudentCourses } from "../../data/studentData";
 import { deleteRegisteredCourse } from "../../data/studentData";
 import { decreaseEnrolled } from "../../data/subjects";
+import Nav from "../../components/Nav";
 
 export default function Registered() {
   const [courses, setCourses] = useState([]);
@@ -93,18 +94,21 @@ export default function Registered() {
   ];
 
   return (
-    <div className="registered-container">
-      <Header />
-      <div className="registered">
-        <h1>Các Học Phần Đã Đăng Ký</h1>
-        <div className="table-container">
-          <Table
-            className="displayer"
-            dataSource={courses}
-            columns={columns}
-            rowKey="key"
-            loading={loading}
-          />
+    <div className="registered-container !flex !flex-col">
+      <Nav />
+      <div className="flex">
+        <Header />
+        <div className="registered">
+          <h1>Các Học Phần Đã Đăng Ký</h1>
+          <div className="table-container">
+            <Table
+              className="displayer"
+              dataSource={courses}
+              columns={columns}
+              rowKey="key"
+              loading={loading}
+            />
+          </div>
         </div>
       </div>
     </div>

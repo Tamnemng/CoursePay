@@ -18,6 +18,7 @@ import {
   editFeeForStudents,
   addCreditBasedFeeToStudents,
 } from "../../data/TuitionData";
+import Nav from "../../components/Nav";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -291,22 +292,25 @@ export default function TuitionMajor() {
   ];
 
   return (
-    <div className="tuitionMajor-container flex">
-      <div>
-        <Header />
-      </div>
-      <div className="tuitionMajor">
-        <div className="tl">
-          <Title level={3}>Học Phí Học Kỳ</Title>
+    <div className="tuitionMajor-container flex !flex-col">
+      <Nav />
+      <div className="flex">
+        <div>
+          <Header />
         </div>
-        <div className="w-full">
-          <Tabs defaultActiveKey="1" items={items}></Tabs>
-        </div>
-        <div className="tl">
-          <Title level={3}>Danh Sách Học Phí</Title>
-        </div>
-        <div className="tbl">
-          <Table rowKey="id" dataSource={fees} columns={columns} />
+        <div className="tuitionMajor">
+          <div className="tl">
+            <Title level={3}>Học Phí Học Kỳ</Title>
+          </div>
+          <div className="w-full">
+            <Tabs defaultActiveKey="1" items={items}></Tabs>
+          </div>
+          <div className="tl">
+            <Title level={3}>Danh Sách Học Phí</Title>
+          </div>
+          <div className="tbl">
+            <Table rowKey="id" dataSource={fees} columns={columns} />
+          </div>
         </div>
       </div>
     </div>

@@ -34,6 +34,7 @@ import {
 } from "../../../data/subjects";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
+import Nav from "../../../components/Nav";
 
 export default function MajorSubjectChangeDetail() {
   const { id } = useParams();
@@ -652,10 +653,13 @@ export default function MajorSubjectChangeDetail() {
   ];
 
   return (
-    <div className="flex">
-      <Header />
-      <div className="text-3xl my-4 grow flex flex-col">
-        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+    <div className="flex flex-col">
+      <Nav />
+      <div className="flex">
+        <Header />
+        <div className="text-3xl my-4 grow flex flex-col">
+          <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+        </div>
       </div>
     </div>
   );

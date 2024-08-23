@@ -7,15 +7,20 @@ import { login, getUserRole } from "./loggingData";
 
 export default function Logging() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState(1);
 
   useEffect(() => {
     localStorage.setItem("isAuthenticated", "false");
     localStorage.removeItem("role");
-    console.log("Initial isAuthenticated:", localStorage.getItem("isAuthenticated"));
+    console.log(
+      "Initial isAuthenticated:",
+      localStorage.getItem("isAuthenticated")
+    );
   }, []);
 
   const onFinish = async (values) => {
+    setLoading(true);
     try {
       const result = await login(values.email, values.password);
 
@@ -30,13 +35,16 @@ export default function Logging() {
 
           switch (userRole) {
             case 1:
-              navigate("/tuition/pay");
+              // navigate("/tuition/pay");
+              window.location.pathname = "/tuition/pay";
               break;
             case 2:
-              navigate("/generalSubjectChange");
+              // navigate("/generalSubjectChange");
+              window.location.pathname = "/generalSubjectChange";
               break;
             case 3:
-              navigate("/tuitionMain");
+              // navigate("/tuitionMain");
+              window.location.pathname = "/tuitionMain";
               break;
             default:
               message.error("Vai trò không hợp lệ");
@@ -50,6 +58,7 @@ export default function Logging() {
     } catch (error) {
       message.error("Lỗi khi đăng nhập: " + error.message);
     }
+    setLoading(false);
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -97,7 +106,7 @@ export default function Logging() {
               />
             </Form.Item>
             <Form.Item>
-              <Button type="primary" className="input-button" htmlType="submit">
+              <Button type="primary" className="input-button" htmlType="submit" disabled={loading}>
                 Đăng nhập
               </Button>
             </Form.Item>

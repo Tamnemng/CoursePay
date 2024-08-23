@@ -18,11 +18,11 @@ const items = [
     icon: <BankOutlined />,
     label: "Môn chuyên ngành",
   },
-  {
-    key: "logout",
-    label: "Đăng Xuất",
-    icon: <PoweroffOutlined />,
-  },
+  // {
+  //   key: "logout",
+  //   label: "Đăng Xuất",
+  //   icon: <PoweroffOutlined />,
+  // },
 ];
 
 const getLevelKeys = (items1) => {
