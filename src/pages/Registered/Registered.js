@@ -7,12 +7,10 @@ import { getStudentCourses } from "../../data/studentData";
 import { deleteRegisteredCourse, getStudentInfo } from "../../data/studentData";
 import { decreaseEnrolled } from "../../data/subjects";
 import Nav from "../../components/Nav";
-<<<<<<< HEAD
+
 import "jspdf-autotable";
 
 import ArialUnicodeMS from '../../data/Roboto-Regular.ttf';
-=======
->>>>>>> a95f40d2d3e60cc99870b789bfdd33e0fbb7bdb5
 
 export default function Registered() {
   const [courses, setCourses] = useState([]);
@@ -58,41 +56,6 @@ export default function Registered() {
     }
   };
 
-<<<<<<< HEAD
-  const handleExportPDF = () => {
-    const doc = new jsPDF();
-
-    doc.addFont(ArialUnicodeMS, "ArialUnicodeMS", "normal");
-    
-    doc.setFont("ArialUnicodeMS");
-    doc.setFontSize(18);
-
-    doc.text("Phiếu Đăng Ký Môn Học", 20, 20);
-
-    doc.setFontSize(12);
-    doc.text(`Mã số sinh viên: ` + info.id, 20, 30);
-    doc.text(`Họ và tên: ` + info.name, 20, 40);
-    doc.text(`Ngày đăng ký: ${moment().format("DD/MM/YYYY")}`, 20, 50);
-    doc.text(`Học kỳ: ` + info.semester, 20, 60);
-
-    doc.autoTable({
-      startY: 70,
-      head: [["STT", "Mã môn học", "Tên môn học", "Số tín chỉ"]],
-      body: courses.map((course, index) => [
-        index + 1,
-        course.key,
-        course.name,
-        course.credits,
-      ]),
-      styles: { font: "ArialUnicodeMS"},
-      headStyles: { fontStyle: "bold", fillColor: [200, 200, 200], textColor: 20 },
-    });
-
-    doc.save("phieu_dang_ky_mon_hoc.pdf");
-  };
-  
-=======
->>>>>>> a95f40d2d3e60cc99870b789bfdd33e0fbb7bdb5
   const columns = [
     {
       title: "Tên Môn Học",
