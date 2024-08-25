@@ -24,12 +24,10 @@ const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
 const isCreditBased = (feeId) => {
-  // Giả sử bạn xác định học phí tín chỉ dựa vào một điều kiện cụ thể
-  return feeId.startsWith("credit_");
+  return feeId.startsWith("feee_");
 };
 
 const extractCredits = (feeName) => {
-  // Giả sử tên học phí có định dạng "Tên môn - [Số tín chỉ]"
   const match = feeName.match(/\[(\d+)\]/);
   if (match) {
     return parseInt(match[1], 10);
@@ -221,7 +219,7 @@ export default function TuitionMajor() {
         <div className="frm">
           <Title level={4}>Chi Tiết Học Phí</Title>
           <div className="ops">
-            <Text>Mã Học Phí: </Text>
+            <Text>Tên Học Phí: </Text>
             <Input
               style={{
                 width: "30%",
