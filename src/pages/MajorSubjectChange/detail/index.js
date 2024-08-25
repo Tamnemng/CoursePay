@@ -452,7 +452,7 @@ export default function MajorSubjectChangeDetail() {
                 Thông tin học phần
               </h2>
             </div>
-            <Button type="primary" onClick={showModalCreate}>
+            <Button type="primary" onClick={() => {navigate(-1)}}>
               <ArrowLeftOutlined /> Trở về
             </Button>
           </div>

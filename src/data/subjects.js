@@ -738,6 +738,7 @@ export const updateGeneralSubject = async (subjectId, updatedSubjectData) => {
     const updatedData = {
       name: updatedSubjectData.name,
       credits: updatedSubjectData.credits,
+      faculty: updatedSubjectData.faculty,
       classSections: currentSubjectData.classSections || "", // Preserve existing class sections
     };
 
