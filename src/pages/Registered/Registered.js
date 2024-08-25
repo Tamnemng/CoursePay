@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Header from "../../components/Header";
-import { Table, Button } from "antd";
+import { Table } from "antd";
 import moment from "moment";
-import jsPDF from "jspdf";
 import "./Registered.css";
 import { getStudentCourses } from "../../data/studentData";
 import { deleteRegisteredCourse, getStudentInfo } from "../../data/studentData";
 import { decreaseEnrolled } from "../../data/subjects";
 import Nav from "../../components/Nav";
+<<<<<<< HEAD
 import "jspdf-autotable";
 
 import ArialUnicodeMS from '../../data/Roboto-Regular.ttf';
+=======
+>>>>>>> a95f40d2d3e60cc99870b789bfdd33e0fbb7bdb5
 
 export default function Registered() {
   const [courses, setCourses] = useState([]);
@@ -56,6 +58,7 @@ export default function Registered() {
     }
   };
 
+<<<<<<< HEAD
   const handleExportPDF = () => {
     const doc = new jsPDF();
 
@@ -88,6 +91,8 @@ export default function Registered() {
     doc.save("phieu_dang_ky_mon_hoc.pdf");
   };
   
+=======
+>>>>>>> a95f40d2d3e60cc99870b789bfdd33e0fbb7bdb5
   const columns = [
     {
       title: "Tên Môn Học",
@@ -147,11 +152,6 @@ export default function Registered() {
               rowKey="key"
               loading={loading}
             />
-          </div>
-          <div className="flex justify-end mx-10">
-            <Button className="w-fit" type="primary" onClick={handleExportPDF}>
-              Xuất phiếu đăng ký
-            </Button>
           </div>
         </div>
       </div>
