@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Header from "../../components/Header";
-import { Table } from "antd";
+import { Table, Button } from "antd";
 import moment from "moment";
+import jsPDF from "jspdf";
 import "./Registered.css";
 import { getStudentCourses } from "../../data/studentData";
 import { deleteRegisteredCourse } from "../../data/studentData";
 import { decreaseEnrolled } from "../../data/subjects";
 import Nav from "../../components/Nav";
+import "jspdf-autotable";
+import robotoFont from "../Roboto-Regular";
 
 export default function Registered() {
   const [courses, setCourses] = useState([]);
@@ -49,6 +52,39 @@ export default function Registered() {
     }
   };
 
+
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+
+    // Add custom font
+    doc.addFileToVFS("Roboto-Regular.ttf", robotoFont);
+    doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+    doc.setFont("Roboto");
+
+    doc.setFontSize(18);
+    doc.text("Phiếu Đăng Ký Môn Học", 20, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Mã số sinh viên: `, 20, 30);
+    doc.text(`Họ và tên: `, 20, 40);
+    doc.text(`Ngày đăng ký: ${moment().format("DD/MM/YYYY")}`, 20, 50);
+    doc.text(`Học kỳ: `, 20, 60);
+
+    doc.autoTable({
+      startY: 70,
+      head: [["STT", "Mã môn học", "Tên môn học", "Số tín chỉ"]],
+      body: courses.map((course, index) => [
+        index + 1,
+        course.key,
+        course.name,
+        course.credits,
+      ]),
+    });
+
+    doc.save("phieu_dang_ky_mon_hoc.pdf");
+  };
+  
   const columns = [
     {
       title: "Tên Môn Học",
@@ -108,6 +144,11 @@ export default function Registered() {
               rowKey="key"
               loading={loading}
             />
+          </div>
+          <div className="flex justify-end mx-10">
+            <Button className="w-fit" type="primary" onClick={handleExportPDF}>
+              Xuất phiếu đăng ký
+            </Button>
           </div>
         </div>
       </div>
