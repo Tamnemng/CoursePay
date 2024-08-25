@@ -5,14 +5,16 @@ import moment from "moment";
 import jsPDF from "jspdf";
 import "./Registered.css";
 import { getStudentCourses } from "../../data/studentData";
-import { deleteRegisteredCourse } from "../../data/studentData";
+import { deleteRegisteredCourse, getStudentInfo } from "../../data/studentData";
 import { decreaseEnrolled } from "../../data/subjects";
 import Nav from "../../components/Nav";
 import "jspdf-autotable";
-import robotoFont from "../Roboto-Regular";
+
+import ArialUnicodeMS from '../../data/Roboto-Regular.ttf';
 
 export default function Registered() {
   const [courses, setCourses] = useState([]);
+  const [info, setInfo] = useState();
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -30,6 +32,8 @@ export default function Registered() {
       } else {
         setCourses([]);
       }
+      const res = await getStudentInfo();
+      setInfo(res);
     } catch (err) {
       console.error("Error fetching data:", err);
       setCourses([]);
@@ -52,24 +56,21 @@ export default function Registered() {
     }
   };
 
-
-
   const handleExportPDF = () => {
     const doc = new jsPDF();
 
-    // Add custom font
-    doc.addFileToVFS("Roboto-Regular.ttf", robotoFont);
-    doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-    doc.setFont("Roboto");
-
+    doc.addFont(ArialUnicodeMS, "ArialUnicodeMS", "normal");
+    
+    doc.setFont("ArialUnicodeMS");
     doc.setFontSize(18);
+
     doc.text("Phiếu Đăng Ký Môn Học", 20, 20);
 
     doc.setFontSize(12);
-    doc.text(`Mã số sinh viên: `, 20, 30);
-    doc.text(`Họ và tên: `, 20, 40);
+    doc.text(`Mã số sinh viên: ` + info.id, 20, 30);
+    doc.text(`Họ và tên: ` + info.name, 20, 40);
     doc.text(`Ngày đăng ký: ${moment().format("DD/MM/YYYY")}`, 20, 50);
-    doc.text(`Học kỳ: `, 20, 60);
+    doc.text(`Học kỳ: ` + info.semester, 20, 60);
 
     doc.autoTable({
       startY: 70,
@@ -80,6 +81,8 @@ export default function Registered() {
         course.name,
         course.credits,
       ]),
+      styles: { font: "ArialUnicodeMS"},
+      headStyles: { fontStyle: "bold", fillColor: [200, 200, 200], textColor: 20 },
     });
 
     doc.save("phieu_dang_ky_mon_hoc.pdf");
