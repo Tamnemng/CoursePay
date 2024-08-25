@@ -27,6 +27,10 @@ const columns = [
     title: "Ngày Thanh Toán",
     dataIndex: "paymentDate",
     key: "paymentDate",
+    render: (paymentDate) => {
+      const date = new Date(paymentDate);
+      return date.toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    },
   },
 ];
 
