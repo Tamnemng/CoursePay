@@ -2,12 +2,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import moment from "moment";
 import Header from "../../components/Header";
 import { Table, message } from "antd";
+import { CloudDownloadOutlined } from "@ant-design/icons";
 import "./History.css";
 import { getStudentPaid, getStudentInfo } from "../../data/studentData";
 import Nav from "../../components/Nav";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import ArialUnicodeMS from '../../data/Roboto-Regular.ttf';
+import ArialUnicodeMS from "../../data/Roboto-Regular.ttf";
 
 export default function History() {
   const [paidFees, setPaidFees] = useState([]);
@@ -50,14 +51,24 @@ export default function History() {
     doc.setFontSize(18);
     doc.text("Hóa Đơn", 20, 20);
     doc.setFontSize(12);
-    doc.text(`Mã số sinh viên: ${info.id || ''}`, 20, 30);
-    doc.text(`Họ và tên: ${info.name || ''}`, 20, 40);
-    doc.text(`Học kỳ: ${info.semester || ''}`, 20, 60);
+    doc.text(`Mã số sinh viên: ${info.id || ""}`, 20, 30);
+    doc.text(`Họ và tên: ${info.name || ""}`, 20, 40);
+    doc.text(`Học kỳ: ${info.semester || ""}`, 20, 60);
 
-    doc.text(`Mã hóa đơn: ${fee.id || ''}`, 20, 70);
-    doc.text(`Tên Phí: ${fee.name || ''}`, 20, 80);
-    doc.text(`Khoản tiền thanh toán: ${parseInt(fee.amount).toLocaleString("vi-VN")} VNĐ`, 20, 90);
-    doc.text(`Ngày thanh toán: ${moment(fee.paymentDate).format("DD/MM/YYYY")}`, 20, 100);
+    doc.text(`Mã hóa đơn: ${fee.id || ""}`, 20, 70);
+    doc.text(`Tên Phí: ${fee.name || ""}`, 20, 80);
+    doc.text(
+      `Khoản tiền thanh toán: ${parseInt(fee.amount).toLocaleString(
+        "vi-VN"
+      )} VNĐ`,
+      20,
+      90
+    );
+    doc.text(
+      `Ngày thanh toán: ${moment(fee.paymentDate).format("DD/MM/YYYY")}`,
+      20,
+      100
+    );
     doc.save("phieu_hoa_don.pdf");
   };
 
@@ -84,18 +95,22 @@ export default function History() {
       key: "paymentDate",
       render: (paymentDate) => {
         const date = new Date(paymentDate);
-        return date.toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        return date.toLocaleDateString("vi-VN", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
       },
     },
     {
       title: "Xuất Hóa Đơn",
       render: (_, record) => (
         <a className="text-blue-500" onClick={() => handleExportPDF(record)}>
-          In
+          <CloudDownloadOutlined /> Tải xuống
         </a>
       ),
       className: "action-column",
-    }
+    },
   ];
 
   return (
