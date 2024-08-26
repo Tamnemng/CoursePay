@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Header from "../../components/Header";
 import { Button, Table } from "antd";
+import { FilePdfOutlined } from "@ant-design/icons";
 import moment from "moment";
 import jsPDF from "jspdf";
 import "./Registered.css";
@@ -10,7 +11,7 @@ import { decreaseEnrolled } from "../../data/subjects";
 import Nav from "../../components/Nav";
 import "jspdf-autotable";
 
-import ArialUnicodeMS from '../../data/Roboto-Regular.ttf';
+import ArialUnicodeMS from "../../data/Roboto-Regular.ttf";
 
 export default function Registered() {
   const [courses, setCourses] = useState([]);
@@ -60,7 +61,7 @@ export default function Registered() {
     const doc = new jsPDF();
 
     doc.addFont(ArialUnicodeMS, "ArialUnicodeMS", "normal");
-    
+
     doc.setFont("ArialUnicodeMS");
     doc.setFontSize(18);
 
@@ -81,13 +82,17 @@ export default function Registered() {
         course.name,
         course.credits,
       ]),
-      styles: { font: "ArialUnicodeMS"},
-      headStyles: { fontStyle: "bold", fillColor: [200, 200, 200], textColor: 20 },
+      styles: { font: "ArialUnicodeMS" },
+      headStyles: {
+        fontStyle: "bold",
+        fillColor: [200, 200, 200],
+        textColor: 20,
+      },
     });
 
     doc.save("phieu_dang_ky_mon_hoc.pdf");
   };
-  
+
   const columns = [
     {
       title: "Tên Môn Học",
@@ -150,7 +155,7 @@ export default function Registered() {
           </div>
           <div className="flex justify-end mx-10">
             <Button className="w-fit" type="primary" onClick={handleExportPDF}>
-              Xuất phiếu đăng ký
+              <FilePdfOutlined /> Xuất phiếu đăng ký
             </Button>
           </div>
         </div>
