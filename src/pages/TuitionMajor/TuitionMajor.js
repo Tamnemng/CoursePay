@@ -243,17 +243,6 @@ export default function TuitionMajor() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
-            <Text>Học Kỳ: </Text>
-            <Select
-              style={{ width: "200px", marginLeft: "10px" }}
-              value={semester}
-              onChange={(value) => setSemester(value)}
-            >
-              <Select.Option value="">Tất Cả</Select.Option>
-              <Select.Option value="HK1">HK1</Select.Option>
-              <Select.Option value="HK2">HK2</Select.Option>
-              <Select.Option value="HK3">HK3</Select.Option>
-            </Select>
           </div>
           <Button type="primary" onClick={handleAddFee}>
             Thêm Học Phí Cố Định
